@@ -75,7 +75,7 @@ void drawBuffer() {
   pg.beginDraw();
   pg.background(255);
   calculateLoginLine();
-  //drawLoginLine();
+  drawLoginLine();
 
   for (DataObjectAd i : dataObjectsAd) {
     i.findTarget();

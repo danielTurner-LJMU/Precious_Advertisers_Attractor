@@ -50,3 +50,12 @@ void drawOverlays() {
   strokeWeight(1);
   line(guiWidth, 0, guiWidth, height);
 }
+
+void keyPressed(){
+  
+ 
+  if(key == 's' || key == 'S'){
+    println("saving");
+    pg.save("x - output/test.tif");
+  }
+}

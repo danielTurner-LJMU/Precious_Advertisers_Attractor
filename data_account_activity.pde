@@ -60,9 +60,10 @@ class DataObjectLogin
 
   //Target Properties
 
-  PVector location = new PVector(0,0);
+  PVector location = new PVector(0, 0);
   float attraction;
   boolean active = true;
+  boolean hideMe = false;
 
   float r; //radius of shape
 
@@ -95,6 +96,19 @@ class DataObjectLogin
   }
 
   void update() {
+    long minDateVal = (long) cp5.getController("timeRange").getArrayValue(0);
+    long maxDateVal = (long) cp5.getController("timeRange").getArrayValue(1);
+    
+    //hide and deactivate if the data is outside the date range
+    if (timeStamp < minDateVal || timeStamp > maxDateVal) {
+      active = false;
+      hideMe = true;
+      //println(ID + "hiding");
+    } else {
+      hideMe = false;
+    }
+
+
     zeroDate = timeStamp - startDate;
     location.x = ((zeroDate%dateCut)*dateScale) + loginLineX1;
     location.y = (int(zeroDate/dateCut)*rowGap)+yOffset;
@@ -102,14 +116,20 @@ class DataObjectLogin
 
   void drawLogin() {
 
-     if (active) {
+    if (active) {
       pg.fill(250, 106, 248);
     } else {
       pg.fill(150);
     }
-    
-    pg.noStroke();
-    pg.circle(location.x, location.y, r);
+
+    if (hideMe) {
+      pg.fill(0, 0, 248);
+    }
+
+    if (!hideMe) {
+      pg.noStroke();
+      pg.circle(location.x, location.y, r);
+    }
   }
 }
 
@@ -133,6 +153,7 @@ void drawLoginLine() {
 
   //Lines require offseting to centre vertically
   yOffset = border+(rowGap/2);
+  pg.stroke(0);
   //draw guide lines
   for (int i = 0; i < numRows; i++) {
     float yBasePos = i*rowGap;
