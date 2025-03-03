@@ -10,7 +10,7 @@ PGraphics pgPDF; //PDF PGraphic - used to save PDF version of design
 PGraphics pg;
 
 //Used to check if a buffer has been created
-boolean bufferCreated = false; 
+boolean bufferCreated = false;
 
 //Used to update drawing on buffer. set to false when a button is pressed
 Boolean shapesDrawn = false;
@@ -55,16 +55,16 @@ void createImageBuffer(float printX, float printY) {
   } else {
     imScale = (float)(width-guiWidth)/pg.width;
   }
-  
+
   imageMode(CENTER);
-  
+
   //initialise the DataObjectAds
-  for(DataObjectAd i : dataObjectsAd){
+  for (DataObjectAd i : dataObjectsAd) {
     i.initDraw();
   }
-  
+
   //initialise the DataObjectLogins
-  for(DataObjectLogin i : dataObjectsLogin){
+  for (DataObjectLogin i : dataObjectsLogin) {
     i.initDraw();
   }
 }
@@ -75,13 +75,17 @@ void drawBuffer() {
   pg.beginDraw();
   pg.background(255);
   calculateLoginLine();
-  drawLoginLine();
-  for(DataObjectLogin i : dataObjectsLogin){
+  //drawLoginLine();
+
+  for (DataObjectAd i : dataObjectsAd) {
+    i.findTarget();
+    i.update();
+    i.drawAd();
+  }
+  for (DataObjectLogin i : dataObjectsLogin) {
+    i.activate();
     i.update();
     i.drawLogin();
-  }
-  for(DataObjectAd i : dataObjectsAd){
-    i.drawAd();
   }
   //for (int y = 0; y < pg.height; y+= 50) {
   //  for (int x = 0; x < pg.width; x+= 50) {

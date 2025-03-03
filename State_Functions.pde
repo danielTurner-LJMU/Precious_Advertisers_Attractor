@@ -129,10 +129,10 @@ void draw1() {
   //*** a sub-process that draw only when it is updated makes more sense
   //*** from a performance viewpoint.
   if (bufferCreated) {
-    if(!shapesDrawn){
+    //if(!shapesDrawn){
     drawBuffer(); //draws to offscreen buffer
     shapesDrawn = true;
-    }
+    //}
     
     drawPreview(); //copies offscreen buffer to the stage
   }
