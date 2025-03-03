@@ -157,6 +157,6 @@ void drawLoginLine() {
   //draw guide lines
   for (int i = 0; i < numRows; i++) {
     float yBasePos = i*rowGap;
-    pg.line(loginLineX1, yBasePos + yOffset, loginLineX2, yBasePos + yOffset);
+    //pg.line(loginLineX1, yBasePos + yOffset, loginLineX2, yBasePos + yOffset);
   }
 }
