@@ -9,6 +9,9 @@ JSONArray advertisers;
 //-------- OBJECT CREATION ----------//
 DataObjectAd[] dataObjectsAd;
 
+boolean drawTail = true;
+int historyLength = 300;
+
 void loadDataAd() {
 
   //compile path to required data file and load
@@ -47,6 +50,7 @@ class DataObjectAd
   int ID;
   String mySiteName;
   boolean drawMe;
+
 
   //Vehicle Properties for Advertisers
   //array to store vectors of past locations
@@ -95,8 +99,13 @@ class DataObjectAd
     acceleration.mult(0);
 
     history.add(location.get());
-    if (history.size() > 300) {
-      history.remove(0);
+    if (history.size() > historyLength) {
+      int range = history.size() - historyLength;
+      for (int i = 0; i < range; i++) {
+        if (i < history.size()) {
+          history.remove(i);
+        }
+      }
     }
   }
 
@@ -147,19 +156,21 @@ class DataObjectAd
 
   void drawAd() {
 
-    pg.beginShape();
+    if (drawTail) {
+      pg.beginShape();
 
-    pg.stroke(myColor);
-    pg.strokeWeight(1);//strokeThick);
-    pg.noFill();
-    //int step = ceil(strokeThick/2);
-    //println(step);
-    //for (PVector v : history) {
-    for (int i = 0; i < history.size(); i++) {//i+=step){
-      PVector v = history.get(i);
-      pg.vertex(v.x, v.y);//curveVertex(v.x, v.y);
+      pg.stroke(myColor);
+      pg.strokeWeight(1);//strokeThick);
+      pg.noFill();
+      //int step = ceil(strokeThick/2);
+      //println(step);
+      //for (PVector v : history) {
+      for (int i = 0; i < history.size(); i++) {//i+=step){
+        PVector v = history.get(i);
+        pg.vertex(v.x, v.y);//curveVertex(v.x, v.y);
+      }
+      pg.endShape();
     }
-    pg.endShape();
 
     float theta = velocity.heading() + PI/2;
 
@@ -170,7 +181,7 @@ class DataObjectAd
     pg.rotate(theta);
     //pg.beginShape();
     pg.line(-r, -r, r, r);//vertex(0, -r*2);
-     pg.line(r, -r, -r, r);
+    pg.line(r, -r, -r, r);
     //pg.vertex(-r, r*2);
     //pg.vertex(r, r*2);
     //pg.endShape(CLOSE);

@@ -107,10 +107,30 @@ void initProgramControls(int baseX, int baseY) {
     .setSize(300, 20)
     .setRange(1, 500)
     .setValue(border);
-    ;
+  ;
 
   styleMain("border");
-  
+
+  // create a toggle and change the default look to a (on/off) switch look
+  cp5.addToggle("drawTail")
+    .setLabel("DRAW LINES")
+    .setPosition(baseX, baseY + cSpaceY * 1.5)
+    .setSize(50, 20)
+    .setValue(true)
+    .setMode(ControlP5.SWITCH)
+    ;
+  styleMain("drawTail");
+
+  cp5.addSlider("historyLength")
+    .setLabel("LINE LENGTH")
+    .setPosition(baseX, baseY + cSpaceY * 2)
+    .setSize(300, 20)
+    .setRange(30, 500)
+    .setValue(historyLength);
+  ;
+
+  styleMain("historyLength");
+
   cp5.addBang("generate")
     .setLabel("GENERATE")
     .setPosition(baseX, baseY + cSpaceY * 6)
@@ -261,6 +281,8 @@ void styleMain(String theControllerName) {
   c.getCaptionLabel().setSize(14);
   c.getValueLabel().setColor(cBlack);
   c.getValueLabel().setSize(14);
+  
+
 }
 
 
