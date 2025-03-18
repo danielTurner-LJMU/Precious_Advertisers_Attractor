@@ -113,7 +113,7 @@ void initProgramControls(int baseX, int baseY) {
   styleMain("border");
 
 
- cp5.addSlider("historyLength")
+  cp5.addSlider("historyLength")
     .setLabel("LINE LENGTH")
     .setPosition(baseX, baseY + cSpaceY * 1.75)
     .setSize(300, 20)
@@ -128,22 +128,41 @@ void initProgramControls(int baseX, int baseY) {
     .setSize(300, 20)
     .setRange(1, 30)
     .setValue(fixedMaxSpeed);
-  ;
+
   styleMain("fixedMaxSpeed");
-  
-    cp5.addSlider("fixedMaxForce")
+
+  cp5.addSlider("fixedMaxForce")
     .setLabel("MAX FORCE")
     .setPosition(baseX, baseY + cSpaceY * 2.25)
     .setSize(300, 20)
     .setRange(0.01, 0.8)
     .setValue(fixedMaxForce);
-  ;
-  styleMain("fixedMaxForce");
   
+  styleMain("fixedMaxForce");
+
+  cp5.addSlider("xScale")
+    .setLabel("X SCALE")
+    .setPosition(baseX, baseY + cSpaceY * 2.5)
+    .setSize(300, 20)
+    .setRange(1, 20)
+    .setValue(xScale);
+
+  styleMain("xScale");
+  
+    cp5.addSlider("xThickness")
+    .setLabel("X WEIGHT")
+    .setPosition(baseX, baseY + cSpaceY * 2.75)
+    .setSize(300, 20)
+    .setRange(1, 30)
+    .setValue(xThickness);
+
+  styleMain("xThickness");
+  
+
   // create a toggle and change the default look to a (on/off) switch look
   cp5.addToggle("drawTail")
     .setLabel("DRAW\nLINES")
-    .setPosition(baseX, baseY + cSpaceY * 2.5)
+    .setPosition(baseX, baseY + cSpaceY * 3)
     .setSize(50, 20)
     .setValue(true)
     .setMode(ControlP5.SWITCH)
@@ -152,16 +171,16 @@ void initProgramControls(int baseX, int baseY) {
 
   cp5.addToggle("fixedSpeed")
     .setLabel("FIXED\nSPEED")
-    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 2.5)
+    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 3)
     .setSize(50, 20)
     //.setValue(true)
     .setMode(ControlP5.SWITCH)
     ;
   styleMain("fixedSpeed");
 
- cp5.addToggle("drawX")
+  cp5.addToggle("drawX")
     .setLabel("DRAW\nX'S")
-    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 2.5)
+    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 3)
     .setSize(50, 20)
     //.setValue(true)
     .setMode(ControlP5.SWITCH)

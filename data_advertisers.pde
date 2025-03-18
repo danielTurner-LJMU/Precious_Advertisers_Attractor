@@ -17,6 +17,8 @@ float fixedMaxSpeed = 8;
 float fixedMaxForce = 0.1;
 
 boolean drawX = true;
+float xScale = 1;
+float xThickness = 1;
 
 void loadDataAd() {
 
@@ -195,19 +197,19 @@ class DataObjectAd
       pg.endShape();
     }
 
-    float theta = velocity.heading() + PI/2;
 
     if (drawX) {
+      float theta = velocity.heading() + PI/2;
+      float newR = r * xScale;
       pg.fill(175);
       pg.stroke(myColor);
+      pg.strokeWeight(xThickness);
       pg.pushMatrix();
       pg.translate(location.x, location.y);
       pg.rotate(theta);
-      ;
-      pg.line(-r, -r, r, r);
-      pg.line(r, -r, -r, r);
+      pg.line(-newR, -newR, newR, newR);
+      pg.line(newR, -newR, -newR, newR);
       pg.popMatrix();
     }
-    
   }
 }
