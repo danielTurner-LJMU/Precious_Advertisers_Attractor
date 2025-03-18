@@ -83,8 +83,8 @@ void drawBuffer() {
     i.drawAd();
   }
   for (DataObjectLogin i : dataObjectsLogin) {
-    i.activate();
     i.update();
+    i.activate();
     i.drawLogin();
   }
   //for (int y = 0; y < pg.height; y+= 50) {

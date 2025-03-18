@@ -112,10 +112,38 @@ void initProgramControls(int baseX, int baseY) {
 
   styleMain("border");
 
+
+ cp5.addSlider("historyLength")
+    .setLabel("LINE LENGTH")
+    .setPosition(baseX, baseY + cSpaceY * 1.75)
+    .setSize(300, 20)
+    .setRange(30, 500)
+    .setValue(historyLength);
+  ;
+  styleMain("historyLength");
+
+  cp5.addSlider("fixedMaxSpeed")
+    .setLabel("MAX SPEED")
+    .setPosition(baseX, baseY + cSpaceY * 2)
+    .setSize(300, 20)
+    .setRange(1, 30)
+    .setValue(fixedMaxSpeed);
+  ;
+  styleMain("fixedMaxSpeed");
+  
+    cp5.addSlider("fixedMaxForce")
+    .setLabel("MAX FORCE")
+    .setPosition(baseX, baseY + cSpaceY * 2.25)
+    .setSize(300, 20)
+    .setRange(0.01, 0.8)
+    .setValue(fixedMaxForce);
+  ;
+  styleMain("fixedMaxForce");
+  
   // create a toggle and change the default look to a (on/off) switch look
   cp5.addToggle("drawTail")
     .setLabel("DRAW LINES")
-    .setPosition(baseX, baseY + cSpaceY * 1.5)
+    .setPosition(baseX, baseY + cSpaceY * 2.5)
     .setSize(50, 20)
     .setValue(true)
     .setMode(ControlP5.SWITCH)
@@ -124,32 +152,14 @@ void initProgramControls(int baseX, int baseY) {
 
   cp5.addToggle("fixedSpeed")
     .setLabel("FIXED MOVEMENT SPEED")
-    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 1.5)
+    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 2.5)
     .setSize(50, 20)
     //.setValue(true)
     .setMode(ControlP5.SWITCH)
     ;
   styleMain("fixedSpeed");
 
-  cp5.addSlider("historyLength")
-    .setLabel("LINE LENGTH")
-    .setPosition(baseX, baseY + cSpaceY * 2)
-    .setSize(300, 20)
-    .setRange(30, 500)
-    .setValue(historyLength);
-  ;
-
-  styleMain("historyLength");
-
-  cp5.addSlider("fixedMaxSpeed")
-    .setLabel("MAX SPEED")
-    .setPosition(baseX, baseY + cSpaceY * 2.25)
-    .setSize(300, 20)
-    .setRange(1, 30)
-    .setValue(fixedMaxSpeed);
-  ;
-
-  styleMain("fixedMaxSpeed");
+ 
 
 
   cp5.addBang("generate")
@@ -275,7 +285,7 @@ void controlEvent(ControlEvent theEvent) {
   }
 
 
-  if (theEvent.isFrom("fixedMaxSpeed")) {
+  if (theEvent.isFrom("fixedMaxSpeed")||theEvent.isFrom("fixedMaxForce")) {
     for (DataObjectAd i : dataObjectsAd) {
       i.changeSpeed();
     }

@@ -87,18 +87,23 @@ class DataObjectLogin
 
   void activate() {
 
-    float value = random(1);
-    //println(value);
-    if (value > targetActivateChance) {
-      active = !active;
-      attraction = random(1, 100);
+    if (!hideMe) {
+      float value = random(1);
+      //println(value);
+
+      if (value > targetActivateChance) {
+        active = !active;
+        attraction = random(1, 100);
+      }
+    } else {
+      active = false;
     }
   }
 
   void update() {
     long minDateVal = (long) cp5.getController("timeRange").getArrayValue(0);
     long maxDateVal = (long) cp5.getController("timeRange").getArrayValue(1);
-    
+
     //hide and deactivate if the data is outside the date range
     if (timeStamp < minDateVal || timeStamp > maxDateVal) {
       active = false;
@@ -116,6 +121,14 @@ class DataObjectLogin
 
   void drawLogin() {
 
+    if (!hideMe) {
+      pg.strokeWeight(0.5);
+
+      pg.stroke(0);
+      pg.noFill();
+      pg.circle(location.x, location.y, r+10);
+    }
+
     if (active) {
       pg.fill(250, 106, 248);
     } else {
@@ -127,6 +140,7 @@ class DataObjectLogin
     }
 
     if (!hideMe) {
+
       pg.noStroke();
       pg.circle(location.x, location.y, r);
     }

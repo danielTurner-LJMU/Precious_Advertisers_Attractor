@@ -114,10 +114,10 @@ class DataObjectAd
       maxSpeed = myMaxSpeed;
       maxForce = myMaxForce;
     }
-    
+
     //println(ID + " - " + maxSpeed);
   }
-  
+
   void update() {
     velocity.add(acceleration);
     velocity.limit(maxSpeed);
@@ -139,30 +139,26 @@ class DataObjectAd
 
     float distance = 99999;
     float tempDist = 99999;
-    DataObjectLogin t = dataObjectsLogin[0];//targets.get(0);
+    DataObjectLogin t = dataObjectsLogin[0];
 
     for (DataObjectLogin i : dataObjectsLogin) {
 
-      //println("target No = " + i.ID;
       if (i.active) {
         tempDist = PVector.dist(location, i.location);
       }
-      if (distance == 99999) {
+
+      if (tempDist < distance) {
         distance = tempDist;
-      } else {
-
-        if (tempDist < distance) {
-
-          //println("ACTIVE = " + i.ID + " tempDist = " + tempDist);
-          distance = tempDist;
-          t = i;
-        }
+        t = i;
       }
     }
 
-    seek(t.location);
-    //maxForce = t.attraction*0.001;
-    //println(t.ID);
+    if (tempDist == 99999) { //if no active targets are available
+      seek(new PVector(pg.width/2, pg.height/2));
+    } else {
+      seek(t.location);
+    }
+
   }
 
   void seek(PVector target) {
@@ -174,6 +170,7 @@ class DataObjectAd
     steer.limit(maxForce);
 
     applyForce(steer);
+
   }
 
   void applyForce(PVector force) {
@@ -201,7 +198,7 @@ class DataObjectAd
     float theta = velocity.heading() + PI/2;
 
     pg.fill(175);
-    pg.stroke(0);
+    pg.stroke(myColor);
     pg.pushMatrix();
     pg.translate(location.x, location.y);
     pg.rotate(theta);
