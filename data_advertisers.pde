@@ -16,6 +16,8 @@ boolean fixedSpeed = false;
 float fixedMaxSpeed = 8;
 float fixedMaxForce = 0.1;
 
+boolean drawX = true;
+
 void loadDataAd() {
 
   //compile path to required data file and load
@@ -158,7 +160,6 @@ class DataObjectAd
     } else {
       seek(t.location);
     }
-
   }
 
   void seek(PVector target) {
@@ -170,7 +171,6 @@ class DataObjectAd
     steer.limit(maxForce);
 
     applyForce(steer);
-
   }
 
   void applyForce(PVector force) {
@@ -197,23 +197,17 @@ class DataObjectAd
 
     float theta = velocity.heading() + PI/2;
 
-    pg.fill(175);
-    pg.stroke(myColor);
-    pg.pushMatrix();
-    pg.translate(location.x, location.y);
-    pg.rotate(theta);
-    //pg.beginShape();
-    pg.line(-r, -r, r, r);//vertex(0, -r*2);
-    pg.line(r, -r, -r, r);
-    //pg.vertex(-r, r*2);
-    //pg.vertex(r, r*2);
-    //pg.endShape(CLOSE);
-    pg.popMatrix();
-
-    //pg.pushMatrix();
-    //pg.translate(posX, posY);
-    //pg.line(-15, -15, 15, 15);
-    //pg.line(15, -15, -15, 15);
-    //pg.popMatrix();
+    if (drawX) {
+      pg.fill(175);
+      pg.stroke(myColor);
+      pg.pushMatrix();
+      pg.translate(location.x, location.y);
+      pg.rotate(theta);
+      ;
+      pg.line(-r, -r, r, r);
+      pg.line(r, -r, -r, r);
+      pg.popMatrix();
+    }
+    
   }
 }

@@ -17,7 +17,7 @@ color cNothing = color(0, 0, 0);
 
 //Spacers
 int cSpaceY = 100;
-int cSpaceX = 100;
+int cSpaceX = 60;
 
 PFont headerFont, subFont, labelFont14, labelFont18, labelFontMono;
 ControlFont cp5FontGaramond, cp5FontInconsolata;
@@ -142,7 +142,7 @@ void initProgramControls(int baseX, int baseY) {
   
   // create a toggle and change the default look to a (on/off) switch look
   cp5.addToggle("drawTail")
-    .setLabel("DRAW LINES")
+    .setLabel("DRAW\nLINES")
     .setPosition(baseX, baseY + cSpaceY * 2.5)
     .setSize(50, 20)
     .setValue(true)
@@ -151,7 +151,7 @@ void initProgramControls(int baseX, int baseY) {
   styleMain("drawTail");
 
   cp5.addToggle("fixedSpeed")
-    .setLabel("FIXED MOVEMENT SPEED")
+    .setLabel("FIXED\nSPEED")
     .setPosition(baseX + cSpaceX, baseY + cSpaceY * 2.5)
     .setSize(50, 20)
     //.setValue(true)
@@ -159,7 +159,14 @@ void initProgramControls(int baseX, int baseY) {
     ;
   styleMain("fixedSpeed");
 
- 
+ cp5.addToggle("drawX")
+    .setLabel("DRAW\nX'S")
+    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 2.5)
+    .setSize(50, 20)
+    //.setValue(true)
+    .setMode(ControlP5.SWITCH)
+    ;
+  styleMain("drawX");
 
 
   cp5.addBang("generate")
