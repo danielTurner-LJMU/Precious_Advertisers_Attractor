@@ -17,6 +17,7 @@ color cNothing = color(0, 0, 0);
 
 //Spacers
 int cSpaceY = 100;
+int cSpaceX = 100;
 
 PFont headerFont, subFont, labelFont14, labelFont18, labelFontMono;
 ControlFont cp5FontGaramond, cp5FontInconsolata;
@@ -121,6 +122,15 @@ void initProgramControls(int baseX, int baseY) {
     ;
   styleMain("drawTail");
 
+  cp5.addToggle("fixedSpeed")
+    .setLabel("FIXED MOVEMENT SPEED")
+    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 1.5)
+    .setSize(50, 20)
+    //.setValue(true)
+    .setMode(ControlP5.SWITCH)
+    ;
+  styleMain("fixedSpeed");
+
   cp5.addSlider("historyLength")
     .setLabel("LINE LENGTH")
     .setPosition(baseX, baseY + cSpaceY * 2)
@@ -130,6 +140,17 @@ void initProgramControls(int baseX, int baseY) {
   ;
 
   styleMain("historyLength");
+
+  cp5.addSlider("fixedMaxSpeed")
+    .setLabel("MAX SPEED")
+    .setPosition(baseX, baseY + cSpaceY * 2.25)
+    .setSize(300, 20)
+    .setRange(1, 30)
+    .setValue(fixedMaxSpeed);
+  ;
+
+  styleMain("fixedMaxSpeed");
+
 
   cp5.addBang("generate")
     .setLabel("GENERATE")
@@ -252,7 +273,25 @@ void controlEvent(ControlEvent theEvent) {
     endDate = int(theEvent.getController().getArrayValue(1));
     //println(dateSpread);
   }
+
+
+  if (theEvent.isFrom("fixedMaxSpeed")) {
+    for (DataObjectAd i : dataObjectsAd) {
+      i.changeSpeed();
+    }
+  }
 }
+
+void fixedSpeed() {
+
+  fixedSpeed = !fixedSpeed;
+
+  for (DataObjectAd i : dataObjectsAd) {
+    i.changeSpeed();
+  }
+}
+
+
 
 void showController(String theControllerName, boolean show) {
 
@@ -281,8 +320,6 @@ void styleMain(String theControllerName) {
   c.getCaptionLabel().setSize(14);
   c.getValueLabel().setColor(cBlack);
   c.getValueLabel().setSize(14);
-  
-
 }
 
 

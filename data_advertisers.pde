@@ -12,6 +12,10 @@ DataObjectAd[] dataObjectsAd;
 boolean drawTail = true;
 int historyLength = 300;
 
+boolean fixedSpeed = false;
+float fixedMaxSpeed = 8;
+float fixedMaxForce = 0.1;
+
 void loadDataAd() {
 
   //compile path to required data file and load
@@ -61,6 +65,8 @@ class DataObjectAd
   PVector acceleration;
   float maxSpeed;
   float maxForce;
+  float myMaxSpeed;
+  float myMaxForce;
 
   float r; //radius of shape
 
@@ -84,14 +90,34 @@ class DataObjectAd
 
     acceleration = new PVector(0, 0);
     velocity = new PVector(0, 0);
-    maxSpeed = 8;
-    maxForce = 0.1;
+    myMaxSpeed = random(4, 15);
+    myMaxForce = random(0.01, 0.1);
+
+    maxSpeed = myMaxSpeed;
+    maxForce = myMaxForce;
 
     r = 5.0;
 
     myColor = #000000;
+
+    //clear the arraylist storing previous points
+    history.clear();
     //println("initialised" + ID);
   }
+
+  void changeSpeed() {
+
+    if (fixedSpeed) {
+      maxSpeed = fixedMaxSpeed;
+      maxForce = fixedMaxForce;
+    } else {
+      maxSpeed = myMaxSpeed;
+      maxForce = myMaxForce;
+    }
+    
+    //println(ID + " - " + maxSpeed);
+  }
+  
   void update() {
     velocity.add(acceleration);
     velocity.limit(maxSpeed);

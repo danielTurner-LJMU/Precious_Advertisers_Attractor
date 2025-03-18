@@ -1,6 +1,6 @@
 String title = "Precious Advertisers"; //use this to set the window title
 
-int guiWidth = 500; //stores the rigth edge location of the GUI area
+int guiWidth = 500; //stores the right edge location of the GUI area
 
 void setup() {
 
@@ -29,6 +29,7 @@ void draw() {
 
   fill(255);
   text(state, width-20, height-20);
+
 }
 
 void resizeCanvas(int w, int h) {
