@@ -8,7 +8,6 @@ void setup() {
   //if their location is outside the initial stage size
   size(1920, 1080);
   startState();
- 
 }
 
 void draw() {
@@ -29,7 +28,6 @@ void draw() {
 
   fill(255);
   text(state, width-20, height-20);
-
 }
 
 void resizeCanvas(int w, int h) {
@@ -52,11 +50,31 @@ void drawOverlays() {
   line(guiWidth, 0, guiWidth, height);
 }
 
-void keyPressed(){
-  
- 
-  if(key == 's' || key == 'S'){
+void keyPressed() {
+
+
+  if (key == 's' || key == 'S') {
     println("saving");
     pg.save("x - output/test.tif");
   }
+}
+
+void mousePressed() {
+
+  if (state == 1) {
+    if ((mouseX > guiWidth) && (mouseX < width) && (mouseY > 0) && (mouseY < height)) {
+      dragEnabled = true;
+      float tempX = mouseX - dragOffsetX;
+      float tempY = mouseY - dragOffsetY ;
+      dragStartLoc = new PVector(tempX, tempY);
+    }
+  }
+}
+
+void mouseReleased() {
+  
+  if (state == 1) {
+    dragEnabled = false;
+  }
+  
 }

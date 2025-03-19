@@ -17,6 +17,7 @@ Boolean shapesDrawn = false;
 
 //scale factor for drawing preview to stage
 float imScale;
+float imScaleStored;
 
 //Array containing various print sizes @300dpi in pixels
 PVector[] printSize = {
@@ -29,6 +30,10 @@ PVector[] printSize = {
 
 //store the centre of the image preview area
 float previewCentreX, previewCentreY;
+float dragOffsetX = 0;
+float dragOffsetY = 0;
+boolean dragEnabled = false;
+PVector dragStartLoc;
 
 //-------------------------------------------------------------//
 
@@ -55,6 +60,11 @@ void createImageBuffer(float printX, float printY) {
   } else {
     imScale = (float)(width-guiWidth)/pg.width;
   }
+
+  //stores 'full screen' scale for the selected print size
+  //used to centre preview image after it has been dragged around.
+  //when zoomed out it triggers a reset of the drag Offset.
+  imScaleStored = imScale;
 
   imageMode(CENTER);
 
@@ -99,13 +109,29 @@ void drawBuffer() {
   pg.endDraw();
 }
 
+void calculatePreviewOffset() {
+
+  dragOffsetX = mouseX - dragStartLoc.x;
+  dragOffsetY = mouseY - dragStartLoc.y;
+}
+
 void drawPreview() {
 
+  //set scale value to match imScale
+  Controller c = cp5.getController("imScale");
 
+  if (c.getValue() <= imScaleStored) {
+    dragOffsetX = dragOffsetX * 0.6;
+    dragOffsetY = dragOffsetY * 0.6;
+  }
+
+  if (dragEnabled) {
+    calculatePreviewOffset();
+  }
   //println(imScale);
 
   pushMatrix();
-  translate(previewCentreX, previewCentreY);
+  translate(previewCentreX + dragOffsetX, previewCentreY + dragOffsetY);
   scale(imScale);
   image(pg, 0, 0);
   popMatrix();
