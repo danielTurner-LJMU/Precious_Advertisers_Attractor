@@ -87,10 +87,16 @@ void drawBuffer() {
   calculateLoginLine();
   drawLoginLine();
 
+  //find vertical centre of font
+  float textCentre = (textDescent() + textAscent())*0.5;
+  //Might have to be adjusted as ascent/descent maybe not reported correctly
+  float scalar = 0.8;
+  textCentre *= scalar;
+
   for (DataObjectAd i : dataObjectsAd) {
     i.findTarget();
     i.update();
-    i.drawAd();
+    i.drawAd(textCentre);
   }
   for (DataObjectLogin i : dataObjectsLogin) {
     i.update();

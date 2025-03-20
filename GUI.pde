@@ -187,7 +187,16 @@ void initProgramControls(int baseX, int baseY) {
     ;
   styleMain("drawX");
 
-
+  cp5.addToggle("drawAdNames")
+    .setLabel("DRAW\nADVERTISER\nNAMES")
+    .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 3)
+    .setSize(50, 20)
+    //.setValue(true)
+    .setMode(ControlP5.SWITCH)
+    ;
+  styleMain("drawAdNames");
+  
+  
   cp5.addBang("generate")
     .setLabel("GENERATE")
     .setPosition(baseX, baseY + cSpaceY * 6)

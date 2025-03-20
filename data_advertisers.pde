@@ -20,6 +20,8 @@ boolean drawX = true;
 float xScale = 1;
 float xThickness = 1;
 
+boolean drawAdNames = false;
+
 void loadDataAd() {
 
   //compile path to required data file and load
@@ -179,7 +181,7 @@ class DataObjectAd
     acceleration.add(force);
   }
 
-  void drawAd() {
+  void drawAd(float textCentreY) {
 
     if (drawTail) {
       pg.beginShape();
@@ -201,6 +203,7 @@ class DataObjectAd
     if (drawX) {
       float theta = velocity.heading() + PI/2;
       float newR = r * xScale;
+      float newR2 = newR*2;
       pg.fill(175);
       pg.stroke(myColor);
       pg.strokeWeight(xThickness);
@@ -209,6 +212,10 @@ class DataObjectAd
       pg.rotate(theta);
       pg.line(-newR, -newR, newR, newR);
       pg.line(newR, -newR, -newR, newR);
+      if (drawAdNames) {
+        pg.rotate(-theta);
+        pg.text(mySiteName, sqrt(newR2*newR2)-(newR/4), textCentreY);
+      }
       pg.popMatrix();
     }
   }
