@@ -192,7 +192,7 @@ void initProgramControls(int baseX, int baseY) {
     .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 3)
     .setSize(50, 20)
     //.setValue(true)
-    .setMode(ControlP5.SWITCH)
+    //.setMode(ControlP5.SWITCH)
     ;
   styleMain("drawAdNames");
   
