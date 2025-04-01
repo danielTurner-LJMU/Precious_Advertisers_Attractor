@@ -148,35 +148,3 @@ class DataObjectLogin
     }
   }
 }
-
-void calculateLoginLine() {
-
-  //calculate spacing between rows
-  rowGap = (pg.height-(borderAsPixels*2))/numRows;
-
-  loginLineX1 = borderAsPixels;
-  loginLineX2 = pg.width - borderAsPixels;
-
-  lineLength = loginLineX2 - loginLineX1;
-  totalLineLength = lineLength * numRows;
-
-  dateSpread = endDate - startDate;
-  dateScale = totalLineLength/dateSpread;
-  dateCut = dateSpread/numRows;
-  
-  //Lines require offseting to centre vertically
-  yOffset = borderAsPixels+(rowGap/2);
-  
-}
-
-void drawLoginLine() {
-
-  //Lines require offseting to centre vertically
- // yOffset = border+(rowGap/2);
-  pg.stroke(0);
-  //draw guide lines
-  for (int i = 0; i < numRows; i++) {
-    float yBasePos = i*rowGap;
-    pg.line(loginLineX1, yBasePos + yOffset, loginLineX2, yBasePos + yOffset);
-  }
-}

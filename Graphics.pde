@@ -81,13 +81,15 @@ void createImageBuffer(float printX, float printY) {
 
 void drawBuffer() {
 
+  calculateBorder();
+  calculateLoginLine();
 
   pg.beginDraw();
   pg.background(255);
-  calculateBorder();
-  calculateLoginLine();
-  //drawLoginLine();
+  drawLoginLine();
+  drawDates();
 
+  pg.textSize(10); //reset text size
   //find vertical centre of font
   float textCentre = (textDescent() + textAscent())*0.5;
   //Might have to be adjusted as ascent/descent maybe not reported correctly
@@ -104,25 +106,88 @@ void drawBuffer() {
     i.activate();
     i.drawLogin();
   }
-  //for (int y = 0; y < pg.height; y+= 50) {
-  //  for (int x = 0; x < pg.width; x+= 50) {
-  //    pg.pushMatrix();
-  //    pg.translate(25, 25);
-  //    pg.line(x-15, y-15, x+15, y+15);
-  //    pg.line(x+15, y-15, x-15, y+15);
-  //    pg.popMatrix();
-  //  }
-  //}
+
   pg.endDraw();
 }
 
 //border controller sets the border size as percentage of buffer size
 //this function converts the percentage to a pixel number based on
 //the size of the current buffer image
-void calculateBorder(){
-  
+void calculateBorder() {
+
   borderAsPixels = (pg.width/100) * border;
-  
+}
+
+//Login activity is drawn along a line that is spread
+//across numerous rows. (to visualise this line uncomment 'drawLoginLine())
+//This function calculates the length of each individual line and
+//the gap between the rows. The variables calculated here are used to position
+//the login objects.
+void calculateLoginLine() {
+
+  //calculate spacing between rows
+  rowGap = (pg.height-(borderAsPixels*2))/numRows;
+
+  loginLineX1 = borderAsPixels;
+  loginLineX2 = pg.width - borderAsPixels;
+
+  lineLength = loginLineX2 - loginLineX1;
+  totalLineLength = lineLength * numRows;
+
+  dateSpread = endDate - startDate;
+  dateScale = totalLineLength/dateSpread;
+  dateCut = dateSpread/numRows;
+
+  //Lines require offseting to centre vertically
+  yOffset = borderAsPixels+(rowGap/2);
+}
+
+void drawLoginLine() {
+
+  pg.stroke(0);
+  //draw guide lines
+  for (int i = 0; i < numRows; i++) {
+    float yBasePos = i*rowGap;
+    pg.line(loginLineX1, yBasePos + yOffset, loginLineX2, yBasePos + yOffset);
+  }
+}
+
+//Draws the start and end dates represented by the overall date line
+void drawDates() {
+
+  //convert timestamps to dates
+  Date firstDate = convertDate(startDate);
+  Date secondDate = convertDate(endDate);
+
+  //length of line drawn fro date marker
+  int lineLength = 40;
+
+  //y position of the end of the full date line
+  float y2 = ((numRows-1)*rowGap)+yOffset;
+
+  pg.textFont(subFont);
+  pg.textSize(14);
+  pg.fill(0);
+  pg.stroke(0);
+
+  //draw dates and corresponding lines
+  String date = firstDate.toString();
+  pg.line(borderAsPixels, yOffset, borderAsPixels, yOffset - lineLength);
+  pg.text(date, borderAsPixels + 10, yOffset - (lineLength-pg.textAscent()));
+
+  date = secondDate.toString();
+  pg.textAlign(RIGHT);
+  pg.line(loginLineX2, y2, loginLineX2, y2 + lineLength);
+  pg.text(date, loginLineX2 - 10, y2 + lineLength);
+
+  //reset text alignment
+  pg.textAlign(LEFT);
+}
+
+Date convertDate(long timestamp) {
+
+  Date date = new Date(timestamp*1000);
+  return(date);
 }
 
 void calculatePreviewOffset() {
@@ -131,11 +196,18 @@ void calculatePreviewOffset() {
   dragOffsetY = mouseY - dragStartLoc.y;
 }
 
+
+
+
+
 void drawPreview() {
 
   //set scale value to match imScale
   Controller c = cp5.getController("imScale");
 
+  //Each paper size has a different scale value where it shows the entire piece.
+  //If the preview scale (zoom) is sufficient to show the whole image, this function
+  //re-centres the preview by reducing the drag offset.
   if (c.getValue() <= imScaleStored) {
     dragOffsetX = dragOffsetX * 0.6;
     dragOffsetY = dragOffsetY * 0.6;
@@ -144,13 +216,10 @@ void drawPreview() {
   if (dragEnabled) {
     calculatePreviewOffset();
   }
-  //println(imScale);
 
   pushMatrix();
   translate(previewCentreX + dragOffsetX, previewCentreY + dragOffsetY);
   scale(imScale);
   image(pg, 0, 0);
   popMatrix();
-
-  //println("drawing");
 }
