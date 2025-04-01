@@ -39,6 +39,12 @@ void extractDataLogin() {
   accountActivity = dataFileLogin.getJSONArray("account_activity_v2");
   dataObjectsLogin = new DataObjectLogin[accountActivity.size()];
 
+  /*The lines below extract the 'key' names from the individual JSON objects.
+   It uses object 1 from the JSON array as a template */
+  JSONObject accActivity1 = accountActivity.getJSONObject(0);
+  String[] myKeys = (String[]) accActivity1.keys().toArray(new String[accActivity1.size()]);
+  printArray(myKeys);
+
   for (int i = 0; i < accountActivity.size(); i++) {
     JSONObject thisActivity = accountActivity.getJSONObject(i);
     String action = thisActivity.getString("action");

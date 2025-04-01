@@ -86,7 +86,7 @@ void drawBuffer() {
 
   pg.beginDraw();
   pg.background(255);
-  drawLoginLine();
+  //drawLoginLine();
   drawDates();
 
   pg.textSize(10); //reset text size
