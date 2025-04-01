@@ -106,7 +106,7 @@ void initProgramControls(int baseX, int baseY) {
     .setLabel("BORDER")
     .setPosition(baseX, baseY + cSpaceY * 1.25)
     .setSize(300, 20)
-    .setRange(1, 500)
+    .setRange(1, 40)
     .setValue(border);
   ;
 

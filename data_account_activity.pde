@@ -10,7 +10,9 @@ long dateSpread; //total distance bewteen dates
 float dateCut; //modulo operator for working out line return
 float dateScale; //scale factor converting date spread to line length
 
-float border = 100;
+float border = 10;
+float borderAsPixels = 0;
+
 int numRows = 10;
 float rowGap;
 float yOffset;
@@ -150,10 +152,10 @@ class DataObjectLogin
 void calculateLoginLine() {
 
   //calculate spacing between rows
-  rowGap = (pg.height-(border*2))/numRows;
+  rowGap = (pg.height-(borderAsPixels*2))/numRows;
 
-  loginLineX1 = border;
-  loginLineX2 = pg.width - border;
+  loginLineX1 = borderAsPixels;
+  loginLineX2 = pg.width - borderAsPixels;
 
   lineLength = loginLineX2 - loginLineX1;
   totalLineLength = lineLength * numRows;
@@ -161,16 +163,20 @@ void calculateLoginLine() {
   dateSpread = endDate - startDate;
   dateScale = totalLineLength/dateSpread;
   dateCut = dateSpread/numRows;
+  
+  //Lines require offseting to centre vertically
+  yOffset = borderAsPixels+(rowGap/2);
+  
 }
 
 void drawLoginLine() {
 
   //Lines require offseting to centre vertically
-  yOffset = border+(rowGap/2);
+ // yOffset = border+(rowGap/2);
   pg.stroke(0);
   //draw guide lines
   for (int i = 0; i < numRows; i++) {
     float yBasePos = i*rowGap;
-    //pg.line(loginLineX1, yBasePos + yOffset, loginLineX2, yBasePos + yOffset);
+    pg.line(loginLineX1, yBasePos + yOffset, loginLineX2, yBasePos + yOffset);
   }
 }

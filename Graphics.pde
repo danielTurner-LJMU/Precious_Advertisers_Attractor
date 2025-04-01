@@ -84,8 +84,9 @@ void drawBuffer() {
 
   pg.beginDraw();
   pg.background(255);
+  calculateBorder();
   calculateLoginLine();
-  drawLoginLine();
+  //drawLoginLine();
 
   //find vertical centre of font
   float textCentre = (textDescent() + textAscent())*0.5;
@@ -113,6 +114,15 @@ void drawBuffer() {
   //  }
   //}
   pg.endDraw();
+}
+
+//border controller sets the border size as percentage of buffer size
+//this function converts the percentage to a pixel number based on
+//the size of the current buffer image
+void calculateBorder(){
+  
+  borderAsPixels = (pg.width/100) * border;
+  
 }
 
 void calculatePreviewOffset() {

@@ -26,23 +26,22 @@ void draw() {
     // ...
   }
 
-  fill(255);
-  text(state, width-20, height-20);
+  //debug marker - writes current state number to screen
+  //fill(255);
+  //text(state, width-20, height-20);
 }
 
+//resize and centre canvas
 void resizeCanvas(int w, int h) {
 
   int windowX = (displayWidth - w)/2;
   int windowY = (displayHeight - h)/2;
 
-  //println(displayWidth);
-  //println("locx = " + windowX + "\nlocy = " + windowY);
-
   windowResize(w, h);
   surface.setLocation(windowX, windowY);
 }
 
-//common overaly graphics e..g line between controls and preview
+//common overaly graphics e.g. line between controls and preview
 void drawOverlays() {
 
   stroke(255);
@@ -61,6 +60,7 @@ void keyPressed() {
 
 void mousePressed() {
 
+  //collect mouse info for dragging around preview image when zoomed in
   if (state == 1) {
     if ((mouseX > guiWidth) && (mouseX < width) && (mouseY > 0) && (mouseY < height)) {
       dragEnabled = true;
@@ -72,9 +72,9 @@ void mousePressed() {
 }
 
 void mouseReleased() {
-  
+
+  //cancel mouse dragging
   if (state == 1) {
     dragEnabled = false;
   }
-  
 }
