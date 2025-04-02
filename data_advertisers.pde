@@ -35,6 +35,15 @@ void loadDataAd() {
 
 void extractDataAd() {
 
+  //--------------------------------------------------//
+  ///////**** individual entry 'keys'****//////////
+
+  //    "advertiser_name": "Naked Wines UK",
+  //    "has_data_file_custom_audience": true,
+  //    "has_remarketing_custom_audience": false,
+  //    "has_in_person_store_visit": false
+  //--------------------------------------------------//
+
   /*The line below extracts the 'key' names from the JSON object.
    this is a way of finding all the arrays within this object without
    having to manually trawl through the file. As we can only access the data
@@ -49,7 +58,10 @@ void extractDataAd() {
   for (int i = 0; i < advertisers.size(); i++) {
     JSONObject thisAdvertiser = advertisers.getJSONObject(i);
     String advertiserName = thisAdvertiser.getString("advertiser_name");
-    dataObjectsAd[i] = new DataObjectAd(i, advertiserName);
+    Boolean visit = thisAdvertiser.getBoolean("has_in_person_store_visit");
+    Boolean remarket = thisAdvertiser.getBoolean("has_remarketing_custom_audience");
+    Boolean hasCustomerFile = thisAdvertiser.getBoolean("has_data_file_custom_audience");
+    dataObjectsAd[i] = new DataObjectAd(i, advertiserName, visit, remarket, hasCustomerFile);
     //println(advertiserName);
   }
 }
@@ -60,6 +72,9 @@ class DataObjectAd
 {
   int ID;
   String mySiteName;
+  boolean myVisit;
+  boolean myRemarket;
+  boolean myCustomerFile;
   boolean drawMe;
 
 
@@ -80,10 +95,13 @@ class DataObjectAd
   color myColor;
 
 
-  DataObjectAd(int id, String siteName) {
+  DataObjectAd(int id, String siteName, boolean visit, boolean remarket, boolean customerFile) {
 
     ID = id;
     mySiteName = siteName;
+    myVisit = visit;
+    myRemarket = remarket;
+    myCustomerFile = customerFile;
 
     drawMe = false;
   }
@@ -105,7 +123,12 @@ class DataObjectAd
 
     r = 5.0;
 
-    myColor = #000000;
+    if ((myVisit)||(myRemarket)) {
+      myColor = color(255, 0, 0);
+    } else {
+
+      myColor = #000000;
+    }
 
     //clear the arraylist storing previous points
     history.clear();
@@ -221,6 +244,13 @@ class DataObjectAd
       pg.rotate(theta);
       pg.line(-newR, -newR, newR, newR);
       pg.line(newR, -newR, -newR, newR);
+      //if (myCustomerFile) {
+      //  pg.stroke(255);
+      //  pg.strokeWeight(xThickness/10);
+      //  pg.line(-newR/2, -newR/2, newR/2, newR/2);
+      //  pg.line(newR/2, -newR/2, -newR/2, newR/2);
+      //}
+      //stroke(0);
       if (drawAdNames) {
         pg.rotate(-theta);
         pg.text(mySiteName, sqrt(newR2*newR2)-(newR/4), textCentreY);
