@@ -17,6 +17,7 @@ float fixedMaxSpeed = 8;
 float fixedMaxForce = 0.1;
 
 boolean drawX = true;
+boolean sqCaps = false;
 float xScale = 1;
 float xThickness = 1;
 
@@ -204,9 +205,17 @@ class DataObjectAd
       float theta = velocity.heading() + PI/2;
       float newR = r * xScale;
       float newR2 = newR*2;
+
+      //-------- Move These to main draw loop to set once - i.e. rather than for every object-------/////
+      if (sqCaps) {
+        pg.strokeCap(SQUARE);
+      } else {
+        pg.strokeCap(ROUND);
+      }
       pg.fill(175);
       pg.stroke(myColor);
       pg.strokeWeight(xThickness);
+      //----------------------------------------------------------------------------------/////
       pg.pushMatrix();
       pg.translate(location.x, location.y);
       pg.rotate(theta);

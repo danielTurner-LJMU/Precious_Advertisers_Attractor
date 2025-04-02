@@ -165,7 +165,7 @@ void initProgramControls(int baseX, int baseY) {
     .setPosition(baseX, baseY + cSpaceY * 3)
     .setSize(50, 20)
     .setValue(true)
-    .setMode(ControlP5.SWITCH)
+    //.setMode(ControlP5.SWITCH)
     ;
   styleMain("drawTail");
 
@@ -174,7 +174,7 @@ void initProgramControls(int baseX, int baseY) {
     .setPosition(baseX + cSpaceX, baseY + cSpaceY * 3)
     .setSize(50, 20)
     //.setValue(true)
-    .setMode(ControlP5.SWITCH)
+    //.setMode(ControlP5.SWITCH)
     ;
   styleMain("fixedSpeed");
 
@@ -183,7 +183,7 @@ void initProgramControls(int baseX, int baseY) {
     .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 3)
     .setSize(50, 20)
     //.setValue(true)
-    .setMode(ControlP5.SWITCH)
+    //.setMode(ControlP5.SWITCH)
     ;
   styleMain("drawX");
 
@@ -196,6 +196,14 @@ void initProgramControls(int baseX, int baseY) {
     ;
   styleMain("drawAdNames");
   
+  cp5.addToggle("sqCaps")
+    .setLabel("SQUARE\nCAPS")
+    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 3)
+    .setSize(50, 20)
+    //.setValue(true)
+    //.setMode(ControlP5.SWITCH)
+    ;
+  styleMain("sqCaps");
   
   cp5.addBang("generate")
     .setLabel("GENERATE")

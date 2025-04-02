@@ -95,7 +95,7 @@ void drawBuffer() {
   //Might have to be adjusted as ascent/descent maybe not reported correctly
   float scalar = 0.8;
   textCentre *= scalar;
-
+ 
   for (DataObjectAd i : dataObjectsAd) {
     i.findTarget();
     i.update();
@@ -106,6 +106,8 @@ void drawBuffer() {
     i.activate();
     i.drawLogin();
   }
+
+
 
   pg.endDraw();
 }
@@ -167,18 +169,30 @@ void drawDates() {
 
   pg.textFont(subFont);
   pg.textSize(14);
-  pg.fill(0);
+  pg.noFill();
   pg.stroke(0);
+
+  //pg.rectMode(CENTER);
 
   //draw dates and corresponding lines
   String date = firstDate.toString();
-  pg.line(borderAsPixels, yOffset, borderAsPixels, yOffset - lineLength);
-  pg.text(date, borderAsPixels + 10, yOffset - (lineLength-pg.textAscent()));
+  pg.pushMatrix();
+  pg.translate(borderAsPixels, yOffset);
+  pg.line(0, -5, 0, -lineLength);
+  pg.square(-5, -5, 10);
+  pg.fill(0);
+  pg.text(date, 10, -lineLength + pg.textAscent());
+  pg.popMatrix();
 
+  pg.noFill();
   date = secondDate.toString();
   pg.textAlign(RIGHT);
-  pg.line(loginLineX2, y2, loginLineX2, y2 + lineLength);
-  pg.text(date, loginLineX2 - 10, y2 + lineLength);
+  pg.pushMatrix();
+  pg.translate(loginLineX2, y2);
+  pg.line(0, 5, 0, lineLength);
+  pg.square(-5, -5, 10);
+  pg.text(date, -10, lineLength);
+  pg.popMatrix();
 
   //reset text alignment
   pg.textAlign(LEFT);
