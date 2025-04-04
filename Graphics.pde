@@ -15,6 +15,9 @@ boolean bufferCreated = false;
 //Used to update drawing on buffer. set to false when a button is pressed
 Boolean shapesDrawn = false;
 
+//pause updates on objects
+boolean pauseMotion = false;
+
 //scale factor for drawing preview to stage
 float imScale;
 float imScaleStored;
@@ -92,16 +95,20 @@ void drawBuffer() {
   pg.textSize(10); //reset text size
   //find vertical centre of font
   float textCentre = (textDescent() + textAscent())*0.5;
-  //Might have to be adjusted as ascent/descent maybe not reported correctly
+  //ascent/descent maybe not reported correctly so the scalare lets us adjust for this
   float scalar = 0.8;
   textCentre *= scalar;
- 
+
   for (DataObjectAd i : dataObjectsAd) {
-    i.findTarget();
-    i.update();
+    if (!pauseMotion) {
+      i.findTarget();
+      i.update();
+    }
     i.drawAd(textCentre);
   }
+
   for (DataObjectLogin i : dataObjectsLogin) {
+
     i.update();
     i.activate();
     i.drawLogin();

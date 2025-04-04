@@ -67,7 +67,7 @@ void initIntroControls() {
 ///////******* This is where all software controllers are created *******//////
 ///////******* Should be updated for each program *******//////
 void initProgramControls(int baseX, int baseY) {
-
+  
   cp5.addSlider("imScale")
     .setLabel("SCALE")
     .setPosition(baseX, baseY + cSpaceY * 0.5)
@@ -173,8 +173,6 @@ void initProgramControls(int baseX, int baseY) {
     .setLabel("FIXED\nSPEED")
     .setPosition(baseX + cSpaceX, baseY + cSpaceY * 3)
     .setSize(50, 20)
-    //.setValue(true)
-    //.setMode(ControlP5.SWITCH)
     ;
   styleMain("fixedSpeed");
 
@@ -182,17 +180,13 @@ void initProgramControls(int baseX, int baseY) {
     .setLabel("DRAW\nX'S")
     .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 3)
     .setSize(50, 20)
-    //.setValue(true)
-    //.setMode(ControlP5.SWITCH)
     ;
   styleMain("drawX");
 
   cp5.addToggle("drawAdNames")
-    .setLabel("DRAW\nADVERTISER\nNAMES")
+    .setLabel("DRAW\nADVERT\nNAMES")
     .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 3)
     .setSize(50, 20)
-    //.setValue(true)
-    //.setMode(ControlP5.SWITCH)
     ;
   styleMain("drawAdNames");
   
@@ -200,10 +194,17 @@ void initProgramControls(int baseX, int baseY) {
     .setLabel("SQUARE\nCAPS")
     .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 3)
     .setSize(50, 20)
-    //.setValue(true)
-    //.setMode(ControlP5.SWITCH)
     ;
   styleMain("sqCaps");
+  
+  cp5.addToggle("pauseMotion")
+    .setLabel("PAUSE")
+    .setPosition(baseX, baseY + cSpaceY*3.75)
+    .setSize(100, 40)
+    ;
+  styleMain("pauseMotion");
+  
+  
   
   cp5.addBang("generate")
     .setLabel("GENERATE")
@@ -333,6 +334,7 @@ void controlEvent(ControlEvent theEvent) {
       i.changeSpeed();
     }
   }
+  
 }
 
 void fixedSpeed() {
