@@ -67,7 +67,7 @@ void initIntroControls() {
 ///////******* This is where all software controllers are created *******//////
 ///////******* Should be updated for each program *******//////
 void initProgramControls(int baseX, int baseY) {
-  
+
   cp5.addSlider("imScale")
     .setLabel("SCALE")
     .setPosition(baseX, baseY + cSpaceY * 0.5)
@@ -137,7 +137,7 @@ void initProgramControls(int baseX, int baseY) {
     .setSize(300, 20)
     .setRange(0.01, 0.8)
     .setValue(fixedMaxForce);
-  
+
   styleMain("fixedMaxForce");
 
   cp5.addSlider("xScale")
@@ -148,8 +148,8 @@ void initProgramControls(int baseX, int baseY) {
     .setValue(xScale);
 
   styleMain("xScale");
-  
-    cp5.addSlider("xThickness")
+
+  cp5.addSlider("xThickness")
     .setLabel("X WEIGHT")
     .setPosition(baseX, baseY + cSpaceY * 2.75)
     .setSize(300, 20)
@@ -157,7 +157,7 @@ void initProgramControls(int baseX, int baseY) {
     .setValue(xThickness);
 
   styleMain("xThickness");
-  
+
 
   // create a toggle and change the default look to a (on/off) switch look
   cp5.addToggle("drawTail")
@@ -189,23 +189,49 @@ void initProgramControls(int baseX, int baseY) {
     .setSize(50, 20)
     ;
   styleMain("drawAdNames");
-  
+
   cp5.addToggle("sqCaps")
     .setLabel("SQUARE\nCAPS")
     .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 3)
     .setSize(50, 20)
     ;
   styleMain("sqCaps");
-  
+
   cp5.addToggle("pauseMotion")
     .setLabel("PAUSE")
     .setPosition(baseX, baseY + cSpaceY*3.75)
     .setSize(100, 40)
     ;
   styleMain("pauseMotion");
+
+  //Generate Array of advertiser names
+  String[] advertiserNames = new String[dataObjectsAd.length];
+
+  for (int i = 0; i < advertiserNames.length; i++) {
+    advertiserNames[i] = dataObjectsAd[i].mySiteName;
+    //println(advertiserNames[i]);
+  }
+
+  //convert to List
+  List l = Arrays.asList(advertiserNames);
+
+  //add scrollableList
+  cp5.addScrollableList("advertiserDropDown")
+    .setLabel("ADVERTISERS")
+    .setPosition(baseX + guiWidth, baseY)
+    .setSize(300, 800)
+    .setBarHeight(20)
+    .setItemHeight(20)
+    .addItems(l)
+    //.setType(ScrollableList.LIST) // currently supported DROPDOWN and LIST
+    ;
+
+  styleMain("advertiserDropDown");
   
-  
-  
+  Controller c = cp5.getController("advertiserDropDown");
+
+  c.getCaptionLabel().setColor(cBlack);
+
   cp5.addBang("generate")
     .setLabel("GENERATE")
     .setPosition(baseX, baseY + cSpaceY * 6)
@@ -334,7 +360,6 @@ void controlEvent(ControlEvent theEvent) {
       i.changeSpeed();
     }
   }
-  
 }
 
 void fixedSpeed() {
