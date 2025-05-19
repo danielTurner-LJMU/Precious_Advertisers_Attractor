@@ -104,7 +104,9 @@ void drawBuffer() {
       i.findTarget();
       i.update();
     }
-    i.drawAd(textCentre);
+    if (i.drawMe) {//check if it is selected from toggle list
+      i.drawAd(textCentre);
+    }
   }
 
   for (DataObjectLogin i : dataObjectsLogin) {

@@ -28,6 +28,11 @@ RadioButton rOutputSize;
 
 int printSizeSelect;
 
+//Control Frame - Used for listing all advertiser to toggle on and off
+ControlFrame cf;
+
+boolean controlFrameVisible = false;
+
 /// ---- GUI SETUP AND CONTROL ---- ///
 
 void initGUI() {
@@ -204,6 +209,16 @@ void initProgramControls(int baseX, int baseY) {
     ;
   styleMain("pauseMotion");
 
+  cp5.addToggle("showAdvertisers")
+    .setLabel("HIDE\nADVERTISERS")
+    .setPosition(baseX+ cSpaceX * 2, baseY + cSpaceY*3.75)
+    .setSize(100, 40)
+    .setValue(false);
+  styleMain("showAdvertisers");
+  
+  // Launch control frame
+  cf = new ControlFrame(this, "Control Panel");
+
   //Generate Array of advertiser names
   String[] advertiserNames = new String[dataObjectsAd.length];
 
@@ -215,22 +230,22 @@ void initProgramControls(int baseX, int baseY) {
   //convert to List
   List l = Arrays.asList(advertiserNames);
 
-  //add scrollableList
-  cp5.addScrollableList("advertiserDropDown")
-    .setLabel("ADVERTISERS")
-    .setPosition(baseX + guiWidth, baseY)
-    .setSize(300, 800)
-    .setBarHeight(20)
-    .setItemHeight(20)
-    .addItems(l)
-    //.setType(ScrollableList.LIST) // currently supported DROPDOWN and LIST
-    ;
+  ////add scrollableList
+  //cp5.addScrollableList("advertiserDropDown")
+  //  .setLabel("ADVERTISERS")
+  //  .setPosition(baseX + guiWidth, baseY)
+  //  .setSize(300, 800)
+  //  .setBarHeight(20)
+  //  .setItemHeight(20)
+  //  .addItems(l)
+  //  //.setType(ScrollableList.LIST) // currently supported DROPDOWN and LIST
+  //  ;
 
-  styleMain("advertiserDropDown");
-  
-  Controller c = cp5.getController("advertiserDropDown");
+  //styleMain("advertiserDropDown");
 
-  c.getCaptionLabel().setColor(cBlack);
+  //Controller c = cp5.getController("advertiserDropDown");
+
+  //c.getCaptionLabel().setColor(cBlack);
 
   cp5.addBang("generate")
     .setLabel("GENERATE")
@@ -342,6 +357,8 @@ void confirm() {
 
 void controlEvent(ControlEvent theEvent) {
 
+  Controller c = theEvent.getController();
+
   shapesDrawn = false;
   //print("got an event from "+theEvent.getName()+"\t");
 
@@ -358,6 +375,17 @@ void controlEvent(ControlEvent theEvent) {
   if (theEvent.isFrom("fixedMaxSpeed")||theEvent.isFrom("fixedMaxForce")) {
     for (DataObjectAd i : dataObjectsAd) {
       i.changeSpeed();
+    }
+  }
+
+  if (c != null) {
+    String name = c.getName();
+    if (name != null && name.startsWith("adToggle_")) {
+      int id = c.getId();
+      boolean val = c.getValue() == 1.0;
+      println("ControlFrame toggle " + id + " changed to " + val);
+      // update objects here
+      //dataObjectsAd[id].drawMe = val;
     }
   }
 }
@@ -422,4 +450,11 @@ void styleIntro(String theControllerName, String label, String align) {
   c.getCaptionLabel().setSize(14);
 
   c.getCaptionLabel().setText(label);
+}
+
+public void showAdvertisers(boolean val) {
+  controlFrameVisible = val;
+  if (cf != null && cf.isReady()) {
+    cf.getSurface().setVisible(controlFrameVisible);
+  }
 }
