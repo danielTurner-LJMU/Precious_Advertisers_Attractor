@@ -219,33 +219,6 @@ void initProgramControls(int baseX, int baseY) {
   // Launch control frame
   cf = new ControlFrame(this, "Control Panel");
 
-  //Generate Array of advertiser names
-  String[] advertiserNames = new String[dataObjectsAd.length];
-
-  for (int i = 0; i < advertiserNames.length; i++) {
-    advertiserNames[i] = dataObjectsAd[i].mySiteName;
-    //println(advertiserNames[i]);
-  }
-
-  //convert to List
-  List l = Arrays.asList(advertiserNames);
-
-  ////add scrollableList
-  //cp5.addScrollableList("advertiserDropDown")
-  //  .setLabel("ADVERTISERS")
-  //  .setPosition(baseX + guiWidth, baseY)
-  //  .setSize(300, 800)
-  //  .setBarHeight(20)
-  //  .setItemHeight(20)
-  //  .addItems(l)
-  //  //.setType(ScrollableList.LIST) // currently supported DROPDOWN and LIST
-  //  ;
-
-  //styleMain("advertiserDropDown");
-
-  //Controller c = cp5.getController("advertiserDropDown");
-
-  //c.getCaptionLabel().setColor(cBlack);
 
   cp5.addBang("generate")
     .setLabel("GENERATE")
@@ -385,7 +358,7 @@ void controlEvent(ControlEvent theEvent) {
       boolean val = c.getValue() == 1.0;
       println("ControlFrame toggle " + id + " changed to " + val);
       // update objects here
-      //dataObjectsAd[id].drawMe = val;
+      dataObjectsAd[id].drawMe = val;
     }
   }
 }

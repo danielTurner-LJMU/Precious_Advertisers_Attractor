@@ -5,7 +5,7 @@ class ControlFrame extends PApplet {
   boolean ready = false;
 
   //float scrollOffset = 0;
-  int totalToggles = 200;
+  int totalToggles = dataObjectsAd.length;
   int toggleHeight = 25;
   int visibleHeight = 500;
   int toggleStartY = 40;
@@ -60,10 +60,11 @@ class ControlFrame extends PApplet {
     }
     );
 
+
     // Create 200 toggles and store them
     for (int i = 0; i < totalToggles; i++) {
       String toggleName = "adToggle_" + i;
-      String labelText = "toggle_" + (i + 1); // Labels start at 1
+      String labelText = dataObjectsAd[i].mySiteName; // Labels start at 1
 
       Toggle t = cp5.addToggle(toggleName)
         .setPosition(20, toggleStartY + i * toggleHeight)
