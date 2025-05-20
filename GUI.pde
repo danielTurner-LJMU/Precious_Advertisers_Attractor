@@ -215,7 +215,7 @@ void initProgramControls(int baseX, int baseY) {
     .setSize(100, 40)
     .setValue(false);
   styleMain("showAdvertisers");
-  
+
   // Launch control frame
   cf = new ControlFrame(this, "Control Panel");
 
@@ -330,7 +330,13 @@ void confirm() {
 
 void controlEvent(ControlEvent theEvent) {
 
-  Controller c = theEvent.getController();
+  Controller c;
+
+  //radio buttons for output size throw an error if they are not caught here
+  if (theEvent.isFrom(rOutputSize)) {
+    return;
+  }
+  c = theEvent.getController();
 
   shapesDrawn = false;
   //print("got an event from "+theEvent.getName()+"\t");
