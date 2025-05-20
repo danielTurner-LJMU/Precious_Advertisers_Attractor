@@ -4,17 +4,25 @@ class ControlFrame extends PApplet {
   PApplet parent;
   boolean ready = false;
 
+  //Draggable title bar
+  int dragBarHeight = 30;
+  int windowDragOffsetX, windowDragOffsetY;
+  boolean windowDragging = false;
+  float windowTargetX, windowTargetY;    // Where the window *should* move to, updated on drag
+  float windowCurrentX, windowCurrentY;  // Current window position, updated smoothly toward target
+
+
   //float scrollOffset = 0;
   int totalToggles = dataObjectsAd.length;
   int toggleHeight = 25;
   int visibleHeight = 500;
-  int toggleStartY = 40;
+  int toggleStartY = dragBarHeight + 50;
 
   //scrollbar
   float scrollOffset = 0;
   float scrollTrackX = 370;
-  float scrollTrackY = 40;
-  float scrollTrackHeight = 500;
+  float scrollTrackY = toggleStartY;
+  float scrollTrackHeight = visibleHeight;
 
   float scrollThumbY = scrollTrackY;
   float scrollThumbHeight = 40;
@@ -23,12 +31,6 @@ class ControlFrame extends PApplet {
   float dragOffsetY = 0;
   boolean thumbHovered = false;
 
-  //Draggable title bar
-  int dragBarHeight = 30;
-  int windowDragOffsetX, windowDragOffsetY;
-  boolean windowDragging = false;
-  float windowTargetX, windowTargetY;    // Where the window *should* move to, updated on drag
-  float windowCurrentX, windowCurrentY;  // Current window position, updated smoothly toward target
 
   ControlFrame(PApplet _parent, String name) {
     super();
@@ -42,7 +44,7 @@ class ControlFrame extends PApplet {
 
   public void setup() {
     cp5 = new ControlP5(this);
-    surface.setTitle("Control Panel");
+    //surface.setTitle("Show / Hide Advertisers");
 
 
     // Disable window decorations (removes close, minimize, etc.)
@@ -60,6 +62,25 @@ class ControlFrame extends PApplet {
     }
     );
 
+    // Add "All ON" bang button
+    cp5.addBang("setAllOn")
+      .setPosition(20, dragBarHeight + 10)
+      .setSize(40, 20)
+      .setLabel("All ON")
+      .plugTo(this)
+      .setColorForeground(cGrey)
+      .setColorActive(cTheme);
+    ;
+
+    // Add "All OFF" bang button
+    cp5.addBang("setAllOff")
+      .setPosition(80, dragBarHeight + 10)
+      .setSize(40, 20)
+      .setLabel("All OFF")
+      .plugTo(this)
+      .setColorForeground(cGrey)
+      .setColorActive(cTheme);
+    ;
 
     // Create 200 toggles and store them
     for (int i = 0; i < totalToggles; i++) {
@@ -72,9 +93,13 @@ class ControlFrame extends PApplet {
         .setSize(40, 20)
         .setLabel(labelText)
         .plugTo(parent)
-        .setBroadcast(false)    // Temporarily disable event broadcast to avoid triggering event now
-        .setValue(true)         // Set initial value silently
-        .setBroadcast(true);    // Re-enable event broadcast
+        .setBroadcast(false)      // Temporarily disable event broadcast to avoid triggering event now
+        .setValue(true)          // Set initial value silently
+        .setBroadcast(true)      // Re-enable event broadcast
+        .setColorBackground(cGrey)
+        .setColorActive(cTheme)
+        .setColorForeground(cWhite);
+      ;
 
 
       // Make sure label is visible and positioned nicely
@@ -89,18 +114,19 @@ class ControlFrame extends PApplet {
   public void draw() {
     // Background fill for entire control window, slightly extended height
     noStroke();
-    fill(70);
+    fill(cBlack);
     rect(0, 0, width, height + 20);
 
     // Draw custom title bar background
-    fill(40);
+    fill(cTheme);
     rect(0, 0, width, dragBarHeight);
 
     // Draw title text centered vertically within the drag bar
     fill(255);
     textAlign(LEFT, CENTER);
     textSize(14);
-    text("Control Panel", 10, dragBarHeight / 2);
+    fill(cBlack);
+    text("Show/Hide Advertisers", 10, dragBarHeight / 2);
 
     // Determine if the mouse is hovering over the scroll thumb area
     thumbHovered = mouseX > scrollTrackX &&
@@ -109,15 +135,16 @@ class ControlFrame extends PApplet {
       mouseY < scrollThumbY + scrollThumbHeight;
 
     // Draw the scroll track background
-    fill(100);
+    fill(cGrey);
     rect(scrollTrackX, scrollTrackY, 10, scrollTrackHeight);
 
+    stroke(cWhite);
     // Draw the scroll thumb (the draggable part)
     // Highlight it if hovered or actively being dragged
     if (thumbHovered || draggingThumb) {
-      fill(220, 120, 60);  // Orange highlight color
+      fill(cTheme);  // Orange highlight color
     } else {
-      fill(200);           // Normal thumb color
+      fill(cBlack);           // Normal thumb color
     }
     rect(scrollTrackX, scrollThumbY, 10, scrollThumbHeight);
 
@@ -147,7 +174,7 @@ class ControlFrame extends PApplet {
         float y = toggleStartY + i * toggleHeight - scrollOffset;
 
         // Hide toggles that would be covered by the title bar area
-        if (y < dragBarHeight) {
+        if (y < toggleStartY) {
           t.setVisible(false);
         } else {
           // Show and position toggles normally
@@ -241,5 +268,25 @@ class ControlFrame extends PApplet {
 
     // Update custom scroll thumb position to match scrollOffset
     scrollThumbY = map(scrollOffset, 0, maxScroll, scrollTrackY, scrollTrackY + scrollTrackHeight - scrollThumbHeight);
+  }
+
+  public void setAllOn() {
+    for (int i = 0; i < totalToggles; i++) {
+      String toggleName = "adToggle_" + i;
+      Toggle t = cp5.get(Toggle.class, toggleName);
+      if (t != null) {
+        t.setValue(true);
+      }
+    }
+  }
+
+  public void setAllOff() {
+    for (int i = 0; i < totalToggles; i++) {
+      String toggleName = "adToggle_" + i;
+      Toggle t = cp5.get(Toggle.class, toggleName);
+      if (t != null) {
+        t.setValue(false);
+      }
+    }
   }
 }

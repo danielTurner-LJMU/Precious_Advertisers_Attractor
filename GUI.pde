@@ -210,7 +210,7 @@ void initProgramControls(int baseX, int baseY) {
   styleMain("pauseMotion");
 
   cp5.addToggle("showAdvertisers")
-    .setLabel("HIDE\nADVERTISERS")
+    .setLabel("SHOW/HIDE\nADVERTISERS")
     .setPosition(baseX+ cSpaceX * 2, baseY + cSpaceY*3.75)
     .setSize(100, 40)
     .setValue(false);
