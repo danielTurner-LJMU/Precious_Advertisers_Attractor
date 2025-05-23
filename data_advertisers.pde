@@ -21,6 +21,8 @@ boolean sqCaps = false;
 float xScale = 1;
 float xThickness = 1;
 
+color xColor = color(0, 0, 0);
+
 boolean drawAdNames = false;
 
 void loadDataAd() {
@@ -92,7 +94,7 @@ class DataObjectAd
 
   float r; //radius of shape
 
-  color myColor;
+  color myColor; ///**** NOT USED AT MOMENT *** available in case a data property can be used e.g. re-marketing.
 
 
   DataObjectAd(int id, String siteName, boolean visit, boolean remarket, boolean customerFile) {
@@ -154,7 +156,7 @@ class DataObjectAd
     location.add(velocity);
     acceleration.mult(0);
 
-    history.add(location.get());
+    history.add(location.copy());
     if (history.size() > historyLength) {
       int range = history.size() - historyLength;
       for (int i = 0; i < range; i++) {
@@ -231,12 +233,12 @@ class DataObjectAd
 
       //-------- Move These to main draw loop to set once - i.e. rather than for every object-------/////
       if (sqCaps) {
-        pg.strokeCap(SQUARE);
+        pg.strokeCap(PROJECT);
       } else {
         pg.strokeCap(ROUND);
       }
       pg.fill(175);
-      pg.stroke(myColor);
+      pg.stroke(xColor);
       pg.strokeWeight(xThickness);
       //----------------------------------------------------------------------------------/////
       pg.pushMatrix();
