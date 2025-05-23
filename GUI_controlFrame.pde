@@ -1,3 +1,20 @@
+/**
+ * ControlFrame - A custom draggable and scrollable control panel for toggling visibility of dataObjectsAd.
+ *
+ * This class creates a separate undecorated control window with a custom-drawn title bar,
+ * a vertical scrollbar, and a list of toggle switches representing the visibility of `dataObjectsAd` objects
+ * in the main canvas. The `drawMe` boolean in each `dataObjectsAd` object determines whether it is drawn.
+ *
+ * Features:
+ * - Two bang buttons at the top to "Show All" or "Hide All" data objects.
+ * - Smooth scrolling through toggles using a custom scrollbar or mouse wheel.
+ * - Smooth window dragging via an emulated title bar.
+ * - Performance-optimized toggle management using ControlP5.
+ *
+ * Intended for use as a companion control window to interactively manage large sets of visual elements
+ * in the main canvas.
+ */
+
 class ControlFrame extends PApplet {
 
   ControlP5 cp5;
@@ -11,9 +28,7 @@ class ControlFrame extends PApplet {
   float windowTargetX, windowTargetY;    // Where the window *should* move to, updated on drag
   float windowCurrentX, windowCurrentY;  // Current window position, updated smoothly toward target
 
-
-  //float scrollOffset = 0;
-  int totalToggles = dataObjectsAd.length;
+  int totalToggles = dataObjectsAd.length; //match number of toggles to number of advertisers
   int toggleHeight = 25;
   int visibleHeight = 500;
   int toggleStartY = dragBarHeight + 50;
@@ -78,6 +93,17 @@ class ControlFrame extends PApplet {
       .setSize(40, 20)
       .setLabel("All OFF")
       .plugTo(this)
+      .setColorForeground(cGrey)
+      .setColorActive(cTheme);
+    ;
+
+    // Hide Control Panel button
+    cp5.addBang("hidePanel")
+      .setPosition(width - 90, dragBarHeight + 10)  // Adjust position to top-right
+      .setSize(40, 20)
+      .setLabel("Hide Panel")
+      .setTriggerEvent(Bang.RELEASE)
+      .plugTo(parent)
       .setColorForeground(cGrey)
       .setColorActive(cTheme);
     ;

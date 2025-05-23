@@ -158,7 +158,7 @@ void initProgramControls(int baseX, int baseY) {
     .setLabel("X WEIGHT")
     .setPosition(baseX, baseY + cSpaceY * 2.75)
     .setSize(300, 20)
-    .setRange(1, 30)
+    .setRange(1, 100)
     .setValue(xThickness);
 
   styleMain("xThickness");
@@ -357,15 +357,24 @@ void controlEvent(ControlEvent theEvent) {
     }
   }
 
+  // Handle toggle state changes for dataObjectsAd from the controlFrame
+  // This code checks if the control event came from a toggle named "adToggle_#"
+  // and uses the toggle's ID to update the corresponding data object's `drawMe` flag,
+  // which determines whether that object is drawn in the artwork buffer.
+
   if (c != null) {
     String name = c.getName();
     if (name != null && name.startsWith("adToggle_")) {
       int id = c.getId();
       boolean val = c.getValue() == 1.0;
-      println("ControlFrame toggle " + id + " changed to " + val);
       // update objects here
       dataObjectsAd[id].drawMe = val;
     }
+  }
+
+  //hide controlFrame and sync main tiggle button if "hidePanel" Bang is clicked in the controlFrame
+  if (theEvent.isFrom("hidePanel")) {
+    cp5.get(Toggle.class, "showAdvertisers").setValue(false);
   }
 }
 
