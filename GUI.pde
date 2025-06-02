@@ -182,11 +182,21 @@ void initProgramControls(int baseX, int baseY) {
     .setValue(targetOpacity);
 
   styleMain("targetOpacity");
+  
+  cp5.addSlider("strokeThick")
+    .setLabel("LINE THICKNESS")
+    .setPosition(baseX, baseY + cSpaceY * 3.5)
+    .setSize(300, 20)
+    .setRange(1, 100)
+    .setValue(strokeThick);
+
+  styleMain("targetOpacity");
+  
 
   // create a toggle and change the default look to a (on/off) switch look
   cp5.addToggle("drawTail")
     .setLabel("DRAW\nLINES")
-    .setPosition(baseX, baseY + cSpaceY * 3.5)
+    .setPosition(baseX, baseY + cSpaceY * 3.75)
     .setSize(50, 20)
     .setValue(true)
     //.setMode(ControlP5.SWITCH)
@@ -195,49 +205,49 @@ void initProgramControls(int baseX, int baseY) {
 
   cp5.addToggle("fixedSpeed")
     .setLabel("FIXED\nSPEED")
-    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 3.5)
+    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 3.75)
     .setSize(50, 20)
     ;
   styleMain("fixedSpeed");
 
   cp5.addToggle("drawX")
     .setLabel("DRAW\nX'S")
-    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 3.5)
+    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 3.75)
     .setSize(50, 20)
     ;
   styleMain("drawX");
 
   cp5.addToggle("drawAdNames")
     .setLabel("DRAW\nADVERT\nNAMES")
-    .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 3.5)
+    .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 3.75)
     .setSize(50, 20)
     ;
   styleMain("drawAdNames");
 
   cp5.addToggle("sqCaps")
     .setLabel("SQUARE\nCAPS")
-    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 3.5)
+    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 3.75)
     .setSize(50, 20)
     ;
   styleMain("sqCaps");
   
     cp5.addToggle("drawCity")
     .setLabel("DRAW\nCITY")
-    .setPosition(baseX + cSpaceX * 5, baseY + cSpaceY * 3.5)
+    .setPosition(baseX + cSpaceX * 5, baseY + cSpaceY * 3.75)
     .setSize(50, 20)
     ;
   styleMain("drawCity");
 
   cp5.addToggle("pauseMotion")
     .setLabel("PAUSE")
-    .setPosition(baseX, baseY + cSpaceY*4.25)
+    .setPosition(baseX, baseY + cSpaceY*4.5)
     .setSize(100, 40)
     ;
   styleMain("pauseMotion");
 
   cp5.addToggle("showAdvertisers")
     .setLabel("SHOW/HIDE\nADVERTISERS")
-    .setPosition(baseX+ cSpaceX * 2, baseY + cSpaceY*4.25)
+    .setPosition(baseX+ cSpaceX * 2, baseY + cSpaceY*4.5)
     .setSize(100, 40)
     .setValue(false);
   styleMain("showAdvertisers");
@@ -246,7 +256,7 @@ void initProgramControls(int baseX, int baseY) {
   cf = new ControlFrame(this, "Control Panel");
 
   // Create the xColour RGBA slider set at position (20, 50)
-  xColour = new RGBAController(cp5, "X COLOUR", baseX, baseY + cSpaceY*5);
+  xColour = new RGBAController(cp5, "X COLOUR", baseX, baseY + cSpaceY*5.25);
 
   cp5.addBang("generate")
     .setLabel("GENERATE")

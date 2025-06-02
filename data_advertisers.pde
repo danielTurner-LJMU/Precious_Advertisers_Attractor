@@ -25,6 +25,11 @@ color xColor = color(0, 0, 0);
 
 boolean drawAdNames = false;
 
+//**** Line thickness variables
+color[] palette = {#F25CA2, #F229AC, #04B2D9, #F2CB05, #F2B705}; //colours to pick for line colour
+float strokeThick = 1;
+int step = 1;
+
 void loadDataAd() {
 
   //compile path to required data file and load
@@ -125,12 +130,18 @@ class DataObjectAd
 
     r = 5.0;
 
-    if ((myVisit)||(myRemarket)) {
-      myColor = color(255, 0, 0);
-    } else {
+    //Removing this for now - idea to set colour based on data from advertiser
+    //none of mine have it as of yet.
+    //if ((myVisit)||(myRemarket)) {
+    //  myColor = color(255, 0, 0);
+    //} else {
 
-      myColor = #000000;
-    }
+    //  myColor = #000000;
+    //}
+
+    //pick a random colour from the palette
+    int cVal = (int)random(palette.length);
+    myColor = palette[cVal];
 
     //clear the arraylist storing previous points
     history.clear();
@@ -213,15 +224,17 @@ class DataObjectAd
       pg.beginShape();
 
       pg.stroke(myColor);
-      pg.strokeWeight(1);//strokeThick);
+      pg.strokeWeight(strokeThick);
       pg.noFill();
       //int step = ceil(strokeThick/2);
       //println(step);
       //for (PVector v : history) {
-      for (int i = 0; i < history.size(); i++) {//i+=step){
+      for (int i = 0; i < history.size(); i+=step) {
         PVector v = history.get(i);
-        pg.vertex(v.x, v.y);//curveVertex(v.x, v.y);
+        pg.curveVertex(v.x, v.y);//vertex(v.x, v.y);//
       }
+      pg.curveVertex(location.x, location.y);
+      pg.curveVertex(location.x, location.y);
       pg.endShape();
     }
 

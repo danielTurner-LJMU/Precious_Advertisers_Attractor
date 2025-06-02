@@ -101,6 +101,14 @@ void drawBuffer() {
 
   drawDates();
 
+
+  ///**** Stroke Thickness stuff
+  step = ceil(strokeThick/8);
+  if (step < 10) {
+    step = 10;
+  }
+  //-----------------------------///
+
   pg.textSize(10); //reset text size
   //find vertical centre of font
   float textCentre = (textDescent() + textAscent())*0.5;
@@ -108,6 +116,7 @@ void drawBuffer() {
   float scalar = 0.8;
   textCentre *= scalar;
 
+  pg.blendMode(MULTIPLY);
   for (DataObjectAd i : dataObjectsAd) {
     if (!pauseMotion) {
       i.findTarget();
@@ -117,11 +126,7 @@ void drawBuffer() {
       i.drawAd(textCentre);
     }
   }
-
-
-
-
-
+  pg.blendMode(BLEND);
   pg.endDraw();
 }
 
