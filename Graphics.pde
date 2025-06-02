@@ -90,6 +90,15 @@ void drawBuffer() {
   pg.beginDraw();
   pg.background(255);
   //drawLoginLine();
+
+
+  for (DataObjectLogin i : dataObjectsLogin) {
+
+    i.update();
+    i.activate();
+    i.drawLogin();
+  }
+
   drawDates();
 
   pg.textSize(10); //reset text size
@@ -109,12 +118,7 @@ void drawBuffer() {
     }
   }
 
-  for (DataObjectLogin i : dataObjectsLogin) {
 
-    i.update();
-    i.activate();
-    i.drawLogin();
-  }
 
 
 
@@ -180,6 +184,7 @@ void drawDates() {
   pg.textSize(14);
   pg.noFill();
   pg.stroke(0);
+  pg.strokeWeight(1);
 
   //pg.rectMode(CENTER);
 

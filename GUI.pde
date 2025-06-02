@@ -165,11 +165,28 @@ void initProgramControls(int baseX, int baseY) {
 
   styleMain("xThickness");
 
+  cp5.addSlider("targetRadius")
+    .setLabel("ACTIVITY SIZE")
+    .setPosition(baseX, baseY + cSpaceY * 3)
+    .setSize(300, 20)
+    .setRange(1, 100)
+    .setValue(targetRadius);
+
+  styleMain("targetRadius");
+
+  cp5.addSlider("targetOpacity")
+    .setLabel("ACTIVITY OPACITY")
+    .setPosition(baseX, baseY + cSpaceY * 3.25)
+    .setSize(300, 20)
+    .setRange(0, 255)
+    .setValue(targetOpacity);
+
+  styleMain("targetOpacity");
 
   // create a toggle and change the default look to a (on/off) switch look
   cp5.addToggle("drawTail")
     .setLabel("DRAW\nLINES")
-    .setPosition(baseX, baseY + cSpaceY * 3)
+    .setPosition(baseX, baseY + cSpaceY * 3.5)
     .setSize(50, 20)
     .setValue(true)
     //.setMode(ControlP5.SWITCH)
@@ -178,42 +195,49 @@ void initProgramControls(int baseX, int baseY) {
 
   cp5.addToggle("fixedSpeed")
     .setLabel("FIXED\nSPEED")
-    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 3)
+    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 3.5)
     .setSize(50, 20)
     ;
   styleMain("fixedSpeed");
 
   cp5.addToggle("drawX")
     .setLabel("DRAW\nX'S")
-    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 3)
+    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 3.5)
     .setSize(50, 20)
     ;
   styleMain("drawX");
 
   cp5.addToggle("drawAdNames")
     .setLabel("DRAW\nADVERT\nNAMES")
-    .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 3)
+    .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 3.5)
     .setSize(50, 20)
     ;
   styleMain("drawAdNames");
 
   cp5.addToggle("sqCaps")
     .setLabel("SQUARE\nCAPS")
-    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 3)
+    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 3.5)
     .setSize(50, 20)
     ;
   styleMain("sqCaps");
+  
+    cp5.addToggle("drawCity")
+    .setLabel("DRAW\nCITY")
+    .setPosition(baseX + cSpaceX * 5, baseY + cSpaceY * 3.5)
+    .setSize(50, 20)
+    ;
+  styleMain("drawCity");
 
   cp5.addToggle("pauseMotion")
     .setLabel("PAUSE")
-    .setPosition(baseX, baseY + cSpaceY*3.75)
+    .setPosition(baseX, baseY + cSpaceY*4.25)
     .setSize(100, 40)
     ;
   styleMain("pauseMotion");
 
   cp5.addToggle("showAdvertisers")
     .setLabel("SHOW/HIDE\nADVERTISERS")
-    .setPosition(baseX+ cSpaceX * 2, baseY + cSpaceY*3.75)
+    .setPosition(baseX+ cSpaceX * 2, baseY + cSpaceY*4.25)
     .setSize(100, 40)
     .setValue(false);
   styleMain("showAdvertisers");
@@ -222,7 +246,7 @@ void initProgramControls(int baseX, int baseY) {
   cf = new ControlFrame(this, "Control Panel");
 
   // Create the xColour RGBA slider set at position (20, 50)
-  xColour = new RGBAController(cp5, "X COLOUR", baseX, baseY + cSpaceY*4.5);
+  xColour = new RGBAController(cp5, "X COLOUR", baseX, baseY + cSpaceY*5);
 
   cp5.addBang("generate")
     .setLabel("GENERATE")
@@ -507,10 +531,10 @@ class RGBAController {
     return color(sliders[0].getValue(),
       sliders[1].getValue(),
       sliders[2].getValue());
-      //sliders[3].getValue());
+    //sliders[3].getValue());
   }
 
-// Checks whether a given ControlEvent came from one of this RGBAController's sliders
+  // Checks whether a given ControlEvent came from one of this RGBAController's sliders
   boolean detectEvent(ControlEvent theEvent) {
     for (Slider s : sliders) {
       if (theEvent.isFrom(s)) return true;

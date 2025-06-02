@@ -27,6 +27,9 @@ DataObjectLogin[] dataObjectsLogin;
 
 //-------- TARGET PROPERTIES --------//
 float targetActivateChance = 0.995;
+float targetRadius = 30;
+float targetOpacity = 150;
+boolean drawCity = true;
 
 void loadDataLogin() {
 
@@ -124,7 +127,8 @@ class DataObjectLogin
   boolean active = true;
   boolean hideMe = false;
 
-  float r; //radius of shape
+  float radiusMultiplier;
+  float r; //total shape radius
 
 
 
@@ -136,7 +140,8 @@ class DataObjectLogin
     siteName = site;
     city = c;
 
-    r = 30;
+    radiusMultiplier = random(0.1, 2);
+    r = targetRadius*radiusMultiplier;
     attraction = random(1, 100);
   }
 
@@ -178,6 +183,9 @@ class DataObjectLogin
     zeroDate = timeStamp - startDate;
     location.x = ((zeroDate%dateCut)*dateScale) + loginLineX1;
     location.y = (int(zeroDate/dateCut)*rowGap)+yOffset;
+
+    //update radius
+    r = targetRadius*radiusMultiplier;
   }
 
   void drawLogin() {
@@ -186,31 +194,34 @@ class DataObjectLogin
     pg.translate(location.x, location.y);
 
     //draw ring round circle
-    if (!hideMe) {
-      pg.strokeWeight(0.5);
+    //if (!hideMe) {
+    //  pg.strokeWeight(0.5);
 
-      pg.stroke(0);
-      pg.noFill();
-      pg.circle(0, 0, r+10);
-    }
+    //  pg.stroke(0);
+    //  pg.noFill();
+    //  pg.circle(0, 0, r+10);
+    //}
 
     if (active) {
-      pg.fill(250, 106, 248);
+      pg.fill(250, 106, 248, targetOpacity);
     } else {
-      pg.fill(150);
+      pg.fill(150, targetOpacity);
     }
 
-    if (hideMe) {
-      pg.fill(0, 0, 248);
-    }
+    //if (hideMe) {
+    //  pg.fill(0, 0, 248);
+    //}
 
     if (!hideMe) {
 
       pg.noStroke();
       pg.circle(0, 0, r);
-      pg.fill(0);
-      //pg.rotate(radians(ID * 2));
-      pg.text(city, r + 20, 0);
+      if (drawCity) {
+        pg.fill(0);
+        //shift y position of text for overlapping objects
+        float yLoc = ((ID*10)%r) - (r*0.5);
+        pg.text(city, (r*0.5)+5, yLoc);
+      }
     }
 
     pg.popMatrix();
