@@ -55,19 +55,24 @@ void extractDataLogin() {
     String action = thisActivity.getString("action");
     String siteName = thisActivity.getString("site_name");
     String city = thisActivity.getString("city");
+    String ip = thisActivity.getString("ip_address");
     long timestamp = thisActivity.getLong("timestamp");
-    dataObjectsLogin[i] = new DataObjectLogin(i, action, siteName, city, timestamp);
+    dataObjectsLogin[i] = new DataObjectLogin(i, action, siteName, city, ip, timestamp);
   }
 
   startDate = dataObjectsLogin[dataObjectsLogin.length-1].timeStamp;
   endDate = dataObjectsLogin[0].timeStamp;
 
+   
+   
+   
   /*
   ** Examples below show howe to access all different entries for various fields of data
    ** They use the getUniqueFieldValues(obj, variable(field)) method to extract them from the objects
    String[] uniqueActions = getUniqueFieldValues(dataObjectsLogin, "action");
    String[] uniqueSites = getUniqueFieldValues(dataObjectsLogin, "siteName");
    String[] uniqueCities = getUniqueFieldValues(dataObjectsLogin, "city");
+   String[] uniqueIPs = getUniqueFieldValues(dataObjectsLogin, "IP");
    
    println("Unique actions:");
    for (String action : uniqueActions) println(action);
@@ -75,6 +80,8 @@ void extractDataLogin() {
    for (String siteName : uniqueSites) println(siteName);
    println("city names:");
    for (String city : uniqueCities) println(city);
+   println("IP Addresses:");
+   for (String IP : uniqueIPs) println(IP);
    */
 
   //println("start date = " + startDate + "\n" + "end date = " + endDate);
@@ -116,7 +123,7 @@ String[] getUniqueFieldValues(DataObjectLogin[] objects, String fieldName) {
 class DataObjectLogin
 {
   int ID;
-  String action, siteName, city;
+  String action, siteName, city, IP;
   long timeStamp;
   float zeroDate;//store date zero'd out against start date
 
@@ -132,13 +139,14 @@ class DataObjectLogin
 
 
 
-  DataObjectLogin(int id, String act, String site, String c, long time ) {
+  DataObjectLogin(int id, String act, String site, String c, String ip, long time ) {
 
     ID = id;
     action = act;
     timeStamp = time;
     siteName = site;
     city = c;
+    IP = ip;
 
     radiusMultiplier = random(0.1, 2);
     r = targetRadius*radiusMultiplier;
@@ -220,7 +228,7 @@ class DataObjectLogin
         pg.fill(0);
         //shift y position of text for overlapping objects
         float yLoc = ((ID*10)%r) - (r*0.5);
-        pg.text(city + "\n" + action, (r*0.5)+5, yLoc);
+        pg.text(city + "\n" + action + "\n" + IP, (r*0.5)+5, yLoc);
       }
     }
 
