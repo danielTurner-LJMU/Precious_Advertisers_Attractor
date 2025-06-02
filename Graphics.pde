@@ -170,7 +170,7 @@ void drawDates() {
   Date firstDate = convertDate(startDate);
   Date secondDate = convertDate(endDate);
 
-  //length of line drawn fro date marker
+  //length of line drawn from date marker
   int lineLength = 40;
 
   //y position of the end of the full date line

@@ -1,3 +1,5 @@
+import java.lang.reflect.Field;
+
 String subFolderLogin = "/security_and_login_information";
 String dataFileNameLogin = "account_activity.json"; //name of the JSON file
 
@@ -48,21 +50,70 @@ void extractDataLogin() {
   for (int i = 0; i < accountActivity.size(); i++) {
     JSONObject thisActivity = accountActivity.getJSONObject(i);
     String action = thisActivity.getString("action");
+    String siteName = thisActivity.getString("site_name");
+    String city = thisActivity.getString("city");
     long timestamp = thisActivity.getLong("timestamp");
-    dataObjectsLogin[i] = new DataObjectLogin(i, action, timestamp);
+    dataObjectsLogin[i] = new DataObjectLogin(i, action, siteName, city, timestamp);
   }
 
   startDate = dataObjectsLogin[dataObjectsLogin.length-1].timeStamp;
   endDate = dataObjectsLogin[0].timeStamp;
 
+  /*
+  ** Examples below show howe to access all different entries for various fields of data
+   ** They use the getUniqueFieldValues(obj, variable(field)) method to extract them from the objects
+   String[] uniqueActions = getUniqueFieldValues(dataObjectsLogin, "action");
+   String[] uniqueSites = getUniqueFieldValues(dataObjectsLogin, "siteName");
+   String[] uniqueCities = getUniqueFieldValues(dataObjectsLogin, "city");
+   
+   println("Unique actions:");
+   for (String action : uniqueActions) println(action);
+   println("site names:");
+   for (String siteName : uniqueSites) println(siteName);
+   println("city names:");
+   for (String city : uniqueCities) println(city);
+   */
+
   //println("start date = " + startDate + "\n" + "end date = " + endDate);
+}
+
+/**
+ * Returns an array of unique String values from a specified field
+ * in an array of DataObjectLogin instances.
+ *
+ * This method uses reflection to access the field dynamically by name.
+ *
+ * @param objects   An array of DataObjectLogin instances to search through.
+ * @param fieldName The name of the String field to extract (e.g., "action", "city").
+ * @return          An array of unique String values found in the specified field.
+ */
+String[] getUniqueFieldValues(DataObjectLogin[] objects, String fieldName) {
+  HashSet<String> uniqueValues = new HashSet<String>();
+
+  for (DataObjectLogin obj : objects) {
+    try {
+      // Use reflection to get the value of the field
+      Field field = obj.getClass().getDeclaredField(fieldName);
+      field.setAccessible(true); // allow access to private fields if needed
+      Object value = field.get(obj);
+
+      if (value instanceof String) {
+        uniqueValues.add((String) value);
+      }
+    }
+    catch (Exception e) {
+      println("Error accessing field: " + fieldName);
+    }
+  }
+
+  return uniqueValues.toArray(new String[0]);
 }
 
 ///-------------------- LOGIN OBJECT --------------------------///
 class DataObjectLogin
 {
   int ID;
-  String action;
+  String action, siteName, city;
   long timeStamp;
   float zeroDate;//store date zero'd out against start date
 
@@ -77,11 +128,13 @@ class DataObjectLogin
 
 
 
-  DataObjectLogin(int id, String act, long time) {
+  DataObjectLogin(int id, String act, String site, String c, long time ) {
 
     ID = id;
     action = act;
     timeStamp = time;
+    siteName = site;
+    city = c;
 
     r = 30;
     attraction = random(1, 100);
@@ -129,12 +182,16 @@ class DataObjectLogin
 
   void drawLogin() {
 
+    pg.pushMatrix();
+    pg.translate(location.x, location.y);
+
+    //draw ring round circle
     if (!hideMe) {
       pg.strokeWeight(0.5);
 
       pg.stroke(0);
       pg.noFill();
-      pg.circle(location.x, location.y, r+10);
+      pg.circle(0, 0, r+10);
     }
 
     if (active) {
@@ -150,7 +207,12 @@ class DataObjectLogin
     if (!hideMe) {
 
       pg.noStroke();
-      pg.circle(location.x, location.y, r);
+      pg.circle(0, 0, r);
+      pg.fill(0);
+      //pg.rotate(radians(ID * 2));
+      pg.text(city, r + 20, 0);
     }
+
+    pg.popMatrix();
   }
 }

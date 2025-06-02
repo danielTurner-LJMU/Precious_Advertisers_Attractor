@@ -458,13 +458,13 @@ public void showAdvertisers(boolean val) {
 
 class RGBAController {
   Textlabel titleLabel;
-  Slider[] sliders = new Slider[4];
-  String[] labels = {"Red", "Green", "Blue", "Opacity"};
+  Slider[] sliders = new Slider[3]; //change to 4 to add alpha
+  String[] labels = {"Red", "Green", "Blue"}; //, "Opacity"};
   color[] sliderColors = {
     color(255, 0, 0), // Red
     color(0, 255, 0), // Green
     color(0, 0, 255), // Blue
-    color(0, 0, 0) // Gray for Alpha
+    //color(0, 0, 0) // Gray for Alpha
   };
 
   float x, y;   // position of the entire control set
@@ -483,10 +483,10 @@ class RGBAController {
     int sliderWidth = 75; // total width 300 / 4 sliders
 
     // Create sliders individually
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < sliders.length; i++) {
       sliders[i] = cp5.addSlider(labels[i])
         .setRange(0, 255)
-        .setValue(255)
+        .setValue(0)
         .setSize(sliderWidth - 5, 15)
         .setPosition(x + i * sliderWidth, y + 20)  // placed below label
         .setLabel(labels[i])
@@ -506,8 +506,8 @@ class RGBAController {
   color getColor() {
     return color(sliders[0].getValue(),
       sliders[1].getValue(),
-      sliders[2].getValue(),
-      sliders[3].getValue());
+      sliders[2].getValue());
+      //sliders[3].getValue());
   }
 
 // Checks whether a given ControlEvent came from one of this RGBAController's sliders

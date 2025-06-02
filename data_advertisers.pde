@@ -252,10 +252,11 @@ class DataObjectAd
       //  pg.line(-newR/2, -newR/2, newR/2, newR/2);
       //  pg.line(newR/2, -newR/2, -newR/2, newR/2);
       //}
-      //stroke(0);
+      
       if (drawAdNames) {
+        pg.fill(0);
         pg.rotate(-theta);
-        pg.text(mySiteName, sqrt(newR2*newR2)-(newR/4), textCentreY);
+        pg.text(mySiteName, sqrt(newR2*newR2)-(newR/4)+(xThickness/2), textCentreY);
       }
       pg.popMatrix();
     }
