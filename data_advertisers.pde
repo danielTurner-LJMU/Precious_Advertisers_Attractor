@@ -226,11 +226,16 @@ class DataObjectAd
     }
 
 
-    if (drawX) {
-      float theta = velocity.heading() + PI/2;
-      float newR = r * xScale;
-      float newR2 = newR*2;
 
+    float theta = velocity.heading() + PI/2;
+    float newR = r * xScale;
+    float newR2 = newR*2;
+
+    pg.pushMatrix();
+    pg.translate(location.x, location.y);
+    pg.rotate(theta);
+
+    if (drawX) {
       //-------- Move These to main draw loop to set once - i.e. rather than for every object-------/////
       if (sqCaps) {
         pg.strokeCap(PROJECT);
@@ -241,9 +246,7 @@ class DataObjectAd
       pg.stroke(xColor);
       pg.strokeWeight(xThickness);
       //----------------------------------------------------------------------------------/////
-      pg.pushMatrix();
-      pg.translate(location.x, location.y);
-      pg.rotate(theta);
+
       pg.line(-newR, -newR, newR, newR);
       pg.line(newR, -newR, -newR, newR);
       //if (myCustomerFile) {
@@ -252,13 +255,12 @@ class DataObjectAd
       //  pg.line(-newR/2, -newR/2, newR/2, newR/2);
       //  pg.line(newR/2, -newR/2, -newR/2, newR/2);
       //}
-      
-      if (drawAdNames) {
-        pg.fill(0);
-        pg.rotate(-theta);
-        pg.text(mySiteName, sqrt(newR2*newR2)-(newR/4)+(xThickness/2), textCentreY);
-      }
-      pg.popMatrix();
     }
+    if (drawAdNames) {
+      pg.fill(0);
+      pg.rotate(-theta);
+      pg.text(mySiteName, sqrt(newR2*newR2)-(newR/4)+(xThickness/2), textCentreY);
+    }
+    pg.popMatrix();
   }
 }

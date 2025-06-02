@@ -220,7 +220,7 @@ class DataObjectLogin
         pg.fill(0);
         //shift y position of text for overlapping objects
         float yLoc = ((ID*10)%r) - (r*0.5);
-        pg.text(city, (r*0.5)+5, yLoc);
+        pg.text(city + "\n" + action, (r*0.5)+5, yLoc);
       }
     }
 
