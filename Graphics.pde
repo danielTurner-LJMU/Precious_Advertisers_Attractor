@@ -123,10 +123,18 @@ void drawBuffer() {
       i.update();
     }
     if (i.drawMe) {//check if it is selected from toggle list
-      i.drawAd(textCentre);
+      i.drawAdLines();
     }
   }
   pg.blendMode(BLEND);
+
+  for (DataObjectAd i : dataObjectsAd) {
+    if (i.drawMe) {//check if it is selected from toggle list
+      i.drawAd(textCentre);
+    }
+  }
+
+
   pg.endDraw();
 }
 

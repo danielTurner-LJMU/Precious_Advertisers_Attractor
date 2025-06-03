@@ -218,27 +218,26 @@ class DataObjectAd
     acceleration.add(force);
   }
 
-  void drawAd(float textCentreY) {
-
+  void drawAdLines() {
     if (drawTail) {
       pg.beginShape();
 
       pg.stroke(myColor);
       pg.strokeWeight(strokeThick);
       pg.noFill();
-      //int step = ceil(strokeThick/2);
-      //println(step);
-      //for (PVector v : history) {
       for (int i = 0; i < history.size(); i+=step) {
         PVector v = history.get(i);
         pg.curveVertex(v.x, v.y);//vertex(v.x, v.y);//
       }
+      //these two needed to take the shape right up to the vehicle
       pg.curveVertex(location.x, location.y);
       pg.curveVertex(location.x, location.y);
       pg.endShape();
     }
 
+  }
 
+  void drawAd(float textCentreY) {
 
     float theta = velocity.heading() + PI/2;
     float newR = r * xScale;

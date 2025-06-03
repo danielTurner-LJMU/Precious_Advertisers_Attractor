@@ -29,7 +29,9 @@ DataObjectLogin[] dataObjectsLogin;
 float targetActivateChance = 0.995;
 float targetRadius = 30;
 float targetOpacity = 150;
-boolean drawCity = true;
+boolean drawCity = false;
+boolean drawIP = false;
+boolean drawAction = false;
 
 void loadDataLogin() {
 
@@ -63,9 +65,9 @@ void extractDataLogin() {
   startDate = dataObjectsLogin[dataObjectsLogin.length-1].timeStamp;
   endDate = dataObjectsLogin[0].timeStamp;
 
-   
-   
-   
+
+
+
   /*
   ** Examples below show howe to access all different entries for various fields of data
    ** They use the getUniqueFieldValues(obj, variable(field)) method to extract them from the objects
@@ -224,11 +226,23 @@ class DataObjectLogin
 
       pg.noStroke();
       pg.circle(0, 0, r);
-      if (drawCity) {
-        pg.fill(0);
+      textSize(12);
+      float yLoc = -(r*0.5);//((ID*10)%r) - (r*0.5);x
+      pg.fill(0);
+      if (drawCity) {       
         //shift y position of text for overlapping objects
-        float yLoc = ((ID*10)%r) - (r*0.5);
-        pg.text(city + "\n" + action + "\n" + IP, (r*0.5)+5, yLoc);
+        pg.text(city, (r*0.5)+5, yLoc);
+        yLoc+=14;
+      }
+      if (drawIP) {       
+        //shift y position of text for overlapping objects
+        pg.text(IP, (r*0.5)+5, yLoc);
+        yLoc+=14;
+      }
+      if (drawAction) {       
+        //shift y position of text for overlapping objects
+        pg.text(action, (r*0.5)+5, yLoc);
+        yLoc+=14;
       }
     }
 

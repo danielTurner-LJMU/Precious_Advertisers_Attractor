@@ -8,6 +8,8 @@ int sButtonH = 50;
 int lButtonW = 250;
 int lButtonH = 85;
 
+int sliderWidth = 350;
+
 //color palette
 color cBlack = #282829; //Black/grey Colour
 color cTheme = #fad5e5; //pink Colour
@@ -77,8 +79,8 @@ void initProgramControls(int baseX, int baseY) {
 
   cp5.addSlider("imScale")
     .setLabel("SCALE")
-    .setPosition(baseX, baseY + cSpaceY * 0.5)
-    .setSize(300, 20)
+    .setPosition(baseX, baseY + cSpaceY * 0.25)
+    .setSize(sliderWidth, 20)
     .setRange(0, 1)
     ;
 
@@ -89,8 +91,8 @@ void initProgramControls(int baseX, int baseY) {
     // disable broadcasting since setRange and setRangeValues will trigger an event
     .setLabel("TIME RANGE")
     .setBroadcast(false)
-    .setPosition(baseX, baseY + cSpaceY * 0.75)
-    .setSize(300, 20)
+    .setPosition(baseX, baseY + cSpaceY * 0.5)
+    .setSize(sliderWidth, 20)
     .setHandleSize(20)
     .setRange(startDate, endDate)
     .setRangeValues(startDate, endDate)
@@ -102,8 +104,8 @@ void initProgramControls(int baseX, int baseY) {
 
   cp5.addSlider("numRows")
     .setLabel("NUMBER OF ROWS")
-    .setPosition(baseX, baseY + cSpaceY * 1)
-    .setSize(300, 20)
+    .setPosition(baseX, baseY + cSpaceY * 0.75)
+    .setSize(sliderWidth, 20)
     .setRange(1, 50)
     ;
 
@@ -111,64 +113,18 @@ void initProgramControls(int baseX, int baseY) {
 
   cp5.addSlider("border")
     .setLabel("BORDER")
-    .setPosition(baseX, baseY + cSpaceY * 1.25)
-    .setSize(300, 20)
+    .setPosition(baseX, baseY + cSpaceY * 1)
+    .setSize(sliderWidth, 20)
     .setRange(1, 40)
     .setValue(border);
   ;
 
   styleMain("border");
 
-
-  cp5.addSlider("historyLength")
-    .setLabel("LINE LENGTH")
-    .setPosition(baseX, baseY + cSpaceY * 1.75)
-    .setSize(300, 20)
-    .setRange(30, 500)
-    .setValue(historyLength);
-  ;
-  styleMain("historyLength");
-
-  cp5.addSlider("fixedMaxSpeed")
-    .setLabel("MAX SPEED")
-    .setPosition(baseX, baseY + cSpaceY * 2)
-    .setSize(300, 20)
-    .setRange(1, 30)
-    .setValue(fixedMaxSpeed);
-
-  styleMain("fixedMaxSpeed");
-
-  cp5.addSlider("fixedMaxForce")
-    .setLabel("MAX FORCE")
-    .setPosition(baseX, baseY + cSpaceY * 2.25)
-    .setSize(300, 20)
-    .setRange(0.01, 0.8)
-    .setValue(fixedMaxForce);
-
-  styleMain("fixedMaxForce");
-
-  cp5.addSlider("xScale")
-    .setLabel("X SCALE")
-    .setPosition(baseX, baseY + cSpaceY * 2.5)
-    .setSize(300, 20)
-    .setRange(1, 20)
-    .setValue(xScale);
-
-  styleMain("xScale");
-
-  cp5.addSlider("xThickness")
-    .setLabel("X WEIGHT")
-    .setPosition(baseX, baseY + cSpaceY * 2.75)
-    .setSize(300, 20)
-    .setRange(1, 100)
-    .setValue(xThickness);
-
-  styleMain("xThickness");
-
   cp5.addSlider("targetRadius")
     .setLabel("ACTIVITY SIZE")
-    .setPosition(baseX, baseY + cSpaceY * 3)
-    .setSize(300, 20)
+    .setPosition(baseX, baseY + cSpaceY * 1.35)
+    .setSize(sliderWidth, 20)
     .setRange(1, 100)
     .setValue(targetRadius);
 
@@ -176,27 +132,95 @@ void initProgramControls(int baseX, int baseY) {
 
   cp5.addSlider("targetOpacity")
     .setLabel("ACTIVITY OPACITY")
-    .setPosition(baseX, baseY + cSpaceY * 3.25)
-    .setSize(300, 20)
+    .setPosition(baseX, baseY + cSpaceY * 1.6)
+    .setSize(sliderWidth, 20)
     .setRange(0, 255)
     .setValue(targetOpacity);
 
   styleMain("targetOpacity");
+
+  cp5.addToggle("drawCity")
+    .setLabel("DRAW\nCITY")
+    .setPosition(baseX, baseY + cSpaceY * 1.85)
+    .setSize(50, 20)
+    ;
+  styleMain("drawCity");
   
+    cp5.addToggle("drawIP")
+    .setLabel("DRAW\nIP")
+    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 1.85)
+    .setSize(50, 20)
+    ;
+  styleMain("drawIP");
+  
+    cp5.addToggle("drawAction")
+    .setLabel("DRAW\nACTION")
+    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 1.85)
+    .setSize(50, 20)
+    ;
+  styleMain("drawAction");
+
+  cp5.addSlider("fixedMaxSpeed")
+    .setLabel("MAX SPEED")
+    .setPosition(baseX, baseY + cSpaceY * 2.5)
+    .setSize(sliderWidth, 20)
+    .setRange(1, 30)
+    .setValue(fixedMaxSpeed);
+
+  styleMain("fixedMaxSpeed");
+
+  cp5.addSlider("fixedMaxForce")
+    .setLabel("MAX FORCE")
+    .setPosition(baseX, baseY + cSpaceY * 2.75)
+    .setSize(sliderWidth, 20)
+    .setRange(0.01, 0.8)
+    .setValue(fixedMaxForce);
+
+  styleMain("fixedMaxForce");
+
+  cp5.addSlider("xScale")
+    .setLabel("X SCALE")
+    .setPosition(baseX, baseY + cSpaceY * 3)
+    .setSize(sliderWidth, 20)
+    .setRange(1, 20)
+    .setValue(xScale);
+
+  styleMain("xScale");
+
+  cp5.addSlider("xThickness")
+    .setLabel("X WEIGHT")
+    .setPosition(baseX, baseY + cSpaceY * 3.25)
+    .setSize(sliderWidth, 20)
+    .setRange(1, 200)
+    .setValue(xThickness);
+
+  styleMain("xThickness");
+
+
+
+  cp5.addSlider("historyLength")
+    .setLabel("LINE LENGTH")
+    .setPosition(baseX, baseY + cSpaceY * 3.5)
+    .setSize(sliderWidth, 20)
+    .setRange(30, 500)
+    .setValue(historyLength);
+  ;
+  styleMain("historyLength");
+
   cp5.addSlider("strokeThick")
     .setLabel("LINE THICKNESS")
-    .setPosition(baseX, baseY + cSpaceY * 3.5)
-    .setSize(300, 20)
-    .setRange(1, 100)
+    .setPosition(baseX, baseY + cSpaceY * 3.75)
+    .setSize(sliderWidth, 20)
+    .setRange(1, 200)
     .setValue(strokeThick);
 
-  styleMain("targetOpacity");
-  
+  styleMain("strokeThick");
+
 
   // create a toggle and change the default look to a (on/off) switch look
   cp5.addToggle("drawTail")
     .setLabel("DRAW\nLINES")
-    .setPosition(baseX, baseY + cSpaceY * 3.75)
+    .setPosition(baseX, baseY + cSpaceY * 4)
     .setSize(50, 20)
     .setValue(true)
     //.setMode(ControlP5.SWITCH)
@@ -205,49 +229,43 @@ void initProgramControls(int baseX, int baseY) {
 
   cp5.addToggle("fixedSpeed")
     .setLabel("FIXED\nSPEED")
-    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 3.75)
+    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 4)
     .setSize(50, 20)
     ;
   styleMain("fixedSpeed");
 
   cp5.addToggle("drawX")
     .setLabel("DRAW\nX'S")
-    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 3.75)
+    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 4)
     .setSize(50, 20)
     ;
   styleMain("drawX");
 
   cp5.addToggle("drawAdNames")
     .setLabel("DRAW\nADVERT\nNAMES")
-    .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 3.75)
+    .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 4)
     .setSize(50, 20)
     ;
   styleMain("drawAdNames");
 
   cp5.addToggle("sqCaps")
     .setLabel("SQUARE\nCAPS")
-    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 3.75)
+    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 4)
     .setSize(50, 20)
     ;
   styleMain("sqCaps");
-  
-    cp5.addToggle("drawCity")
-    .setLabel("DRAW\nCITY")
-    .setPosition(baseX + cSpaceX * 5, baseY + cSpaceY * 3.75)
-    .setSize(50, 20)
-    ;
-  styleMain("drawCity");
+
 
   cp5.addToggle("pauseMotion")
     .setLabel("PAUSE")
-    .setPosition(baseX, baseY + cSpaceY*4.5)
+    .setPosition(baseX, baseY + cSpaceY*4.75)
     .setSize(100, 40)
     ;
   styleMain("pauseMotion");
 
   cp5.addToggle("showAdvertisers")
     .setLabel("SHOW/HIDE\nADVERTISERS")
-    .setPosition(baseX+ cSpaceX * 2, baseY + cSpaceY*4.5)
+    .setPosition(baseX+ cSpaceX * 2, baseY + cSpaceY*4.75)
     .setSize(100, 40)
     .setValue(false);
   styleMain("showAdvertisers");
@@ -256,15 +274,15 @@ void initProgramControls(int baseX, int baseY) {
   cf = new ControlFrame(this, "Control Panel");
 
   // Create the xColour RGBA slider set at position (20, 50)
-  xColour = new RGBAController(cp5, "X COLOUR", baseX, baseY + cSpaceY*5.25);
+  xColour = new RGBAController(cp5, "X COLOUR", baseX, baseY + cSpaceY*5.5);
 
-  cp5.addBang("generate")
-    .setLabel("GENERATE")
-    .setPosition(baseX, baseY + cSpaceY * 6)
-    .setSize(sButtonW, sButtonH)
-    ;
+  //cp5.addBang("generate")
+  //  .setLabel("GENERATE")
+  //  .setPosition(baseX, baseY + cSpaceY * 6)
+  //  .setSize(sButtonW, sButtonH)
+  //  ;
 
-  styleMain("generate");
+  //styleMain("generate");
 }
 void initMainControls() {
 
