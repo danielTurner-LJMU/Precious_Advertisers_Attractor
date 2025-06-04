@@ -33,7 +33,7 @@ int printSizeSelect;
 //Control Frame - Used for listing all advertiser to toggle on and off
 ControlFrame cf;
 
-RGBAController xColour;
+//RGBAController xColour;
 
 boolean controlFrameVisible = false;
 
@@ -145,15 +145,15 @@ void initProgramControls(int baseX, int baseY) {
     .setSize(50, 20)
     ;
   styleMain("drawCity");
-  
-    cp5.addToggle("drawIP")
+
+  cp5.addToggle("drawIP")
     .setLabel("DRAW\nIP")
     .setPosition(baseX + cSpaceX, baseY + cSpaceY * 1.85)
     .setSize(50, 20)
     ;
   styleMain("drawIP");
-  
-    cp5.addToggle("drawAction")
+
+  cp5.addToggle("drawAction")
     .setLabel("DRAW\nACTION")
     .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 1.85)
     .setSize(50, 20)
@@ -255,17 +255,31 @@ void initProgramControls(int baseX, int baseY) {
     ;
   styleMain("sqCaps");
 
+  cp5.addToggle("xWhite")
+    .setLabel("BLACK/\nWHITE")
+    .setPosition(baseX + cSpaceX * 5, baseY + cSpaceY * 4)
+    .setSize(50, 20)
+    ;
+  styleMain("xWhite");
+
+  cp5.addToggle("colourLine")
+    .setLabel("COLOURED\nLINE")
+    .setPosition(baseX + cSpaceX * 6, baseY + cSpaceY * 4)
+    .setSize(50, 20)
+    .setValue(colourLine);
+    ;
+  styleMain("colourLine");
 
   cp5.addToggle("pauseMotion")
     .setLabel("PAUSE")
-    .setPosition(baseX, baseY + cSpaceY*4.75)
+    .setPosition(baseX, baseY + cSpaceY*6)
     .setSize(100, 40)
     ;
   styleMain("pauseMotion");
 
   cp5.addToggle("showAdvertisers")
     .setLabel("SHOW/HIDE\nADVERTISERS")
-    .setPosition(baseX+ cSpaceX * 2, baseY + cSpaceY*4.75)
+    .setPosition(baseX+ cSpaceX * 2, baseY + cSpaceY*6)
     .setSize(100, 40)
     .setValue(false);
   styleMain("showAdvertisers");
@@ -274,7 +288,7 @@ void initProgramControls(int baseX, int baseY) {
   cf = new ControlFrame(this, "Control Panel");
 
   // Create the xColour RGBA slider set at position (20, 50)
-  xColour = new RGBAController(cp5, "X COLOUR", baseX, baseY + cSpaceY*5.5);
+  //xColour = new RGBAController(cp5, "X COLOUR", baseX, baseY + cSpaceY*5.5);
 
   //cp5.addBang("generate")
   //  .setLabel("GENERATE")
@@ -434,9 +448,9 @@ void controlEvent(ControlEvent theEvent) {
   }
 
   ///check xColor is fully initialised + event is from xColor controller
-  if (xColour != null && xColour.detectEvent(theEvent)) {
-    xColor = xColour.getColor();
-  }
+  //if (xColour != null && xColour.detectEvent(theEvent)) {
+  //  xColor = xColour.getColor();
+  //}
 }
 
 void fixedSpeed() {
@@ -448,7 +462,32 @@ void fixedSpeed() {
   }
 }
 
+void xWhite() {
 
+  xWhite = !xWhite;
+
+  if (xWhite) {
+    xColor = color(255, 255, 255);
+  } else {
+    xColor = color(0, 0, 0);
+  }
+}
+
+void colourLine() {
+
+  if (colourLine) {
+    for (DataObjectAd i : dataObjectsAd) {
+      i.myColor = palette[i.cVal];
+    }
+  } else {
+    for (DataObjectAd i : dataObjectsAd) {
+      i.myColor = color(0, 0, 0);
+    }
+  }
+  
+   colourLine = !colourLine;
+   
+}
 
 void showController(String theControllerName, boolean show) {
 
@@ -508,65 +547,66 @@ public void showAdvertisers(boolean val) {
   }
 }
 
-class RGBAController {
-  Textlabel titleLabel;
-  Slider[] sliders = new Slider[3]; //change to 4 to add alpha
-  String[] labels = {"Red", "Green", "Blue"}; //, "Opacity"};
-  color[] sliderColors = {
-    color(255, 0, 0), // Red
-    color(0, 255, 0), // Green
-    color(0, 0, 255), // Blue
-    //color(0, 0, 0) // Gray for Alpha
-  };
+//*** Removin for now - Only want X's to be black or white ***///
+//class RGBAController {
+//  Textlabel titleLabel;
+//  Slider[] sliders = new Slider[3]; //change to 4 to add alpha
+//  String[] labels = {"Red", "Green", "Blue"}; //, "Opacity"};
+//  color[] sliderColors = {
+//    color(255, 0, 0), // Red
+//    color(0, 255, 0), // Green
+//    color(0, 0, 255), // Blue
+//    //color(0, 0, 0) // Gray for Alpha
+//  };
 
-  float x, y;   // position of the entire control set
+//  float x, y;   // position of the entire control set
 
-  RGBAController(ControlP5 cp5, String title, float x, float y) {
-    this.x = x;
-    this.y = y;
+//  RGBAController(ControlP5 cp5, String title, float x, float y) {
+//    this.x = x;
+//    this.y = y;
 
-    // Add the title label (like a group header)
-    titleLabel = cp5.addTextlabel(title + "Label")
-      .setText(title)
-      .setPosition(x, y)
-      .setFont(cp5FontInconsolata)
-      .setColorValue(cGrey); // black text
+//    // Add the title label (like a group header)
+//    titleLabel = cp5.addTextlabel(title + "Label")
+//      .setText(title)
+//      .setPosition(x, y)
+//      .setFont(cp5FontInconsolata)
+//      .setColorValue(cGrey); // black text
 
-    int sliderWidth = 75; // total width 300 / 4 sliders
+//    int sliderWidth = 75; // total width 300 / 4 sliders
 
-    // Create sliders individually
-    for (int i = 0; i < sliders.length; i++) {
-      sliders[i] = cp5.addSlider(labels[i])
-        .setRange(0, 255)
-        .setValue(0)
-        .setSize(sliderWidth - 5, 15)
-        .setPosition(x + i * sliderWidth, y + 20)  // placed below label
-        .setLabel(labels[i])
-        .setColorForeground(sliderColors[i])
-        .setColorActive(sliderColors[i])
-        .setColorBackground(cGrey);
+//    // Create sliders individually
+//    for (int i = 0; i < sliders.length; i++) {
+//      sliders[i] = cp5.addSlider(labels[i])
+//        .setRange(0, 255)
+//        .setValue(0)
+//        .setSize(sliderWidth - 5, 15)
+//        .setPosition(x + i * sliderWidth, y + 20)  // placed below label
+//        .setLabel(labels[i])
+//        .setColorForeground(sliderColors[i])
+//        .setColorActive(sliderColors[i])
+//        .setColorBackground(cGrey);
 
-      sliders[i].getCaptionLabel()
-        .setText(labels[i])
-        .align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE)
-        .setPaddingX(2)
-        .setPaddingY(2)
-        .setColor(cGrey);
-    }
-  }
+//      sliders[i].getCaptionLabel()
+//        .setText(labels[i])
+//        .align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE)
+//        .setPaddingX(2)
+//        .setPaddingY(2)
+//        .setColor(cGrey);
+//    }
+//  }
 
-  color getColor() {
-    return color(sliders[0].getValue(),
-      sliders[1].getValue(),
-      sliders[2].getValue());
-    //sliders[3].getValue());
-  }
+//  color getColor() {
+//    return color(sliders[0].getValue(),
+//      sliders[1].getValue(),
+//      sliders[2].getValue());
+//    //sliders[3].getValue());
+//  }
 
-  // Checks whether a given ControlEvent came from one of this RGBAController's sliders
-  boolean detectEvent(ControlEvent theEvent) {
-    for (Slider s : sliders) {
-      if (theEvent.isFrom(s)) return true;
-    }
-    return false;
-  }
-}
+//  // Checks whether a given ControlEvent came from one of this RGBAController's sliders
+//  boolean detectEvent(ControlEvent theEvent) {
+//    for (Slider s : sliders) {
+//      if (theEvent.isFrom(s)) return true;
+//    }
+//    return false;
+//  }
+//}

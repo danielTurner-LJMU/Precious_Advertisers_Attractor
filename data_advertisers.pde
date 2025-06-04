@@ -21,11 +21,13 @@ boolean sqCaps = false;
 float xScale = 1;
 float xThickness = 1;
 
+boolean xWhite = false;
 color xColor = color(0, 0, 0);
 
 boolean drawAdNames = false;
 
-//**** Line thickness variables
+//**** Line variables
+boolean colourLine = true;
 color[] palette = {#F25CA2, #F229AC, #04B2D9, #F2CB05, #F2B705}; //colours to pick for line colour
 float strokeThick = 1;
 int step = 1;
@@ -99,8 +101,8 @@ class DataObjectAd
 
   float r; //radius of shape
 
-  color myColor; ///**** NOT USED AT MOMENT *** available in case a data property can be used e.g. re-marketing.
-
+  int cVal; //array position object draws individual color from
+  color myColor;
 
   DataObjectAd(int id, String siteName, boolean visit, boolean remarket, boolean customerFile) {
 
@@ -140,7 +142,7 @@ class DataObjectAd
     //}
 
     //pick a random colour from the palette
-    int cVal = (int)random(palette.length);
+    cVal = (int)random(palette.length);
     myColor = palette[cVal];
 
     //clear the arraylist storing previous points
