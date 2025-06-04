@@ -156,9 +156,23 @@ void initProgramControls(int baseX, int baseY) {
     ;
   styleMain("drawIP");
 
+  cp5.addToggle("drawCookie")
+    .setLabel("Draw\nCOOKIE")
+    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 1.85)
+    .setSize(50, 20)
+    ;
+  styleMain("drawCookie");
+  
+  cp5.addToggle("drawDate")
+    .setLabel("DRAW\nDATE")
+    .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 1.85)
+    .setSize(50, 20)
+    ;
+  styleMain("drawDate");
+
   cp5.addToggle("drawAction")
     .setLabel("DRAW\nACTION")
-    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 1.85)
+    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 1.85)
     .setSize(50, 20)
     ;
   styleMain("drawAction");
@@ -459,7 +473,6 @@ void controlEvent(ControlEvent theEvent) {
       for (int i = 0; i < wheels.length; i++) {
         if (theEvent.getController() == wheels[i]) {
           palette[i] = wheels[i].getRGB();
-          println("updating colour" + colourLine);
           if (colourLine) {
 
             for (DataObjectAd p : dataObjectsAd) {

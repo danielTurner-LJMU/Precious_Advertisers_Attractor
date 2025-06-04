@@ -31,7 +31,9 @@ float targetRadius = 30;
 float targetOpacity = 150;
 boolean drawCity = false;
 boolean drawIP = false;
+boolean drawCookie = false;
 boolean drawAction = false;
+boolean drawDate = false;
 
 void loadDataLogin() {
 
@@ -57,9 +59,11 @@ void extractDataLogin() {
     String action = thisActivity.getString("action");
     String siteName = thisActivity.getString("site_name");
     String city = thisActivity.getString("city");
+    String country = thisActivity.getString("country");
     String ip = thisActivity.getString("ip_address");
+    String cookie = thisActivity.getString("datr_cookie");
     long timestamp = thisActivity.getLong("timestamp");
-    dataObjectsLogin[i] = new DataObjectLogin(i, action, siteName, city, ip, timestamp);
+    dataObjectsLogin[i] = new DataObjectLogin(i, action, siteName, city, country, ip, cookie, timestamp);
   }
 
   startDate = dataObjectsLogin[dataObjectsLogin.length-1].timeStamp;
@@ -125,7 +129,7 @@ String[] getUniqueFieldValues(DataObjectLogin[] objects, String fieldName) {
 class DataObjectLogin
 {
   int ID;
-  String action, siteName, city, IP;
+  String action, siteName, city, country, IP, datr_cookie, date;
   long timeStamp;
   float zeroDate;//store date zero'd out against start date
 
@@ -141,14 +145,19 @@ class DataObjectLogin
 
 
 
-  DataObjectLogin(int id, String act, String site, String c, String ip, long time ) {
+  DataObjectLogin(int id, String act, String site, String c, String place, String ip, String cookie, long time ) {
 
     ID = id;
     action = act;
     timeStamp = time;
     siteName = site;
     city = c;
+    country = place;
     IP = ip;
+    datr_cookie = cookie;
+    //convert timestamp to dates
+    Date tempDate = convertDate(time);
+    date = tempDate.toString();
 
     radiusMultiplier = random(0.1, 2);
     r = targetRadius*radiusMultiplier;
@@ -229,18 +238,23 @@ class DataObjectLogin
       textSize(12);
       float yLoc = -(r*0.5);//((ID*10)%r) - (r*0.5);x
       pg.fill(0);
-      if (drawCity) {       
-        //shift y position of text for overlapping objects
-        pg.text(city, (r*0.5)+5, yLoc);
+      if (drawCity) {
+        pg.text(city +", " + country, (r*0.5)+5, yLoc);
         yLoc+=14;
       }
-      if (drawIP) {       
-        //shift y position of text for overlapping objects
+      if (drawIP) {
         pg.text(IP, (r*0.5)+5, yLoc);
         yLoc+=14;
       }
-      if (drawAction) {       
-        //shift y position of text for overlapping objects
+      if (drawCookie) {
+        pg.text(datr_cookie, (r*0.5)+5, yLoc);
+        yLoc+=14;
+      }
+      if (drawDate) {
+        pg.text(date, (r*0.5)+5, yLoc);
+        yLoc+=14;
+      }
+      if (drawAction) {
         pg.text(action, (r*0.5)+5, yLoc);
         yLoc+=14;
       }
