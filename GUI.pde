@@ -37,6 +37,9 @@ ControlFrame cf;
 
 boolean controlFrameVisible = false;
 
+//Colour wheels for controlling line colors:
+ColorWheel[] wheels = new ColorWheel[5];
+
 /// ---- GUI SETUP AND CONTROL ---- ///
 
 void initGUI() {
@@ -263,12 +266,22 @@ void initProgramControls(int baseX, int baseY) {
   styleMain("xWhite");
 
   cp5.addToggle("colourLine")
-    .setLabel("COLOURED\nLINE")
-    .setPosition(baseX + cSpaceX * 6, baseY + cSpaceY * 4)
+    .setLabel("COLOURED\nLINES")
+    .setPosition(baseX, baseY + cSpaceY * 4.75)
     .setSize(50, 20)
-    .setValue(colourLine);
+    .setBroadcast(false)
+    .setValue(true)
+    .setBroadcast(true)
     ;
   styleMain("colourLine");
+
+  //Add colour wheels
+  for (int i = 0; i < palette.length; i++) {
+    wheels[i] = cp5.addColorWheel("wheel" + i, baseX + (i+1) * 70, int(baseY + cSpaceY * 4.75), 60)
+      .setRGB(palette[i])
+      .setLabel("Color " + (i + 1));
+  }
+
 
   cp5.addToggle("pauseMotion")
     .setLabel("PAUSE")
@@ -427,18 +440,34 @@ void controlEvent(ControlEvent theEvent) {
     }
   }
 
-  // Handle toggle state changes for dataObjectsAd from the controlFrame
-  // This code checks if the control event came from a toggle named "adToggle_#"
-  // and uses the toggle's ID to update the corresponding data object's `drawMe` flag,
-  // which determines whether that object is drawn in the artwork buffer.
-
   if (c != null) {
     String name = c.getName();
+    // Handle toggle state changes for dataObjectsAd from the controlFrame
+    // This code checks if the control event came from a toggle named "adToggle_#"
+    // and uses the toggle's ID to update the corresponding data object's `drawMe` flag,
+    // which determines whether that object is drawn in the artwork buffer.
     if (name != null && name.startsWith("adToggle_")) {
       int id = c.getId();
       boolean val = c.getValue() == 1.0;
       // update objects here
       dataObjectsAd[id].drawMe = val;
+    }
+    // ColorWheel controls to update colours stored in "palette" array
+    // it subsequently updates the 'myColor' variable in each advertiser object
+    if (name != null && name.startsWith("wheel")) {
+
+      for (int i = 0; i < wheels.length; i++) {
+        if (theEvent.getController() == wheels[i]) {
+          palette[i] = wheels[i].getRGB();
+          println("updating colour" + colourLine);
+          if (colourLine) {
+
+            for (DataObjectAd p : dataObjectsAd) {
+              p.myColor = palette[p.cVal];
+            }
+          }
+        }
+      }
     }
   }
 
@@ -446,6 +475,8 @@ void controlEvent(ControlEvent theEvent) {
   if (theEvent.isFrom("hidePanel")) {
     cp5.get(Toggle.class, "showAdvertisers").setValue(false);
   }
+
+
 
   ///check xColor is fully initialised + event is from xColor controller
   //if (xColour != null && xColour.detectEvent(theEvent)) {
@@ -475,6 +506,8 @@ void xWhite() {
 
 void colourLine() {
 
+  colourLine = !colourLine;
+
   if (colourLine) {
     for (DataObjectAd i : dataObjectsAd) {
       i.myColor = palette[i.cVal];
@@ -484,9 +517,6 @@ void colourLine() {
       i.myColor = color(0, 0, 0);
     }
   }
-  
-   colourLine = !colourLine;
-   
 }
 
 void showController(String theControllerName, boolean show) {
