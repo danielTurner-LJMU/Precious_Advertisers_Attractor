@@ -80,3 +80,20 @@ void mouseReleased() {
     dragEnabled = false;
   }
 }
+
+String generateFileName(String fileType) {
+  
+  String saveLocation = "x - output/";
+  String fileName = "Precious_Advertisers - " +
+  year() + "-" + month() + "-" + day() + 
+  " - " + hour() + "-" + minute() + "-" + second();
+  
+  return(saveLocation + fileName + " - " + currentPrintSize + "." + fileType);
+  
+}
+void outputTiff() {
+
+  println("saving tiff");
+  String outputFileName = generateFileName("tif");
+  pg.save(outputFileName);
+}

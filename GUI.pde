@@ -162,7 +162,7 @@ void initProgramControls(int baseX, int baseY) {
     .setSize(50, 20)
     ;
   styleMain("drawCookie");
-  
+
   cp5.addToggle("drawDate")
     .setLabel("DRAW\nDATE")
     .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 1.85)
@@ -299,14 +299,14 @@ void initProgramControls(int baseX, int baseY) {
 
   cp5.addToggle("pauseMotion")
     .setLabel("PAUSE")
-    .setPosition(baseX, baseY + cSpaceY*6)
+    .setPosition(baseX, baseY + cSpaceY*5.7)
     .setSize(100, 40)
     ;
   styleMain("pauseMotion");
 
   cp5.addToggle("showAdvertisers")
     .setLabel("SHOW/HIDE\nADVERTISERS")
-    .setPosition(baseX+ cSpaceX * 2, baseY + cSpaceY*6)
+    .setPosition(baseX+ cSpaceX * 2, baseY + cSpaceY*5.7)
     .setSize(100, 40)
     .setValue(false);
   styleMain("showAdvertisers");
@@ -349,6 +349,7 @@ void initMainControls() {
     .setFont(subFont)
     ;
 
+  //radion buttons to select print output size
   rOutputSize = cp5.addRadioButton("outputSize")
     .setLabel("PRINT SIZE")
     .setPosition(baseX, baseY + (cSpaceY * 0.3))
@@ -383,7 +384,7 @@ void initMainControls() {
   initProgramControls(baseX, baseY);
 
   // --- OUTPUT GROUP --- //
-  baseY = 900; //update start position on y-axis
+  baseY = 875; //update start position on y-axis
 
   cp5.addTextlabel("Output")
     .setText("OUTPUT")
@@ -391,6 +392,14 @@ void initMainControls() {
     .setColorValue(cGrey)
     .setFont(subFont)
     ;
+
+  cp5.addBang("outputTiff")
+    .setLabel("Save Image")
+    .setPosition(baseX, baseY + cSpaceY * 0.25)
+    .setSize(sButtonW, sButtonH)
+    ;
+
+  styleMain("outputTiff");
 }
 
 //Output size selector
@@ -404,6 +413,7 @@ void outputSize(int a) {
       printSizeSelect = a-1;
       PVector bufferSize = printSize[printSizeSelect];
       createImageBuffer(bufferSize.x, bufferSize.y);
+      currentPrintSize = printSizeLabel[printSizeSelect]; //stroe label for print size
     }
   }
 
@@ -549,6 +559,10 @@ void showController(String theControllerName, boolean show) {
 void styleMain(String theControllerName) {
 
   Controller c = cp5.getController(theControllerName);
+  // Get the class name (type) of the controller
+  //String typeName = c.getClass().getSimpleName();
+
+
 
   c.setColorBackground(cGrey);
   c.setColorForeground(cWhite); //needs updating
@@ -559,6 +573,11 @@ void styleMain(String theControllerName) {
   c.getCaptionLabel().setSize(14);
   c.getValueLabel().setColor(cBlack);
   c.getValueLabel().setSize(14);
+
+//catch bang buttons and reset foreground colour to grey
+  if (c instanceof Bang) {
+    c.setColorForeground(cGrey); 
+  }
 }
 
 

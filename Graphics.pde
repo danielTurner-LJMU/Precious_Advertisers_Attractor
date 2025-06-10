@@ -31,6 +31,13 @@ PVector[] printSize = {
   new PVector(2480, 2480), //Square - A4 width
 };
 
+//Matching array containing print size labels for attaching to output fileNames
+String[] printSizeLabel = {
+  "A6", "A5", "A4", "A3", "A4 Square"
+};
+//Store print size label selected
+String currentPrintSize = "none";
+
 //store the centre of the image preview area
 float previewCentreX, previewCentreY;
 float dragOffsetX = 0;
@@ -42,8 +49,6 @@ PVector dragStartLoc;
 
 //creates offscreen image buffer to draw to screen
 void createImageBuffer(float printX, float printY) {
-
-  String fileName = "z - Output/" + "OffSite Facebok - " + year() + "-" + month() + "-" + day() + "-" + hour()+minute()+second()+".pdf";
 
   //println("buffer Created = " + printX + " - " + printY);
   //if (pgRaster == null) {
@@ -236,10 +241,6 @@ void calculatePreviewOffset() {
   dragOffsetX = mouseX - dragStartLoc.x;
   dragOffsetY = mouseY - dragStartLoc.y;
 }
-
-
-
-
 
 void drawPreview() {
 

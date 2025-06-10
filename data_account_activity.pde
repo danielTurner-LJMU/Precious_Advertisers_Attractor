@@ -155,6 +155,7 @@ class DataObjectLogin
     country = place;
     IP = ip;
     datr_cookie = cookie;
+
     //convert timestamp to dates
     Date tempDate = convertDate(time);
     date = tempDate.toString();
@@ -247,8 +248,10 @@ class DataObjectLogin
         yLoc+=14;
       }
       if (drawCookie) {
-        pg.text(datr_cookie, (r*0.5)+5, yLoc);
-        yLoc+=14;
+        if (datr_cookie != null) {
+          pg.text(datr_cookie, (r*0.5)+5, yLoc);
+          yLoc+=14;
+        }
       }
       if (drawDate) {
         pg.text(date, (r*0.5)+5, yLoc);
