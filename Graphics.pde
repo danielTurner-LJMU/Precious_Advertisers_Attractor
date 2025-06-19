@@ -53,7 +53,7 @@ void createImageBuffer(float printX, float printY) {
   //println("buffer Created = " + printX + " - " + printY);
   //if (pgRaster == null) {
   pgRaster = createGraphics(int(printX), int(printY));
-  // pgPDF = createGraphics(sketchWidth, sketchHeight, PDF, fileName);
+  //pgPDF = createGraphics(int(printX), int(printY), PDF, fileName);
   pg = pgRaster;
   //}
 
@@ -86,6 +86,9 @@ void createImageBuffer(float printX, float printY) {
     i.initDraw();
   }
 }
+
+
+
 
 void drawBuffer() {
 

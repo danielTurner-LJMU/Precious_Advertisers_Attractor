@@ -1,3 +1,5 @@
+import processing.pdf.*; //PDF Export
+
 import java.util.*; //used for accesing date conversion function
 
 String title = "Precious Advertisers"; //use this to set the window title
@@ -82,18 +84,94 @@ void mouseReleased() {
 }
 
 String generateFileName(String fileType) {
-  
+
   String saveLocation = "x - output/";
   String fileName = "Precious_Advertisers - " +
-  year() + "-" + month() + "-" + day() + 
-  " - " + hour() + "-" + minute() + "-" + second();
-  
+    year() + "-" + month() + "-" + day() +
+    " - " + hour() + "-" + minute() + "-" + second();
+
   return(saveLocation + fileName + " - " + currentPrintSize + "." + fileType);
-  
 }
+
 void outputTiff() {
 
   println("saving tiff");
   String outputFileName = generateFileName("tif");
   pg.save(outputFileName);
+}
+
+void outputMultiPagePDF() {
+
+  println("saving PDF");
+
+  //
+  String outputFileName = generateFileName("pdf");
+  PVector bufferSize = printSize[printSizeSelect];
+  pgPDF = createGraphics(int(bufferSize.x), int(bufferSize.y), PDF, outputFileName);
+  pg = pgPDF; //swap pg to PDF renderer
+
+  PGraphicsPDF pdf = (PGraphicsPDF) pgPDF; //get the renderer
+
+
+
+  calculateBorder();
+  calculateLoginLine();
+
+  pg.beginDraw();
+  pg.background(255);
+  //drawLoginLine();
+
+  pdf.nextPage();
+
+  for (DataObjectLogin i : dataObjectsLogin) {
+
+    i.update();
+    i.activate();
+    i.drawLogin();
+  }
+
+  pdf.nextPage();
+
+  drawDates();
+
+  pdf.nextPage();
+
+  ///**** Stroke Thickness stuff
+  step = ceil(strokeThick/8);
+  if (step < 10) {
+    step = 10;
+  }
+  //-----------------------------///
+
+  pg.textSize(10); //reset text size
+  //find vertical centre of font
+  float textCentre = (textDescent() + textAscent())*0.5;
+  //ascent/descent maybe not reported correctly so the scalare lets us adjust for this
+  float scalar = 0.8;
+  textCentre *= scalar;
+
+
+  for (DataObjectAd i : dataObjectsAd) {
+    if (!pauseMotion) {
+      i.findTarget();
+      i.update();
+    }
+    if (i.drawMe) {//check if it is selected from toggle list
+      i.drawAdLines();
+     // pdf.nextPage(); this creates new page for every line
+    }
+  }
+
+  pdf.nextPage();
+
+
+  for (DataObjectAd i : dataObjectsAd) {
+    if (i.drawMe) {//check if it is selected from toggle list
+      i.drawAd(textCentre);
+    }
+  }
+  pg.endDraw();
+
+  pg.dispose();
+  pg = pgRaster;
 }

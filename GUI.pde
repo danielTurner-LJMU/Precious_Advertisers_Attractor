@@ -401,13 +401,13 @@ void initMainControls() {
 
   styleMain("outputTiff");
   
-    cp5.addBang("outputPDF")
+    cp5.addBang("outputMultiPagePDF")
     .setLabel("Save PDF")
     .setPosition(baseX + (cSpaceX * 2), baseY + cSpaceY * 0.25)
     .setSize(100, 40)
     ;
 
-  styleMain("outputPDF");
+  styleMain("outputMultiPagePDF");
 }
 
 //Output size selector
