@@ -396,10 +396,18 @@ void initMainControls() {
   cp5.addBang("outputTiff")
     .setLabel("Save Image")
     .setPosition(baseX, baseY + cSpaceY * 0.25)
-    .setSize(sButtonW, sButtonH)
+    .setSize(100, 40)
     ;
 
   styleMain("outputTiff");
+  
+    cp5.addBang("outputPDF")
+    .setLabel("Save PDF")
+    .setPosition(baseX + (cSpaceX * 2), baseY + cSpaceY * 0.25)
+    .setSize(100, 40)
+    ;
+
+  styleMain("outputPDF");
 }
 
 //Output size selector
