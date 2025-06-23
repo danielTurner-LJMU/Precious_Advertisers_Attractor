@@ -408,6 +408,14 @@ void initMainControls() {
     ;
 
   styleMain("outputMultiPagePDF");
+  
+   cp5.addBang("outputAlternatePDF")
+    .setLabel("Save X on top PDF")
+    .setPosition(baseX + (cSpaceX * 4), baseY + cSpaceY * 0.25)
+    .setSize(100, 40)
+    ;
+
+  styleMain("outputAlternatePDF");
 }
 
 //Output size selector

@@ -112,25 +112,22 @@ void outputMultiPagePDF() {
 
   PGraphicsPDF pdf = (PGraphicsPDF) pgPDF; //get the renderer
 
-
-
   calculateBorder();
   calculateLoginLine();
 
   pg.beginDraw();
-  pg.background(255);
-  //drawLoginLine();
 
-  pdf.nextPage();
-
+  //draw login circles
   for (DataObjectLogin i : dataObjectsLogin) {
-
-    i.update();
-    i.activate();
     i.drawLogin();
   }
 
   pdf.nextPage();
+
+  //draw login text and dates
+  for (DataObjectLogin i : dataObjectsLogin) {
+    i.drawLoginText();
+  }
 
   drawDates();
 
@@ -150,20 +147,35 @@ void outputMultiPagePDF() {
   float scalar = 0.8;
   textCentre *= scalar;
 
+  // temporary bool to store current state of drawAdNames
+  // if we are drawing white crosses they need to be drawn over the lines
+  // so they occlude when printing. drawing the advertiser names is
+  // integrated within 'drawAd' so we want to temporarily turn it off here
+  // meaning the advertiser name is not drawn on this page. We are storing
+  // the current state so it can be reset afterwards.
+  boolean drawNamesState = drawAdNames;
+  drawAdNames = false;
 
-  for (DataObjectAd i : dataObjectsAd) {
-    if (!pauseMotion) {
-      i.findTarget();
-      i.update();
+  //loop through all line colours and draw one colour to individual pages
+  for (int p = 0; p < palette.length; p++) {
+    for (DataObjectAd i : dataObjectsAd) {
+      if (i.drawMe) {//check if it is selected from toggle list
+        if (i.cVal == p) { //check if it is using first colour from palette array
+          i.drawAdLines();
+        }
+      }
     }
-    if (i.drawMe) {//check if it is selected from toggle list
-      i.drawAdLines();
-     // pdf.nextPage(); this creates new page for every line
+    //if x's are white then draw them - We have to draw all X's to each page
+    //as they need to cut through all line layers
+    for (DataObjectAd i : dataObjectsAd) {
+      if (xWhite) { 
+        i.drawAd(textCentre);
+      }
     }
+    pdf.nextPage();
   }
 
-  pdf.nextPage();
-
+  drawAdNames = drawNamesState; //reset drawAdNames value
 
   for (DataObjectAd i : dataObjectsAd) {
     if (i.drawMe) {//check if it is selected from toggle list

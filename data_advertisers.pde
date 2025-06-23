@@ -31,6 +31,7 @@ boolean colourLine = true;
 color[] palette = {#F25CA2, #F229AC, #04B2D9, #F2CB05};//, #F2B705}; //colours to pick for line colour
 float strokeThick = 1;
 int step = 1;
+color pdfBlack = color(0, 150); //semi transparent colour used for PDF export to risograph
 
 void loadDataAd() {
 
@@ -98,6 +99,8 @@ class DataObjectAd
   float maxForce;
   float myMaxSpeed;
   float myMaxForce;
+  float theta = 0; //rotation of x
+  float newR, newR2; //used to scale x and locate location to place advertiser text 
 
   float r; //radius of shape
 
@@ -131,6 +134,9 @@ class DataObjectAd
     maxForce = myMaxForce;
 
     r = 5.0;
+    
+    newR = r * xScale;
+    newR2 = newR*2;
 
     //Removing this for now - idea to set colour based on data from advertiser
     //none of mine have it as of yet.
@@ -168,6 +174,10 @@ class DataObjectAd
     velocity.limit(maxSpeed);
     location.add(velocity);
     acceleration.mult(0);
+
+    theta = velocity.heading() + PI/2;
+    newR = r * xScale;
+    newR2 = newR*2;
 
     history.add(location.copy());
     if (history.size() > historyLength) {
@@ -224,7 +234,18 @@ class DataObjectAd
     if (drawTail) {
       pg.beginShape();
 
-      pg.stroke(myColor);
+      //Check if we are exporting a PDF. If so set the stroke colour to black, semi-transparent
+      //As this is for riso-reproduction this should allow for some multiplying of colour within
+      //each colour layer/PDF page.
+      if (pg == pgPDF) {
+        if (colourLine) {      //if we are drawing coloured lines
+          pg.stroke(pdfBlack);
+        } else {               //if we are drawing black lines
+          pg.stroke(0);
+        }
+      } else {
+        pg.stroke(myColor);
+      }
       pg.strokeWeight(strokeThick);
       pg.noFill();
       for (int i = 0; i < history.size(); i+=step) {
@@ -236,14 +257,9 @@ class DataObjectAd
       pg.curveVertex(location.x, location.y);
       pg.endShape();
     }
-
   }
 
   void drawAd(float textCentreY) {
-
-    float theta = velocity.heading() + PI/2;
-    float newR = r * xScale;
-    float newR2 = newR*2;
 
     pg.pushMatrix();
     pg.translate(location.x, location.y);
@@ -277,4 +293,5 @@ class DataObjectAd
     }
     pg.popMatrix();
   }
+
 }

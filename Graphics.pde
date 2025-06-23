@@ -105,6 +105,7 @@ void drawBuffer() {
     i.update();
     i.activate();
     i.drawLogin();
+    i.drawLoginText();
   }
 
   drawDates();

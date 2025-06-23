@@ -222,22 +222,38 @@ class DataObjectLogin
     //  pg.circle(0, 0, r+10);
     //}
 
-    if (active) {
-      pg.fill(250, 106, 248, targetOpacity);
-    } else {
-      pg.fill(150, targetOpacity);
-    }
 
-    //if (hideMe) {
-    //  pg.fill(0, 0, 248);
-    //}
+    /* debugging sections allows you to see which logins are activated */
+    //if (active) {
+    //  pg.fill(250, 106, 248, targetOpacity);
+    //} else {
+    //  pg.fill(150, targetOpacity);
+    // }
+
+    //check if we are exporting to PDF for riso print
+    if (pg == pgPDF) {
+      pg.fill(0, targetOpacity);
+    } else {
+      pg.fill(250, 106, 248, targetOpacity);
+    }
 
     if (!hideMe) {
 
       pg.noStroke();
       pg.circle(0, 0, r);
+    }
+
+    pg.popMatrix();
+  }
+
+  void drawLoginText() {
+    pg.pushMatrix();
+    pg.translate(location.x, location.y);
+
+    if (!hideMe) {
+
       textSize(12);
-      float yLoc = -(r*0.5);//((ID*10)%r) - (r*0.5);x
+      float yLoc = -(r*0.5);
       pg.fill(0);
       if (drawCity) {
         pg.text(city +", " + country, (r*0.5)+5, yLoc);
