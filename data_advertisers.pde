@@ -9,22 +9,27 @@ JSONArray advertisers;
 //-------- OBJECT CREATION ----------//
 DataObjectAd[] dataObjectsAd;
 
-boolean drawTail = true;
-int historyLength = 300;
+boolean drawTail = true;          //Show/hide all lines
+int historyLength = 300;          //Number of previous positions to be stored for the lines
+boolean randomLineWeight = false;  //draw line thickness uniformly/with degree of randomness
 
+//controls for attraction behaviour of X objects.
+//by default the pick random max speeds and forces but this can be changed
+//so their behaviour is uniform. When uniform, the user can control the
+//maximum speed and maximum force for th esteering behaviour,].
 boolean fixedSpeed = false;
 float fixedMaxSpeed = 8;
 float fixedMaxForce = 0.1;
 
-boolean drawX = true;
-boolean sqCaps = false;
-float xScale = 1;
-float xThickness = 1;
+boolean drawX = true;           //show/hide all X's
+boolean sqCaps = false;         //draw with square/rounded caps
+float xScale = 1;               //size of x's
+float xThickness = 1;           //stroke weight for X's
 
-boolean xWhite = false;
-color xColor = color(0, 0, 0);
+boolean xWhite = false;         //draw X's white/black
+color xColor = color(0, 0, 0);  //colour to draw X's
 
-boolean drawAdNames = false;
+boolean drawAdNames = false;    //draw advertiser names?
 
 //**** Line variables
 boolean colourLine = true;
@@ -100,12 +105,13 @@ class DataObjectAd
   float myMaxSpeed;
   float myMaxForce;
   float theta = 0; //rotation of x
-  float newR, newR2; //used to scale x and locate location to place advertiser text 
+  float newR, newR2; //used to scale x and locate location to place advertiser text
 
   float r; //radius of shape
 
   int cVal; //array position object draws individual color from
   color myColor;
+  float randomStrokeThick; //randomised strokeWeight for when 'randomLineWeight' = true
 
   DataObjectAd(int id, String siteName, boolean visit, boolean remarket, boolean customerFile) {
 
@@ -134,7 +140,7 @@ class DataObjectAd
     maxForce = myMaxForce;
 
     r = 5.0;
-    
+
     newR = r * xScale;
     newR2 = newR*2;
 
@@ -150,6 +156,9 @@ class DataObjectAd
     //pick a random colour from the palette
     cVal = (int)random(palette.length);
     myColor = palette[cVal];
+
+    //initialise the random weight to 1
+    randomStrokeThick = 1;
 
     //clear the arraylist storing previous points
     history.clear();
@@ -176,8 +185,6 @@ class DataObjectAd
     acceleration.mult(0);
 
     theta = velocity.heading() + PI/2;
-    newR = r * xScale;
-    newR2 = newR*2;
 
     history.add(location.copy());
     if (history.size() > historyLength) {
@@ -246,7 +253,13 @@ class DataObjectAd
       } else {
         pg.stroke(myColor);
       }
-      pg.strokeWeight(strokeThick);
+
+      if (randomLineWeight) {
+        pg.strokeWeight(randomStrokeThick);
+      } else {
+        pg.strokeWeight(strokeThick);
+      }
+
       pg.noFill();
       for (int i = 0; i < history.size(); i+=step) {
         PVector v = history.get(i);
@@ -259,6 +272,10 @@ class DataObjectAd
     }
   }
 
+  void randomiseWeight() {
+    randomStrokeThick = random(strokeThick*0.2, strokeThick);
+  }
+
   void drawAd(float textCentreY) {
 
     pg.pushMatrix();
@@ -266,12 +283,16 @@ class DataObjectAd
     pg.rotate(theta);
 
     if (drawX) {
+      newR = r * xScale;
+      newR2 = newR*2;
+
       //-------- Move These to main draw loop to set once - i.e. rather than for every object-------/////
       if (sqCaps) {
         pg.strokeCap(PROJECT);
       } else {
         pg.strokeCap(ROUND);
       }
+
       pg.fill(175);
       pg.stroke(xColor);
       pg.strokeWeight(xThickness);
@@ -293,5 +314,4 @@ class DataObjectAd
     }
     pg.popMatrix();
   }
-
 }

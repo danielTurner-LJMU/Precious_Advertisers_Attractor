@@ -47,7 +47,7 @@ PVector dragStartLoc;
 
 //helper booleans - used to control visibility of graphics that show what user is affecting when they change values
 boolean borderVisible = false;
-boolean linesVisible = false;
+boolean rowsVisible = false;
 
 //-------------------------------------------------------------//
 
@@ -103,7 +103,7 @@ void drawBuffer() {
   pg.background(255);
 
   //if changing login Lines slider make the helper visible
-  if (linesVisible) {
+  if (rowsVisible) {
     drawLoginLine();
   }
 

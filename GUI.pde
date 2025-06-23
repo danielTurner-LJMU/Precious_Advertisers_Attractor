@@ -279,9 +279,19 @@ void initProgramControls(int baseX, int baseY) {
     ;
   styleMain("xWhite");
 
+  cp5.addToggle("randomLineWeight")
+    .setLabel("RANDOM\nLINE\nWEIGHT")
+    .setPosition(baseX, baseY + cSpaceY * 4.75)
+    .setSize(50, 20)
+    .setBroadcast(false)
+    .setValue(false)
+    .setBroadcast(true)
+    ;
+  styleMain("randomLineWeight");
+
   cp5.addToggle("colourLine")
     .setLabel("COLOURED\nLINES")
-    .setPosition(baseX, baseY + cSpaceY * 4.75)
+    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 4.75)
     .setSize(50, 20)
     .setBroadcast(false)
     .setValue(true)
@@ -291,7 +301,7 @@ void initProgramControls(int baseX, int baseY) {
 
   //Add colour wheels
   for (int i = 0; i < palette.length; i++) {
-    wheels[i] = cp5.addColorWheel("wheel" + i, baseX + (i+1) * 70, int(baseY + cSpaceY * 4.75), 60)
+    wheels[i] = cp5.addColorWheel("wheel" + i, baseX + cSpaceX + (i+1) * 70, int(baseY + cSpaceY * 4.75), 60)
       .setRGB(palette[i])
       .setLabel("Color " + (i + 1));
   }
@@ -520,10 +530,16 @@ void controlEvent(ControlEvent theEvent) {
   }
 
   if (theEvent.isFrom("numRows")) {
-    linesVisible = true;
+    rowsVisible = true;
   }
 
-
+  if (theEvent.isFrom("strokeThick")) {
+    if (randomLineWeight) {
+      for (DataObjectAd i : dataObjectsAd) {
+        i.randomiseWeight();
+      }
+    }
+  }
   ///check xColor is fully initialised + event is from xColor controller
   //if (xColour != null && xColour.detectEvent(theEvent)) {
   //  xColor = xColour.getColor();
@@ -564,6 +580,18 @@ void colourLine() {
     }
   }
 }
+
+void randomLineWeight() {
+
+  randomLineWeight = !randomLineWeight;
+
+  if (randomLineWeight) {
+    for (DataObjectAd i : dataObjectsAd) {
+      i.randomiseWeight();
+    }
+  }
+}
+
 
 void showController(String theControllerName, boolean show) {
 

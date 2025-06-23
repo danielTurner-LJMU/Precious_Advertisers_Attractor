@@ -81,10 +81,16 @@ void mouseReleased() {
   if (state == 1) {
     dragEnabled = false;
   }
-  
+
   //hide all helped graphics
   borderVisible = false;
-  linesVisible = false;
+
+
+  //for (DataObjectAd i : dataObjectsAd) {
+  //  i.initDraw();
+  //}
+
+  rowsVisible = false;
 }
 
 String generateFileName(String fileType) {
@@ -104,11 +110,10 @@ void outputTiff() {
   pg.save(outputFileName);
 }
 
-void outputTiffAndPDF(){
- 
+void outputTiffAndPDF() {
+
   outputTiff();
   outputMultiPagePDF();
-  
 }
 
 void outputMultiPagePDF() {
@@ -179,7 +184,7 @@ void outputMultiPagePDF() {
     //if x's are white then draw them - We have to draw all X's to each page
     //as they need to cut through all line layers
     for (DataObjectAd i : dataObjectsAd) {
-      if (xWhite) { 
+      if (xWhite) {
         i.drawAd(textCentre);
       }
     }
