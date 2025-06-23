@@ -81,6 +81,10 @@ void mouseReleased() {
   if (state == 1) {
     dragEnabled = false;
   }
+  
+  //hide all helped graphics
+  borderVisible = false;
+  linesVisible = false;
 }
 
 String generateFileName(String fileType) {

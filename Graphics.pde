@@ -45,6 +45,10 @@ float dragOffsetY = 0;
 boolean dragEnabled = false;
 PVector dragStartLoc;
 
+//helper booleans - used to control visibility of graphics that show what user is affecting when they change values
+boolean borderVisible = false;
+boolean linesVisible = false;
+
 //-------------------------------------------------------------//
 
 //creates offscreen image buffer to draw to screen
@@ -97,8 +101,11 @@ void drawBuffer() {
 
   pg.beginDraw();
   pg.background(255);
-  //drawLoginLine();
 
+  //if changing login Lines slider make the helper visible
+  if (linesVisible) {
+    drawLoginLine();
+  }
 
   for (DataObjectLogin i : dataObjectsLogin) {
 
@@ -143,6 +150,10 @@ void drawBuffer() {
     }
   }
 
+  //if changing broder value then draw the border helper
+  if (borderVisible) {
+    drawBorder();
+  }
 
   pg.endDraw();
 }
@@ -153,6 +164,18 @@ void drawBuffer() {
 void calculateBorder() {
 
   borderAsPixels = (pg.width/100) * border;
+}
+
+//draw border while re-sizing so user can see what they're controlling
+void drawBorder() {
+
+  pg.noFill();
+  pg.stroke(0, 255, 0);
+  pg.strokeWeight(4);
+  pg.line(borderAsPixels, 0, borderAsPixels, pg.height);
+  pg.line(pg.width - borderAsPixels, 0, pg.width - borderAsPixels, pg.height);
+  pg.line(0, borderAsPixels, pg.width, borderAsPixels);
+  pg.line(0, pg.height - borderAsPixels, pg.width, pg.height - borderAsPixels);
 }
 
 //Login activity is drawn along a line that is spread
@@ -181,7 +204,8 @@ void calculateLoginLine() {
 
 void drawLoginLine() {
 
-  pg.stroke(0);
+  pg.stroke(0, 0, 255);
+  pg.strokeWeight(4);
   //draw guide lines
   for (int i = 0; i < numRows; i++) {
     float yBasePos = i*rowGap;

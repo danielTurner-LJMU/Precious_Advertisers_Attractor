@@ -400,16 +400,16 @@ void initMainControls() {
     ;
 
   styleMain("outputTiff");
-  
-    cp5.addBang("outputMultiPagePDF")
+
+  cp5.addBang("outputMultiPagePDF")
     .setLabel("Save PDF")
     .setPosition(baseX + (cSpaceX * 2), baseY + cSpaceY * 0.25)
     .setSize(100, 40)
     ;
 
   styleMain("outputMultiPagePDF");
-  
-   cp5.addBang("outputTiffAndPDF")
+
+  cp5.addBang("outputTiffAndPDF")
     .setLabel("Save image and PDF")
     .setPosition(baseX + (cSpaceX * 4), baseY + cSpaceY * 0.25)
     .setSize(100, 40)
@@ -515,6 +515,13 @@ void controlEvent(ControlEvent theEvent) {
     cp5.get(Toggle.class, "showAdvertisers").setValue(false);
   }
 
+  if (theEvent.isFrom("border")) {
+    borderVisible = true;
+  }
+
+  if (theEvent.isFrom("numRows")) {
+    linesVisible = true;
+  }
 
 
   ///check xColor is fully initialised + event is from xColor controller
@@ -590,9 +597,9 @@ void styleMain(String theControllerName) {
   c.getValueLabel().setColor(cBlack);
   c.getValueLabel().setSize(14);
 
-//catch bang buttons and reset foreground colour to grey
+  //catch bang buttons and reset foreground colour to grey
   if (c instanceof Bang) {
-    c.setColorForeground(cGrey); 
+    c.setColorForeground(cGrey);
   }
 }
 
