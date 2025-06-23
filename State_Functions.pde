@@ -125,18 +125,28 @@ void draw1() {
 
   background(0);
 
-  //*** drawBuffer maybe should not be called every frame as it is here.
-  //*** a sub-process that draw only when it is updated makes more sense
-  //*** from a performance viewpoint.
+  /* We are doing some balancing of performance here. When the 'pause' button is selected
+   the offsecreen buffer only updates when a GUI element is selected.
+   If you look in the GUI tab, I have excluded 'imScale' from this process.
+   This makes for smoother exploration of the piece as the buffer is not re-drawn
+   when we change the image scale.
+   *** Am sure there are more I could exclude ****
+   */
   if (bufferCreated) {
-    //if(!shapesDrawn){
-    drawBuffer(); //draws to offscreen buffer
-    shapesDrawn = true;
-    //}
-    
+    if (!pauseMotion) {
+      drawBuffer(); //draws to offscreen buffer
+      shapesDrawn = true;
+    } else {
+      if (!shapesDrawn) {
+        drawBuffer(); //draws to offscreen buffer
+        shapesDrawn = true;
+        //hide all helper graphics
+        borderVisible = false;
+        rowsVisible = false;
+      }
+    }
     drawPreview(); //copies offscreen buffer to the stage
   }
-
   //draw background rectangle to cover GUI area
   fill(cBlack);
   rect(guiWidth/2, height/2, guiWidth, height);

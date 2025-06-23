@@ -286,12 +286,7 @@ class DataObjectAd
       newR = r * xScale;
       newR2 = newR*2;
 
-      //-------- Move These to main draw loop to set once - i.e. rather than for every object-------/////
-      if (sqCaps) {
-        pg.strokeCap(PROJECT);
-      } else {
-        pg.strokeCap(ROUND);
-      }
+
 
       pg.fill(175);
       pg.stroke(xColor);

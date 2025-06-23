@@ -82,15 +82,10 @@ void mouseReleased() {
     dragEnabled = false;
   }
 
-  //hide all helped graphics
+  //hide all helper graphics
   borderVisible = false;
-
-
-  //for (DataObjectAd i : dataObjectsAd) {
-  //  i.initDraw();
-  //}
-
   rowsVisible = false;
+  
 }
 
 String generateFileName(String fileType) {

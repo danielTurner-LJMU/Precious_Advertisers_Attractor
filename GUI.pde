@@ -219,7 +219,7 @@ void initProgramControls(int baseX, int baseY) {
     .setLabel("LINE LENGTH")
     .setPosition(baseX, baseY + cSpaceY * 3.5)
     .setSize(sliderWidth, 20)
-    .setRange(30, 500)
+    .setRange(30, 1000)
     .setValue(historyLength);
   ;
   styleMain("historyLength");
@@ -228,7 +228,7 @@ void initProgramControls(int baseX, int baseY) {
     .setLabel("LINE THICKNESS")
     .setPosition(baseX, baseY + cSpaceY * 3.75)
     .setSize(sliderWidth, 20)
-    .setRange(1, 200)
+    .setRange(1, 400)
     .setValue(strokeThick);
 
   styleMain("strokeThick");
@@ -471,7 +471,6 @@ void controlEvent(ControlEvent theEvent) {
   }
   c = theEvent.getController();
 
-  shapesDrawn = false;
   //print("got an event from "+theEvent.getName()+"\t");
 
   if (theEvent.isFrom("timeRange")) {
@@ -540,10 +539,14 @@ void controlEvent(ControlEvent theEvent) {
       }
     }
   }
-  ///check xColor is fully initialised + event is from xColor controller
-  //if (xColour != null && xColour.detectEvent(theEvent)) {
-  //  xColor = xColour.getColor();
-  //}
+
+  //
+  if (pauseMotion) {
+    if (theEvent.isFrom("imScale")) {
+    } else {
+      shapesDrawn = false;
+    }
+  }
 }
 
 void fixedSpeed() {

@@ -102,9 +102,18 @@ void drawBuffer() {
   pg.beginDraw();
   pg.background(255);
 
+  //choose drawing square or round caps. Affects crosses and lines
+  if (sqCaps) {
+    pg.strokeCap(PROJECT);
+  } else {
+    pg.strokeCap(ROUND);
+  }
+
   //if changing login Lines slider make the helper visible
   if (rowsVisible) {
-    drawLoginLine();
+    if (!pauseMotion) { //have to check this as these lines do not clear out when the motion is paused
+      drawLoginLine();
+    }
   }
 
   for (DataObjectLogin i : dataObjectsLogin) {
@@ -150,9 +159,11 @@ void drawBuffer() {
     }
   }
 
-  //if changing broder value then draw the border helper
+  //if changing border value then draw the border helper
   if (borderVisible) {
-    drawBorder();
+    if (!pauseMotion) { //have to check this as these lines do not clear out when the motion is paused
+      drawBorder();
+    }
   }
 
   pg.endDraw();
@@ -204,7 +215,7 @@ void calculateLoginLine() {
 
 void drawLoginLine() {
 
-  pg.stroke(0, 0, 255);
+  pg.stroke(0, 255, 0);
   pg.strokeWeight(4);
   //draw guide lines
   for (int i = 0; i < numRows; i++) {
