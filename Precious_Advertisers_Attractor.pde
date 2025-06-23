@@ -2,7 +2,7 @@ import processing.pdf.*; //PDF Export
 
 import java.util.*; //used for accesing date conversion function
 
-String title = "Precious Advertisers"; //use this to set the window title
+String title = "Advertisers"; //use this to set the window and front page title
 
 int guiWidth = 500; //stores the right edge location of the GUI area
 
@@ -98,6 +98,13 @@ void outputTiff() {
   println("saving tiff");
   String outputFileName = generateFileName("tif");
   pg.save(outputFileName);
+}
+
+void outputTiffAndPDF(){
+ 
+  outputTiff();
+  outputMultiPagePDF();
+  
 }
 
 void outputMultiPagePDF() {

@@ -101,7 +101,7 @@ void draw0() {
 
   textFont(labelFont14);
   textSize(14);
-  text("Program Name Here", canvasCenterX, canvasCenterY+15);
+  text(title, canvasCenterX, canvasCenterY+15);
 
 
 

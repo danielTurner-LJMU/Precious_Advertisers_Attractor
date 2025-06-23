@@ -156,12 +156,12 @@ void initProgramControls(int baseX, int baseY) {
     ;
   styleMain("drawIP");
 
-  cp5.addToggle("drawCookie")
-    .setLabel("Draw\nCOOKIE")
+  cp5.addToggle("drawPlatform")
+    .setLabel("DRAW\nPLATFORM")
     .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 1.85)
     .setSize(50, 20)
     ;
-  styleMain("drawCookie");
+  styleMain("drawPlatform");
 
   cp5.addToggle("drawDate")
     .setLabel("DRAW\nDATE")
@@ -409,13 +409,13 @@ void initMainControls() {
 
   styleMain("outputMultiPagePDF");
   
-   cp5.addBang("outputAlternatePDF")
-    .setLabel("Save X on top PDF")
+   cp5.addBang("outputTiffAndPDF")
+    .setLabel("Save image and PDF")
     .setPosition(baseX + (cSpaceX * 4), baseY + cSpaceY * 0.25)
     .setSize(100, 40)
     ;
 
-  styleMain("outputAlternatePDF");
+  styleMain("outputTiffAndPDF");
 }
 
 //Output size selector

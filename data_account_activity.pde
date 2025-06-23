@@ -31,7 +31,7 @@ float targetRadius = 30;
 float targetOpacity = 150;
 boolean drawCity = false;
 boolean drawIP = false;
-boolean drawCookie = false;
+boolean drawPlatform = false;
 boolean drawAction = false;
 boolean drawDate = false;
 
@@ -61,16 +61,16 @@ void extractDataLogin() {
     String city = thisActivity.getString("city");
     String country = thisActivity.getString("country");
     String ip = thisActivity.getString("ip_address");
-    String cookie = thisActivity.getString("datr_cookie");
+    String userAgent = thisActivity.getString("user_agent"); // long string containing platform info
+    // Extract text between first pair of parentheses from the user agent string
+    String platformInfo = extractBetweenParentheses(userAgent);
+    
     long timestamp = thisActivity.getLong("timestamp");
-    dataObjectsLogin[i] = new DataObjectLogin(i, action, siteName, city, country, ip, cookie, timestamp);
+    dataObjectsLogin[i] = new DataObjectLogin(i, action, siteName, city, country, ip, platformInfo, timestamp);
   }
 
   startDate = dataObjectsLogin[dataObjectsLogin.length-1].timeStamp;
   endDate = dataObjectsLogin[0].timeStamp;
-
-
-
 
   /*
   ** Examples below show howe to access all different entries for various fields of data
@@ -91,6 +91,19 @@ void extractDataLogin() {
    */
 
   //println("start date = " + startDate + "\n" + "end date = " + endDate);
+}
+
+// This method extracts the text between the first pair of parentheses in a string.
+// If no valid pair is found, it returns an empty string.
+String extractBetweenParentheses(String input) {
+  int start = input.indexOf('(');
+  int end = input.indexOf(')', start);
+
+  if (start != -1 && end != -1 && end > start) {
+    return input.substring(start + 1, end);
+  } else {
+    return "No Platform Info"; // Return an empty string if no valid parentheses found
+  }
 }
 
 /**
@@ -129,7 +142,7 @@ String[] getUniqueFieldValues(DataObjectLogin[] objects, String fieldName) {
 class DataObjectLogin
 {
   int ID;
-  String action, siteName, city, country, IP, datr_cookie, date;
+  String action, siteName, city, country, IP, platformInfo, date;
   long timeStamp;
   float zeroDate;//store date zero'd out against start date
 
@@ -145,7 +158,7 @@ class DataObjectLogin
 
 
 
-  DataObjectLogin(int id, String act, String site, String c, String place, String ip, String cookie, long time ) {
+  DataObjectLogin(int id, String act, String site, String c, String place, String ip, String pInfo, long time ) {
 
     ID = id;
     action = act;
@@ -154,7 +167,7 @@ class DataObjectLogin
     city = c;
     country = place;
     IP = ip;
-    datr_cookie = cookie;
+    platformInfo = pInfo;
 
     //convert timestamp to dates
     Date tempDate = convertDate(time);
@@ -263,9 +276,9 @@ class DataObjectLogin
         pg.text(IP, (r*0.5)+5, yLoc);
         yLoc+=14;
       }
-      if (drawCookie) {
-        if (datr_cookie != null) {
-          pg.text(datr_cookie, (r*0.5)+5, yLoc);
+      if (drawPlatform) {
+        if (platformInfo != null) {
+          pg.text(platformInfo, (r*0.5)+5, yLoc);
           yLoc+=14;
         }
       }

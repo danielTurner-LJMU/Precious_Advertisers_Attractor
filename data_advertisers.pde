@@ -28,7 +28,7 @@ boolean drawAdNames = false;
 
 //**** Line variables
 boolean colourLine = true;
-color[] palette = {#F25CA2, #F229AC, #04B2D9, #F2CB05};//, #F2B705}; //colours to pick for line colour
+color[] palette = {#F229AC, #04B2D9, #F2CB05};//#F25CA2, #F2B705}; //colours to pick for line colour
 float strokeThick = 1;
 int step = 1;
 color pdfBlack = color(0, 150); //semi transparent colour used for PDF export to risograph
