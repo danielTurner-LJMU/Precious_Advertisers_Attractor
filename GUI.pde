@@ -480,6 +480,7 @@ void controlEvent(ControlEvent theEvent) {
     startDate = int(theEvent.getController().getArrayValue(0));
     endDate = int(theEvent.getController().getArrayValue(1));
     //println(dateSpread);
+    datesVisible = true;
   }
 
 

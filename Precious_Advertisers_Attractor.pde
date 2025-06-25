@@ -85,6 +85,7 @@ void mouseReleased() {
   //hide all helper graphics
   borderVisible = false;
   rowsVisible = false;
+  datesVisible = false;
   
 }
 

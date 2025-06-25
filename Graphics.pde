@@ -48,6 +48,7 @@ PVector dragStartLoc;
 //helper booleans - used to control visibility of graphics that show what user is affecting when they change values
 boolean borderVisible = false;
 boolean rowsVisible = false;
+boolean datesVisible = false;
 
 //-------------------------------------------------------------//
 
@@ -189,6 +190,34 @@ void drawBorder() {
   pg.line(0, pg.height - borderAsPixels, pg.width, pg.height - borderAsPixels);
 }
 
+
+//draw start/end dates while re-scaling so user can see the date range easily
+void drawHelperDates() {
+
+  //convert timestamps to dates
+  Date firstDate = convertDate(startDate);
+  Date secondDate = convertDate(endDate);
+
+  //create string for readout and set up meaasurmeents for background rect
+  String dateReadout = "Start Date: " + firstDate + "\n" + "End Date: " + secondDate;
+  textSize(24);
+  float dateLength = textWidth(dateReadout);
+  int padding = 10;
+  rectMode(CORNER);
+
+  //draw the rect and date
+  pushMatrix();
+  translate(guiWidth + 100, 100);
+  fill(0, 200);
+  noStroke();
+  rect(0, -textAscent(), dateLength + (padding*2), textAscent() + (padding * 5));
+  fill(0, 255, 0);
+  text(dateReadout, 10, 10);
+  popMatrix();
+
+  rectMode(CENTER); //reset rect mode
+}
+
 //Login activity is drawn along a line that is spread
 //across numerous rows. (to visualise this line uncomment 'drawLoginLine())
 //This function calculates the length of each individual line and
@@ -303,4 +332,9 @@ void drawPreview() {
   scale(imScale);
   image(pg, 0, 0);
   popMatrix();
+
+  //if changing date value then draw the date helper
+  if (datesVisible) {
+    drawHelperDates();
+  }
 }
