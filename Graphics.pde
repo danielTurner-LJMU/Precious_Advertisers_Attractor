@@ -200,7 +200,7 @@ void drawHelperDates() {
 
   //create string for readout and set up meaasurmeents for background rect
   String dateReadout = "Start Date: " + firstDate + "\n" + "End Date: " + secondDate;
-  textSize(24);
+  textSize(18);
   float dateLength = textWidth(dateReadout);
   int padding = 10;
   rectMode(CORNER);
@@ -210,7 +210,7 @@ void drawHelperDates() {
   translate(guiWidth + 100, 100);
   fill(0, 200);
   noStroke();
-  rect(0, -textAscent(), dateLength + (padding*2), textAscent() + (padding * 5));
+  rect(0, -textAscent(), dateLength + (padding*2), textAscent() + (padding * 4.3));
   fill(0, 255, 0);
   text(dateReadout, 10, 10);
   popMatrix();
