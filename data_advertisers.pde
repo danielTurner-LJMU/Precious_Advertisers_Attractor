@@ -121,12 +121,12 @@ class DataObjectAd
     myRemarket = remarket;
     myCustomerFile = customerFile;
 
-    drawMe = false;
+    drawMe = true;
   }
 
   void initDraw() {
 
-    drawMe = true;
+    //drawMe = true;
 
     location.x = random(pg.width);
     location.y = random(pg.height);

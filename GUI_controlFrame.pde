@@ -108,7 +108,7 @@ class ControlFrame extends PApplet {
       .setColorActive(cTheme);
     ;
 
-    // Create 200 toggles and store them
+    // Create required number of toggles based on data entries
     for (int i = 0; i < totalToggles; i++) {
       String toggleName = "adToggle_" + i;
       String labelText = dataObjectsAd[i].mySiteName; // Labels start at 1
