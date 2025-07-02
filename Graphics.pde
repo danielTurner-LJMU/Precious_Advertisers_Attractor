@@ -31,6 +31,14 @@ PVector[] printSize = {
   new PVector(2480, 2480), //Square - A4 width
 };
 
+//This is used to calculate the scalefactor for outputting the PDFs
+//I want them to be the correct size when opening in Illustrator or Photoshop (@300dpi)
+//PDF's are resolution independent but work with 'points' as their units. There are 72 points per inch
+//To convert we need to divide 72 by our desired dpi. This will give our scale factor.
+//To invert scaling i.e. sclae up from PDF to print just reverse - dpi / 72.0 ≈ 4.1667
+float dpi = 300;
+float pdfScaleFactor = 72.0 / dpi;
+
 //Matching array containing print size labels for attaching to output fileNames
 String[] printSizeLabel = {
   "A6", "A5", "A4", "A3", "A4 Square"
@@ -267,7 +275,11 @@ void drawDates() {
   float y2 = ((numRows-1)*rowGap)+yOffset;
 
   pg.textFont(subFont);
+  // if (pg == pgPDF) {
+  //   pg.textSize(14*pdfScaleFactor);
+  // } else {
   pg.textSize(14);
+  // }
   pg.noFill();
   pg.stroke(0);
   pg.strokeWeight(1);
@@ -277,7 +289,11 @@ void drawDates() {
   //draw dates and corresponding lines
   String date = firstDate.toString();
   pg.pushMatrix();
-  pg.translate(borderAsPixels, yOffset);
+  if (pg == pgPDF) {
+    pg.translate(borderAsPixels/pdfScaleFactor, yOffset/pdfScaleFactor);
+  } else {
+    pg.translate(borderAsPixels, yOffset);
+  }
   pg.line(0, -5, 0, -lineLength);
   pg.square(-5, -5, 10);
   pg.fill(0);
@@ -288,7 +304,11 @@ void drawDates() {
   date = secondDate.toString();
   pg.textAlign(RIGHT);
   pg.pushMatrix();
-  pg.translate(loginLineX2, y2);
+  if (pg == pgPDF) {
+    pg.translate(loginLineX2/pdfScaleFactor, y2/pdfScaleFactor);
+  } else {
+    pg.translate(loginLineX2, y2);
+  }
   pg.line(0, 5, 0, lineLength);
   pg.square(-5, -5, 10);
   pg.text(date, -10, lineLength);

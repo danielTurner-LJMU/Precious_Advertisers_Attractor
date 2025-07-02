@@ -86,7 +86,6 @@ void mouseReleased() {
   borderVisible = false;
   rowsVisible = false;
   datesVisible = false;
-  
 }
 
 String generateFileName(String fileType) {
@@ -119,7 +118,9 @@ void outputMultiPagePDF() {
   //
   String outputFileName = generateFileName("pdf");
   PVector bufferSize = printSize[printSizeSelect];
-  pgPDF = createGraphics(int(bufferSize.x), int(bufferSize.y), PDF, outputFileName);
+
+  //PDF buffer is created using the PDF scale factor to convert from DPI to points
+  pgPDF = createGraphics(int(bufferSize.x*pdfScaleFactor), int(bufferSize.y*pdfScaleFactor), PDF, outputFileName);
   pg = pgPDF; //swap pg to PDF renderer
 
   PGraphicsPDF pdf = (PGraphicsPDF) pgPDF; //get the renderer
@@ -128,22 +129,21 @@ void outputMultiPagePDF() {
   calculateLoginLine();
 
   pg.beginDraw();
+  pg.pushMatrix();
+  pg.scale(pdfScaleFactor); //adjust all drawing by the PDF scale factor
 
+  /////----- LOGIN CIRCLE LAYER -------///////
+  
   //draw login circles
   for (DataObjectLogin i : dataObjectsLogin) {
     i.drawLogin();
   }
 
-  pdf.nextPage();
-
-  //draw login text and dates
-  for (DataObjectLogin i : dataObjectsLogin) {
-    i.drawLoginText();
-  }
-
-  drawDates();
+  pg.popMatrix();
 
   pdf.nextPage();
+  
+  /////----- COLOURED LINE LAYERS -------///////
 
   ///**** Stroke Thickness stuff
   step = ceil(strokeThick/8);
@@ -153,10 +153,10 @@ void outputMultiPagePDF() {
   //-----------------------------///
 
   pg.textSize(10); //reset text size
-  //find vertical centre of font
-  float textCentre = (textDescent() + textAscent())*0.5;
-  //ascent/descent maybe not reported correctly so the scalare lets us adjust for this
-  float scalar = 0.8;
+
+
+  float textCentre = (textDescent() + textAscent())*0.5; //find vertical centre of font
+  float scalar = 0.8; //ascent/descent maybe not reported correctly so the scalare lets us adjust for this
   textCentre *= scalar;
 
   // temporary bool to store current state of drawAdNames
@@ -170,9 +170,12 @@ void outputMultiPagePDF() {
 
   //loop through all line colours and draw one colour to individual pages
   for (int p = 0; p < palette.length; p++) {
+    pg.pushMatrix();
+    pg.scale(pdfScaleFactor);
+
     for (DataObjectAd i : dataObjectsAd) {
-      if (i.drawMe) {//check if it is selected from toggle list
-        if (i.cVal == p) { //check if it is using first colour from palette array
+      if (i.drawMe) {//check if object is selected from toggle list
+        if (i.cVal == p) { //check if it is using the relevant from palette array
           i.drawAdLines();
         }
       }
@@ -184,16 +187,32 @@ void outputMultiPagePDF() {
         i.drawAd(textCentre);
       }
     }
+    pg.popMatrix();
     pdf.nextPage();
   }
 
   drawAdNames = drawNamesState; //reset drawAdNames value
 
+
+  /////----- BLACK PRINT LAYERS -------///////
+  
+  pg.pushMatrix();
+  pg.scale(pdfScaleFactor); //scale factor has to be applied every time we go to a new page
+
+  //draw login data text and dates
+  for (DataObjectLogin i : dataObjectsLogin) {
+    i.drawLoginText();
+  }
+
+  drawDates();
+
+  //draw the advertiser names
   for (DataObjectAd i : dataObjectsAd) {
     if (i.drawMe) {//check if it is selected from toggle list
       i.drawAd(textCentre);
     }
   }
+  pg.popMatrix();
   pg.endDraw();
 
   pg.dispose();
