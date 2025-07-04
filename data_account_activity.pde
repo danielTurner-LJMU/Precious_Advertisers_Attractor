@@ -226,16 +226,6 @@ class DataObjectLogin
     pg.pushMatrix();
     pg.translate(location.x, location.y);
 
-    //draw ring round circle
-    //if (!hideMe) {
-    //  pg.strokeWeight(0.5);
-
-    //  pg.stroke(0);
-    //  pg.noFill();
-    //  pg.circle(0, 0, r+10);
-    //}
-
-
     /* debugging sections allows you to see which logins are activated */
     //if (active) {
     //  pg.fill(250, 106, 248, targetOpacity);
@@ -251,7 +241,6 @@ class DataObjectLogin
     }
 
     if (!hideMe) {
-
       pg.noStroke();
       pg.circle(0, 0, r);
     }
