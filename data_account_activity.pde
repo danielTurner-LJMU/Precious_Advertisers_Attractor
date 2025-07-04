@@ -265,30 +265,30 @@ class DataObjectLogin
 
     if (!hideMe) {
 
-      textSize(12);
+      pg.textSize(fontSize);
       float yLoc = -(r*0.5);
       pg.fill(0);
       if (drawCity) {
         pg.text(city +", " + country, (r*0.5)+5, yLoc);
-        yLoc+=14;
+        yLoc+=fontSize;
       }
       if (drawIP) {
         pg.text(IP, (r*0.5)+5, yLoc);
-        yLoc+=14;
+        yLoc+=fontSize;
       }
       if (drawPlatform) {
         if (platformInfo != null) {
           pg.text(platformInfo, (r*0.5)+5, yLoc);
-          yLoc+=14;
+          yLoc+=fontSize;
         }
       }
       if (drawDate) {
         pg.text(date, (r*0.5)+5, yLoc);
-        yLoc+=14;
+        yLoc+=fontSize;
       }
       if (drawAction) {
         pg.text(action, (r*0.5)+5, yLoc);
-        yLoc+=14;
+        yLoc+=fontSize;
       }
     }
 

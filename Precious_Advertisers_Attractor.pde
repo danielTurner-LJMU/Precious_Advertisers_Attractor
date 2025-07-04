@@ -152,7 +152,7 @@ void outputMultiPagePDF() {
   }
   //-----------------------------///
 
-  pg.textSize(10); //reset text size
+  pg.textSize(fontSize); //reset text size
 
 
   float textCentre = (textDescent() + textAscent())*0.5; //find vertical centre of font

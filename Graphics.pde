@@ -58,6 +58,9 @@ boolean borderVisible = false;
 boolean rowsVisible = false;
 boolean datesVisible = false;
 
+//variable to control font size of text drawn to artwork
+float fontSize = 10;
+
 //-------------------------------------------------------------//
 
 //creates offscreen image buffer to draw to screen
@@ -143,7 +146,7 @@ void drawBuffer() {
   }
   //-----------------------------///
 
-  pg.textSize(10); //reset text size
+  pg.textSize(fontSize); //reset text size
   //find vertical centre of font
   float textCentre = (textDescent() + textAscent())*0.5;
   //ascent/descent maybe not reported correctly so the scalare lets us adjust for this
@@ -278,7 +281,7 @@ void drawDates() {
   // if (pg == pgPDF) {
   //   pg.textSize(14*pdfScaleFactor);
   // } else {
-  pg.textSize(14);
+  pg.textSize(fontSize + 4);
   // }
   pg.noFill();
   pg.stroke(0);

@@ -118,7 +118,7 @@ void initProgramControls(int baseX, int baseY) {
     .setLabel("BORDER")
     .setPosition(baseX, baseY + cSpaceY * 1)
     .setSize(sliderWidth, 20)
-    .setRange(1, 40)
+    .setRange(-10, 40)
     .setValue(border);
   ;
 
@@ -320,6 +320,17 @@ void initProgramControls(int baseX, int baseY) {
     .setSize(100, 40)
     .setValue(false);
   styleMain("showAdvertisers");
+  
+    cp5.addSlider("fontSize")
+  .setLabel("FONT SIZE")
+    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 5.7)
+    .setSize(110, 20)
+    .setRange(10, 28)
+    .setNumberOfTickMarks(10)
+    .setValue(fontSize);
+  ;
+  styleMain("fontSize");
+  
 
   // Launch control frame
   cf = new ControlFrame(this, "Control Panel");
@@ -392,6 +403,8 @@ void initMainControls() {
     ;
 
   initProgramControls(baseX, baseY);
+  
+
 
   // --- OUTPUT GROUP --- //
   baseY = 875; //update start position on y-axis
