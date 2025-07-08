@@ -59,8 +59,6 @@ class ControlFrame extends PApplet {
 
   public void setup() {
     cp5 = new ControlP5(this);
-    //surface.setTitle("Show / Hide Advertisers");
-
 
     // Disable window decorations (removes close, minimize, etc.)
     javax.swing.SwingUtilities.invokeLater(() -> {

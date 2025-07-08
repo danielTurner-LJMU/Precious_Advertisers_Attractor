@@ -22,10 +22,7 @@ void endState() {
   case 1:
     cleanup1();
     break;
-  case 2:
-    cleanup2();
-    break;
-    // ...
+    // add more states here if required
   }
 }
 void startState() {
@@ -36,10 +33,7 @@ void startState() {
   case 1:
     setup1();
     break;
-  case 2:
-    setup2();
-    break;
-    // ...
+    // add more states here if required
   }
 }
 
@@ -76,9 +70,6 @@ void setup1() {
   initMainControls();
 }
 
-void setup2() {
-  //surface.setSize(800, 400);
-}
 
 //draw functions
 
@@ -113,8 +104,6 @@ void draw0() {
     textFont(subFont);
     textSize(14);
     text("Facebook data folder selected:", canvasCenterX, 590);
-    // folderName = parentFolderName[parentFolderName.length - 1]; //extract final folder name from full path
-    //String folderText = "Facebook data folder selected:\n\n" + folderName;
     textSize(18);
     text(folderName, canvasCenterX, 610);
   }
@@ -161,21 +150,12 @@ void draw1() {
   text(folderName, 200, 80);
 }
 
-void draw2() {
-  background(100);
-}
-
 //cleanup functions
 void cleanup0() {
 
   showController("confirm", false);
 
-  //cp5.getController("selectDataPath").hide();
-  //cp5.getController("confirm").hide();
 }
 
 void cleanup1() {
-}
-
-void cleanup2() {
 }

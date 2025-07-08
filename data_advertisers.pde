@@ -1,25 +1,27 @@
-//parentFolderPath is the path that is selected by the user.
+// parentFolderPath is the path that is selected by the user.
 
 String subFolderAd = "/ads_information"; //sub Folder we want to access
 String dataFileNameAd = "advertisers_using_your_activity_or_information.json"; //name of the JSON file
 
-JSONObject dataFileAd;
-JSONArray advertisers;
+JSONObject dataFileAd;  // Full JSON object loaded from file
+JSONArray advertisers;  // JSON array of individual advertisers
+
 
 //-------- OBJECT CREATION ----------//
-DataObjectAd[] dataObjectsAd;
+DataObjectAd[] dataObjectsAd;     // Array to store advertiser objects
 
 boolean drawTail = true;          //Show/hide all lines
-int historyLength = 300;          //Number of previous positions to be stored for the lines
-boolean randomLineWeight = false;  //draw line thickness uniformly/with degree of randomness
+int historyLength = 300;          // Number of points stored in trail history
+boolean randomLineWeight = false;  // Toggle for randomised line thickness
 
 //controls for attraction behaviour of X objects.
 //by default the pick random max speeds and forces but this can be changed
 //so their behaviour is uniform. When uniform, the user can control the
-//maximum speed and maximum force for th esteering behaviour,].
-boolean fixedSpeed = false;
-float fixedMaxSpeed = 8;
-float fixedMaxForce = 0.1;
+//maximum speed and maximum force for the steering behaviour.
+
+boolean fixedSpeed = false;    // Use uniform speed and force for all objects?
+float fixedMaxSpeed = 8;       // Fixed max speed (if enabled)
+float fixedMaxForce = 0.1;     // Fixed max force (if enabled)
 
 boolean drawX = true;           //show/hide all X's
 boolean sqCaps = false;         //draw with square/rounded caps
@@ -29,31 +31,29 @@ float xThickness = 1;           //stroke weight for X's
 boolean xWhite = false;         //draw X's white/black
 color xColor = color(0, 0, 0);  //colour to draw X's
 
-boolean drawAdNames = false;    //draw advertiser names?
+boolean drawAdNames = false;    // Toggle to draw advertiser names as text
 
 //**** Line variables
-boolean colourLine = true;
-color[] palette = {#F229AC, #04B2D9, #F2CB05};//#F25CA2, #F2B705}; //colours to pick for line colour
-float strokeThick = 1;
-int step = 1;
-color pdfBlack = color(0, 150); //semi transparent colour used for PDF export to risograph
+boolean colourLine = true;      // Toggle coloured/black lines
+color[] palette = {#F229AC, #04B2D9, #F2CB05}; //Line colour palette
+float strokeThick = 1;          // Base stroke weight
+int step = 1;                   // Distance between vertices on tail line
+color pdfBlack = color(0, 150); // Semi-transparent black for PDF export to risograph
 
 void loadDataAd() {
 
-  //compile path to required data file and load
+  // Build path to JSON file and load
   String fullDataPath = parentFolderPath + subFolderAd + "/" + dataFileNameAd;
   dataFileAd = loadJSONObject(fullDataPath);
-
-  //get individual objects
-  extractDataAd();
+  extractDataAd(); // Parse the JSON into objects
 }
 
 void extractDataAd() {
 
   //--------------------------------------------------//
-  ///////**** individual entry 'keys'****//////////
+  ///////**** Individual Entry 'keys'****//////////
 
-  //    "advertiser_name": "Naked Wines UK",
+  //    "advertiser_name": "Some Advertiser",
   //    "has_data_file_custom_audience": true,
   //    "has_remarketing_custom_audience": false,
   //    "has_in_person_store_visit": false
@@ -67,17 +67,21 @@ void extractDataAd() {
   //String[] myKeys = (String[]) dataFileLogin.keys().toArray(new String[dataFileLogin.size()]);
   //printArray(myKeys);
 
+  // Access array by known key in JSON file
   advertisers = dataFileAd.getJSONArray("custom_audiences_all_types_v2");
   dataObjectsAd = new DataObjectAd[advertisers.size()];
 
   for (int i = 0; i < advertisers.size(); i++) {
     JSONObject thisAdvertiser = advertisers.getJSONObject(i);
+
+    // Extract required fields from JSON entry
     String advertiserName = thisAdvertiser.getString("advertiser_name");
     Boolean visit = thisAdvertiser.getBoolean("has_in_person_store_visit");
     Boolean remarket = thisAdvertiser.getBoolean("has_remarketing_custom_audience");
     Boolean hasCustomerFile = thisAdvertiser.getBoolean("has_data_file_custom_audience");
+
+    // Create new advertiser object
     dataObjectsAd[i] = new DataObjectAd(i, advertiserName, visit, remarket, hasCustomerFile);
-    //println(advertiserName);
   }
 }
 
@@ -85,33 +89,27 @@ void extractDataAd() {
 
 class DataObjectAd
 {
+  // Basic Info
   int ID;
   String mySiteName;
-  boolean myVisit;
-  boolean myRemarket;
-  boolean myCustomerFile;
+  boolean myVisit, myRemarket, myCustomerFile;
   boolean drawMe;
 
 
   //Vehicle Properties for Advertisers
-  //array to store vectors of past locations
-  ArrayList<PVector> history = new ArrayList<PVector>();
-
+  ArrayList<PVector> history = new ArrayList<PVector>();  //array to store vectors of past locations
   PVector location = new PVector(0, 0);
-  PVector velocity;
-  PVector acceleration;
-  float maxSpeed;
-  float maxForce;
-  float myMaxSpeed;
-  float myMaxForce;
-  float theta = 0; //rotation of x
-  float newR, newR2; //used to scale x and locate location to place advertiser text
+  PVector velocity, acceleration;
+  float maxSpeed, maxForce;
+  float myMaxSpeed, myMaxForce;
 
-  float r; //radius of shape
-
-  int cVal; //array position object draws individual color from
-  color myColor;
-  float randomStrokeThick; //randomised strokeWeight for when 'randomLineWeight' = true
+  // Visual + Drawing Settings
+  float theta = 0;          //rotation of x
+  float newR, newR2;        // Used for scaling & spacing of sdvertiser text
+  float r;                  //radius of x shape
+  int cVal;                 // Index for colour palette
+  color myColor;            // Colour selected from palette
+  float randomStrokeThick;   //randomised strokeWeight for when 'randomLineWeight' = true
 
   DataObjectAd(int id, String siteName, boolean visit, boolean remarket, boolean customerFile) {
 
@@ -120,13 +118,11 @@ class DataObjectAd
     myVisit = visit;
     myRemarket = remarket;
     myCustomerFile = customerFile;
-
     drawMe = true;
   }
 
+  // Initiate advertiser objects
   void initDraw() {
-
-    //drawMe = true;
 
     location.x = random(pg.width);
     location.y = random(pg.height);
@@ -144,15 +140,6 @@ class DataObjectAd
     newR = r * xScale;
     newR2 = newR*2;
 
-    //Removing this for now - idea to set colour based on data from advertiser
-    //none of mine have it as of yet.
-    //if ((myVisit)||(myRemarket)) {
-    //  myColor = color(255, 0, 0);
-    //} else {
-
-    //  myColor = #000000;
-    //}
-
     //pick a random colour from the palette
     cVal = (int)random(palette.length);
     myColor = palette[cVal];
@@ -162,11 +149,10 @@ class DataObjectAd
 
     //clear the arraylist storing previous points
     history.clear();
-    //println("initialised" + ID);
   }
 
   void changeSpeed() {
-
+    // Switch between fixed or random (personal) speed/force
     if (fixedSpeed) {
       maxSpeed = fixedMaxSpeed;
       maxForce = fixedMaxForce;
@@ -174,10 +160,9 @@ class DataObjectAd
       maxSpeed = myMaxSpeed;
       maxForce = myMaxForce;
     }
-
-    //println(ID + " - " + maxSpeed);
   }
 
+  // Update Movement and Trail
   void update() {
     velocity.add(acceleration);
     velocity.limit(maxSpeed);
@@ -197,39 +182,48 @@ class DataObjectAd
     }
   }
 
+  //Seek Closest Active Login Object
   void findTarget() {
 
-    float distance = 99999;
-    float tempDist = 99999;
-    DataObjectLogin t = dataObjectsLogin[0];
+    // Set initial closest distance to a very large number
+    float closestDistance = Float.MAX_VALUE;
 
-    for (DataObjectLogin i : dataObjectsLogin) {
+    // Store the closest login target found (initially none)
+    DataObjectLogin closestTarget = null;
 
-      if (i.active) {
-        tempDist = PVector.dist(location, i.location);
-      }
+    // Loop through all login data objects
+    for (DataObjectLogin login : dataObjectsLogin) {
 
-      if (tempDist < distance) {
-        distance = tempDist;
-        t = i;
+      // Skip any login objects that are not currently active
+      if (!login.active) continue;
+
+      // Calculate the distance between this advertiser and the active login object
+      float d = PVector.dist(location, login.location);
+
+      // If this is the closest one so far, store it
+      if (d < closestDistance) {
+        closestDistance = d;
+        closestTarget = login;
       }
     }
 
-    if (tempDist == 99999) { //if no active targets are available
-      seek(new PVector(pg.width/2, pg.height/2));
+    // If no active login objects were found, seek the centre of the canvas
+    if (closestTarget == null) {
+      seek(new PVector(pg.width / 2, pg.height / 2));
     } else {
-      seek(t.location);
+
+      // Otherwise, seek the closest active login object's location
+      seek(closestTarget.location);
     }
   }
 
+  // Steering behavior to move towards the target
   void seek(PVector target) {
 
     PVector desired = PVector.sub(target, location);
     desired.setMag(maxSpeed);
     PVector steer = PVector.sub(desired, velocity);
-
     steer.limit(maxForce);
-
     applyForce(steer);
   }
 
@@ -237,12 +231,13 @@ class DataObjectAd
     acceleration.add(force);
   }
 
+  //Draw trailing lines
   void drawAdLines() {
     if (drawTail) {
       pg.beginShape();
 
       //Check if we are exporting a PDF. If so set the stroke colour to black, semi-transparent
-      //As this is for riso-reproduction this should allow for some multiplying of colour within
+      //As this is for riso-reproduction this will allow for some multiplying of colour within
       //each colour layer/PDF page.
       if (pg == pgPDF) {
         if (colourLine) {      //if we are drawing coloured lines
@@ -263,45 +258,38 @@ class DataObjectAd
       pg.noFill();
       for (int i = 0; i < history.size(); i+=step) {
         PVector v = history.get(i);
-        pg.curveVertex(v.x, v.y);//vertex(v.x, v.y);//
+        pg.curveVertex(v.x, v.y);
       }
-      //these two needed to take the shape right up to the vehicle
+
+      //these two are needed to take the path right up to the vehicle
       pg.curveVertex(location.x, location.y);
       pg.curveVertex(location.x, location.y);
       pg.endShape();
     }
   }
 
+  //Randomise stroke weight
   void randomiseWeight() {
     randomStrokeThick = random(strokeThick*0.2, strokeThick);
   }
 
+  //Draw 'X' Shape and Optional Text
   void drawAd(float textCentreY) {
 
     pg.pushMatrix();
     pg.translate(location.x, location.y);
     pg.rotate(theta);
 
+    // Draw 'x' shape
     if (drawX) {
       newR = r * xScale;
-      newR2 = newR*2;
-
-
-
-      pg.fill(175);
       pg.stroke(xColor);
       pg.strokeWeight(xThickness);
-      //----------------------------------------------------------------------------------/////
-
       pg.line(-newR, -newR, newR, newR);
       pg.line(newR, -newR, -newR, newR);
-      //if (myCustomerFile) {
-      //  pg.stroke(255);
-      //  pg.strokeWeight(xThickness/10);
-      //  pg.line(-newR/2, -newR/2, newR/2, newR/2);
-      //  pg.line(newR/2, -newR/2, -newR/2, newR/2);
-      //}
     }
+
+    // Draw label (Advertiser anme)
     if (drawAdNames) {
       pg.fill(0);
       pg.rotate(-theta);

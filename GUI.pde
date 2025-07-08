@@ -1,13 +1,10 @@
-import controlP5.*;
+import controlP5.*;  // GUI library
 ControlP5 cp5;
 
 
-// Button Size Presets s = small, l = large
-int sButtonW = 150;
-int sButtonH = 50;
-int lButtonW = 250;
-int lButtonH = 85;
-
+// Button sizes
+int sButtonW = 150, sButtonH = 50;
+int lButtonW = 250, lButtonH = 85;
 int sliderWidth = 350;
 
 //color palette
@@ -17,36 +14,30 @@ color cGrey = #aac0c1;
 color cWhite = color(255, 255, 255);
 color cNothing = color(0, 0, 0);
 
-//Spacers
-int cSpaceY = 100;
-int cSpaceX = 60;
+// Layout spacers
+int cSpaceY = 100, cSpaceX = 60;
 
+// Fonts and styles
 PFont headerFont, subFont, labelFont14, labelFont18, labelFontMono;
 ControlFont cp5FontGaramond, cp5FontInconsolata;
 
-int guiYGap = 50;
-
+//print size options
 RadioButton rOutputSize;
-
 int printSizeSelect;
 
 //Control Frame - Used for listing all advertiser to toggle on and off
 ControlFrame cf;
-
-//RGBAController xColour;
-
 boolean controlFrameVisible = false;
 
 //Colour wheels for controlling line colors:
 ColorWheel[] wheels = new ColorWheel[5];
 
 /// ---- GUI SETUP AND CONTROL ---- ///
-
 void initGUI() {
 
   cp5 = new ControlP5(this);
 
-  //load fonts
+  // load fonts
   labelFont14 = loadFont("AGaramondPro-Regular-14.vlw");
   subFont = createFont("Inconsolata-Regular.ttf", 18, true);
   labelFontMono = createFont("Inconsolata-Bold.ttf", 12, true);
@@ -70,7 +61,6 @@ void initIntroControls() {
     .setPosition(canvasCenterX-(lButtonW/2), 640)
     .setSize(lButtonW, lButtonH)
     .hide()
-    //.setLabel("confirm data path")
     ;
 
   styleIntro("confirm", "Confirm", "Top");
@@ -78,6 +68,7 @@ void initIntroControls() {
 
 ///////******* This is where all software controllers are created *******//////
 ///////******* Should be updated for each program *******//////
+
 void initProgramControls(int baseX, int baseY) {
 
   cp5.addSlider("imScale")
@@ -320,9 +311,9 @@ void initProgramControls(int baseX, int baseY) {
     .setSize(100, 40)
     .setValue(false);
   styleMain("showAdvertisers");
-  
-    cp5.addSlider("fontSize")
-  .setLabel("FONT SIZE")
+
+  cp5.addSlider("fontSize")
+    .setLabel("FONT SIZE")
     .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 5.7)
     .setSize(110, 20)
     .setRange(10, 28)
@@ -330,21 +321,10 @@ void initProgramControls(int baseX, int baseY) {
     .setValue(fontSize);
   ;
   styleMain("fontSize");
-  
+
 
   // Launch control frame
   cf = new ControlFrame(this, "Control Panel");
-
-  // Create the xColour RGBA slider set at position (20, 50)
-  //xColour = new RGBAController(cp5, "X COLOUR", baseX, baseY + cSpaceY*5.5);
-
-  //cp5.addBang("generate")
-  //  .setLabel("GENERATE")
-  //  .setPosition(baseX, baseY + cSpaceY * 6)
-  //  .setSize(sButtonW, sButtonH)
-  //  ;
-
-  //styleMain("generate");
 }
 void initMainControls() {
 
@@ -402,8 +382,7 @@ void initMainControls() {
     .setFont(subFont)
     ;
 
-  initProgramControls(baseX, baseY);
-  
+  initProgramControls(baseX, baseY); //main controls section
 
 
   // --- OUTPUT GROUP --- //
@@ -443,16 +422,17 @@ void initMainControls() {
 
 //Output size selector
 void outputSize(int a) {
-  //println("a radio Button event: "+ a);
 
   //if a radio button is clicked when already selected it returns a value of -1.
   //This first 'if' catches that event.
   if (a != -1) {
-    if ((a-1 != printSizeSelect)||(!bufferCreated)) { //button numbering starts at 1. Here we are aligning for an arrray that starts at 0.
+
+    //button numbering starts at 1. Here we are aligning for an arrray that starts at 0.
+    if ((a-1 != printSizeSelect)||(!bufferCreated)) {
       printSizeSelect = a-1;
       PVector bufferSize = printSize[printSizeSelect];
       createImageBuffer(bufferSize.x, bufferSize.y);
-      currentPrintSize = printSizeLabel[printSizeSelect]; //stroe label for print size
+      currentPrintSize = printSizeLabel[printSizeSelect]; //store label for print size
     }
   }
 
@@ -479,12 +459,9 @@ void controlEvent(ControlEvent theEvent) {
   Controller c;
 
   //radio buttons for output size throw an error if they are not caught here
-  if (theEvent.isFrom(rOutputSize)) {
-    return;
-  }
-  c = theEvent.getController();
+  if (theEvent.isFrom(rOutputSize)) return;
 
-  //print("got an event from "+theEvent.getName()+"\t");
+  c = theEvent.getController();
 
   if (theEvent.isFrom("timeRange")) {
     // min and max values are stored in an array.
@@ -492,38 +469,33 @@ void controlEvent(ControlEvent theEvent) {
     // min is at index 0, max is at index 1.
     startDate = int(theEvent.getController().getArrayValue(0));
     endDate = int(theEvent.getController().getArrayValue(1));
-    //println(dateSpread);
     datesVisible = true;
   }
 
 
   if (theEvent.isFrom("fixedMaxSpeed")||theEvent.isFrom("fixedMaxForce")) {
-    for (DataObjectAd i : dataObjectsAd) {
-      i.changeSpeed();
-    }
+    for (DataObjectAd i : dataObjectsAd) i.changeSpeed();
   }
 
   if (c != null) {
     String name = c.getName();
+    
     // Handle toggle state changes for dataObjectsAd from the controlFrame
     // This code checks if the control event came from a toggle named "adToggle_#"
     // and uses the toggle's ID to update the corresponding data object's `drawMe` flag,
     // which determines whether that object is drawn in the artwork buffer.
     if (name != null && name.startsWith("adToggle_")) {
       int id = c.getId();
-      boolean val = c.getValue() == 1.0;
-      // update objects here
-      dataObjectsAd[id].drawMe = val;
+      dataObjectsAd[id].drawMe = c.getValue() == 1.0; // set boolean to match toggle state
     }
+    
     // ColorWheel controls to update colours stored in "palette" array
     // it subsequently updates the 'myColor' variable in each advertiser object
     if (name != null && name.startsWith("wheel")) {
-
       for (int i = 0; i < wheels.length; i++) {
-        if (theEvent.getController() == wheels[i]) {
+        if (c == wheels[i]) {
           palette[i] = wheels[i].getRGB();
           if (colourLine) {
-
             for (DataObjectAd p : dataObjectsAd) {
               p.myColor = palette[p.cVal];
             }
@@ -533,7 +505,7 @@ void controlEvent(ControlEvent theEvent) {
     }
   }
 
-  //hide controlFrame and sync main tiggle button if "hidePanel" Bang is clicked in the controlFrame
+  //hide controlFrame and sync main toggle button if "hidePanel" Bang is clicked in the controlFrame
   if (theEvent.isFrom("hidePanel")) {
     cp5.get(Toggle.class, "showAdvertisers").setValue(false);
   }
@@ -620,6 +592,7 @@ void showController(String theControllerName, boolean show) {
     c.hide();
   }
 }
+
 //// ------ CONTROLLER STYLING -------- ///
 
 //Style settings for the app main screen
@@ -627,10 +600,6 @@ void showController(String theControllerName, boolean show) {
 void styleMain(String theControllerName) {
 
   Controller c = cp5.getController(theControllerName);
-  // Get the class name (type) of the controller
-  //String typeName = c.getClass().getSimpleName();
-
-
 
   c.setColorBackground(cGrey);
   c.setColorForeground(cWhite); //needs updating
@@ -655,7 +624,6 @@ void styleIntro(String theControllerName, String label, String align) {
 
   Controller c = cp5.getController(theControllerName);
 
-
   c.setColorForeground(cGrey);
   c.setColorBackground(cBlack);
   c.setColorActive(cGrey);
@@ -670,73 +638,10 @@ void styleIntro(String theControllerName, String label, String align) {
   c.getCaptionLabel().setText(label);
 }
 
+// Show / Hide controlfrma with advertiser toggles buttons
 public void showAdvertisers(boolean val) {
   controlFrameVisible = val;
   if (cf != null && cf.isReady()) {
     cf.getSurface().setVisible(controlFrameVisible);
   }
 }
-
-//*** Removin for now - Only want X's to be black or white ***///
-//class RGBAController {
-//  Textlabel titleLabel;
-//  Slider[] sliders = new Slider[3]; //change to 4 to add alpha
-//  String[] labels = {"Red", "Green", "Blue"}; //, "Opacity"};
-//  color[] sliderColors = {
-//    color(255, 0, 0), // Red
-//    color(0, 255, 0), // Green
-//    color(0, 0, 255), // Blue
-//    //color(0, 0, 0) // Gray for Alpha
-//  };
-
-//  float x, y;   // position of the entire control set
-
-//  RGBAController(ControlP5 cp5, String title, float x, float y) {
-//    this.x = x;
-//    this.y = y;
-
-//    // Add the title label (like a group header)
-//    titleLabel = cp5.addTextlabel(title + "Label")
-//      .setText(title)
-//      .setPosition(x, y)
-//      .setFont(cp5FontInconsolata)
-//      .setColorValue(cGrey); // black text
-
-//    int sliderWidth = 75; // total width 300 / 4 sliders
-
-//    // Create sliders individually
-//    for (int i = 0; i < sliders.length; i++) {
-//      sliders[i] = cp5.addSlider(labels[i])
-//        .setRange(0, 255)
-//        .setValue(0)
-//        .setSize(sliderWidth - 5, 15)
-//        .setPosition(x + i * sliderWidth, y + 20)  // placed below label
-//        .setLabel(labels[i])
-//        .setColorForeground(sliderColors[i])
-//        .setColorActive(sliderColors[i])
-//        .setColorBackground(cGrey);
-
-//      sliders[i].getCaptionLabel()
-//        .setText(labels[i])
-//        .align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE)
-//        .setPaddingX(2)
-//        .setPaddingY(2)
-//        .setColor(cGrey);
-//    }
-//  }
-
-//  color getColor() {
-//    return color(sliders[0].getValue(),
-//      sliders[1].getValue(),
-//      sliders[2].getValue());
-//    //sliders[3].getValue());
-//  }
-
-//  // Checks whether a given ControlEvent came from one of this RGBAController's sliders
-//  boolean detectEvent(ControlEvent theEvent) {
-//    for (Slider s : sliders) {
-//      if (theEvent.isFrom(s)) return true;
-//    }
-//    return false;
-//  }
-//}

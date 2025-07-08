@@ -1,59 +1,65 @@
-import java.lang.reflect.Field;
+import java.lang.reflect.Field; // Used for reflection to access object fields dynamically
 
+// File path and name for login activity data
 String subFolderLogin = "/security_and_login_information";
 String dataFileNameLogin = "account_activity.json"; //name of the JSON file
 
+// JSON objects to store and parse login activity
 JSONObject dataFileLogin;
 JSONArray accountActivity;
 
 //Variables used to calculate and draw timestamps across as set of horizontal lines
-long startDate, endDate; //store first and last dates of activity
-long dateSpread; //total distance bewteen dates
-float dateCut; //modulo operator for working out line return
-float dateScale; //scale factor converting date spread to line length
+long startDate, endDate;    //store first and last dates of activity
+long dateSpread;            //total distance bewteen dates
+float dateCut;              //modulo operator for working out line return
+float dateScale;            //scale factor converting date spread to line length
 
+//Layout parameters
 float border = 10;
 float borderAsPixels = 0;
 
-int numRows = 10;
-float rowGap;
-float yOffset;
+int numRows = 10;            // Number of rows in the timeline view
+float rowGap;                // Gap between rows
+float yOffset;               // Vertical offset for layout
 float lineLength, totalLineLength;
-float loginLineX1, loginLineX2;
+float loginLineX1, loginLineX2; // X-coordinates for start and end of login line
 
 //-------- OBJECT CREATION ----------//
-DataObjectLogin[] dataObjectsLogin;
+DataObjectLogin[] dataObjectsLogin;  // Array to store each login as an object
 
 
 //-------- TARGET PROPERTIES --------//
-float targetActivateChance = 0.995;
-float targetRadius = 30;
-float targetOpacity = 150;
+float targetActivateChance = 0.995;  // Probability of a target being (de)activated
+float targetRadius = 30;             // Default radius of target shapes
+float targetOpacity = 150;           // Opacity of the visual circles
+
+// Flags for drawing additional data
 boolean drawCity = false;
 boolean drawIP = false;
 boolean drawPlatform = false;
 boolean drawAction = false;
 boolean drawDate = false;
 
+// Load JSON login data and parse it
 void loadDataLogin() {
 
   String fullDataPath = parentFolderPath + subFolderLogin + "/" + dataFileNameLogin;
-  dataFileLogin = loadJSONObject(fullDataPath);
-
-  extractDataLogin();
+  dataFileLogin = loadJSONObject(fullDataPath); // Load JSON from file
+  extractDataLogin(); // Parse the JSON into objects
 }
 
+// Parse login data and initialize data objects
 void extractDataLogin() {
 
   accountActivity = dataFileLogin.getJSONArray("account_activity_v2");
   dataObjectsLogin = new DataObjectLogin[accountActivity.size()];
 
-  /*The lines below extract the 'key' names from the individual JSON objects.
-   It uses object 1 from the JSON array as a template */
+  // Use the first entry to extract keys (field names) for reference/debugging
   JSONObject accActivity1 = accountActivity.getJSONObject(0);
   String[] myKeys = (String[]) accActivity1.keys().toArray(new String[accActivity1.size()]);
   printArray(myKeys);
 
+  // Loop through each login entry and extract data
   for (int i = 0; i < accountActivity.size(); i++) {
     JSONObject thisActivity = accountActivity.getJSONObject(i);
     String action = thisActivity.getString("action");
@@ -61,20 +67,21 @@ void extractDataLogin() {
     String city = thisActivity.getString("city");
     String country = thisActivity.getString("country");
     String ip = thisActivity.getString("ip_address");
-    String userAgent = thisActivity.getString("user_agent"); // long string containing platform info
-    // Extract text between first pair of parentheses from the user agent string
-    String platformInfo = extractBetweenParentheses(userAgent);
-    
+    String userAgent = thisActivity.getString("user_agent"); // Raw platform string
+    String platformInfo = extractBetweenParentheses(userAgent); // Extract OS info from user agent
+
     long timestamp = thisActivity.getLong("timestamp");
+
+    // Create a new DataObjectLogin with extracted data
     dataObjectsLogin[i] = new DataObjectLogin(i, action, siteName, city, country, ip, platformInfo, timestamp);
   }
 
+  // Define the start and end dates based on first and last entries
   startDate = dataObjectsLogin[dataObjectsLogin.length-1].timeStamp;
   endDate = dataObjectsLogin[0].timeStamp;
 
   /*
-  ** Examples below show howe to access all different entries for various fields of data
-   ** They use the getUniqueFieldValues(obj, variable(field)) method to extract them from the objects
+  // Example code for extracting unique values from the data using reflection
    String[] uniqueActions = getUniqueFieldValues(dataObjectsLogin, "action");
    String[] uniqueSites = getUniqueFieldValues(dataObjectsLogin, "siteName");
    String[] uniqueCities = getUniqueFieldValues(dataObjectsLogin, "city");
@@ -82,25 +89,16 @@ void extractDataLogin() {
    
    println("Unique actions:");
    for (String action : uniqueActions) println(action);
-   println("site names:");
-   for (String siteName : uniqueSites) println(siteName);
-   println("city names:");
-   for (String city : uniqueCities) println(city);
-   println("IP Addresses:");
-   for (String IP : uniqueIPs) println(IP);
    */
-
-  //println("start date = " + startDate + "\n" + "end date = " + endDate);
 }
 
-// This method extracts the text between the first pair of parentheses in a string.
-// If no valid pair is found, it returns an empty string.
+// Extracts the text inside the first pair of parentheses in a string (e.g., OS from user agent)
 String extractBetweenParentheses(String input) {
   int start = input.indexOf('(');
   int end = input.indexOf(')', start);
 
   if (start != -1 && end != -1 && end > start) {
-    return input.substring(start + 1, end);
+    return input.substring(start + 1, end); // Extract text between '(' and ')'
   } else {
     return "No Platform Info"; // Return an empty string if no valid parentheses found
   }
@@ -121,43 +119,42 @@ String[] getUniqueFieldValues(DataObjectLogin[] objects, String fieldName) {
 
   for (DataObjectLogin obj : objects) {
     try {
-      // Use reflection to get the value of the field
-      Field field = obj.getClass().getDeclaredField(fieldName);
+      Field field = obj.getClass().getDeclaredField(fieldName); // Access field by name
       field.setAccessible(true); // allow access to private fields if needed
-      Object value = field.get(obj);
+      Object value = field.get(obj); // Get value from object
 
       if (value instanceof String) {
-        uniqueValues.add((String) value);
+        uniqueValues.add((String) value); // Store in set if it's a string
       }
     }
     catch (Exception e) {
-      println("Error accessing field: " + fieldName);
+      println("Error accessing field: " + fieldName); // Handle reflection errors
     }
   }
 
-  return uniqueValues.toArray(new String[0]);
+  return uniqueValues.toArray(new String[0]); // Convert set to array
 }
 
 ///-------------------- LOGIN OBJECT --------------------------///
+
+// Class representing one login entry as an object
 class DataObjectLogin
 {
   int ID;
   String action, siteName, city, country, IP, platformInfo, date;
   long timeStamp;
-  float zeroDate;//store date zero'd out against start date
+  float zeroDate; // Timestamp normalized against start date
 
-  //Target Properties
-
-  PVector location = new PVector(0, 0);
+  // Target behavior and visual properties
+  PVector location = new PVector(0, 0); // Position on canvas
   float attraction;
   boolean active = true;
   boolean hideMe = false;
 
-  float radiusMultiplier;
+  float radiusMultiplier;  // Used to vary circle sizes
   float r; //total shape radius
 
-
-
+  // Constructor that initializes all data fields
   DataObjectLogin(int id, String act, String site, String c, String place, String ip, String pInfo, long time ) {
 
     ID = id;
@@ -169,27 +166,25 @@ class DataObjectLogin
     IP = ip;
     platformInfo = pInfo;
 
-    //convert timestamp to dates
+    // Convert timestamp into readable date
     Date tempDate = convertDate(time);
     date = tempDate.toString();
 
+    // Set random values for appearance
     radiusMultiplier = random(0.1, 2);
     r = targetRadius*radiusMultiplier;
     attraction = random(1, 100);
   }
 
+  // Prepare object for visual layout by calculating relative date
   void initDraw() {
-
     zeroDate = timeStamp - startDate;
-    // println("ID = " + ID + " time = " + timeStamp + " action = " + action);
   }
 
+  // Randomly toggle activity state based on chance (if not hidden)
   void activate() {
-
     if (!hideMe) {
       float value = random(1);
-      //println(value);
-
       if (value > targetActivateChance) {
         active = !active;
         attraction = random(1, 100);
@@ -199,6 +194,7 @@ class DataObjectLogin
     }
   }
 
+  // Update position and visibility based on date range and layout
   void update() {
     long minDateVal = (long) cp5.getController("timeRange").getArrayValue(0);
     long maxDateVal = (long) cp5.getController("timeRange").getArrayValue(1);
@@ -207,20 +203,21 @@ class DataObjectLogin
     if (timeStamp < minDateVal || timeStamp > maxDateVal) {
       active = false;
       hideMe = true;
-      //println(ID + "hiding");
     } else {
       hideMe = false;
     }
 
-
     zeroDate = timeStamp - startDate;
+
+    // Calculate location using modulo for horizontal wrap and vertical row
     location.x = ((zeroDate%dateCut)*dateScale) + loginLineX1;
     location.y = (int(zeroDate/dateCut)*rowGap)+yOffset;
 
-    //update radius
-    r = targetRadius*radiusMultiplier;
+
+    r = targetRadius*radiusMultiplier; // Update radius
   }
 
+  // Draw the visual representation of a login/activity
   void drawLogin() {
 
     pg.pushMatrix();
@@ -233,13 +230,14 @@ class DataObjectLogin
     //  pg.fill(150, targetOpacity);
     // }
 
-    //check if we are exporting to PDF for riso print
+    // Set fill color depending on export mode: PDF is for Riso so greyscale
     if (pg == pgPDF) {
       pg.fill(0, targetOpacity);
     } else {
       pg.fill(250, 106, 248, targetOpacity);
     }
 
+    // Only draw if not hidden
     if (!hideMe) {
       pg.noStroke();
       pg.circle(0, 0, r);
@@ -248,15 +246,16 @@ class DataObjectLogin
     pg.popMatrix();
   }
 
+  // Optionally draw associated text labels for each login
   void drawLoginText() {
     pg.pushMatrix();
     pg.translate(location.x, location.y);
 
     if (!hideMe) {
-
       pg.textSize(fontSize);
-      float yLoc = -(r*0.5);
+      float yLoc = -(r*0.5); // Start top edge of the circle
       pg.fill(0);
+      
       if (drawCity) {
         pg.text(city +", " + country, (r*0.5)+5, yLoc);
         yLoc+=fontSize;

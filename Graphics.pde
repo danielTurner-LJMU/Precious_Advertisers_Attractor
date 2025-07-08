@@ -129,7 +129,6 @@ void drawBuffer() {
   }
 
   for (DataObjectLogin i : dataObjectsLogin) {
-
     i.update();
     i.activate();
     i.drawLogin();
@@ -138,21 +137,23 @@ void drawBuffer() {
 
   drawDates();
 
-
-  ///**** Stroke Thickness stuff
-  step = ceil(strokeThick/8);
+  step = ceil(strokeThick/8); // calculate spacing based on stroke weight
   if (step < 10) {
     step = 10;
   }
+
   //-----------------------------///
 
-  pg.textSize(fontSize); //reset text size
-  //find vertical centre of font
-  float textCentre = (textDescent() + textAscent())*0.5;
-  //ascent/descent maybe not reported correctly so the scalare lets us adjust for this
+  pg.textSize(fontSize);
+
+
+  float textCentre = (textDescent() + textAscent())*0.5; //find vertical centre of font
+
+  // Apply a scalar adjustment because text ascent/descent might not be accurate
   float scalar = 0.8;
   textCentre *= scalar;
 
+  //apply multiply mode so we get a sense of risograph output
   pg.blendMode(MULTIPLY);
   for (DataObjectAd i : dataObjectsAd) {
     if (!pauseMotion) {
@@ -163,7 +164,7 @@ void drawBuffer() {
       i.drawAdLines();
     }
   }
-  pg.blendMode(BLEND);
+  pg.blendMode(BLEND); // Reset blending mode
 
   for (DataObjectAd i : dataObjectsAd) {
     if (i.drawMe) {//check if it is selected from toggle list
@@ -230,7 +231,7 @@ void drawHelperDates() {
 }
 
 //Login activity is drawn along a line that is spread
-//across numerous rows. (to visualise this line uncomment 'drawLoginLine())
+//across numerous rows. 
 //This function calculates the length of each individual line and
 //the gap between the rows. The variables calculated here are used to position
 //the login objects.
@@ -321,12 +322,14 @@ void drawDates() {
   pg.textAlign(LEFT);
 }
 
+// Converts a Unix timestamp (in seconds) to a Java Date object
 Date convertDate(long timestamp) {
 
-  Date date = new Date(timestamp*1000);
+  Date date = new Date(timestamp*1000); // Multiply by 1000 to convert seconds to milliseconds
   return(date);
 }
 
+// Calculates how far the mouse has been dragged from its starting point
 void calculatePreviewOffset() {
 
   dragOffsetX = mouseX - dragStartLoc.x;
