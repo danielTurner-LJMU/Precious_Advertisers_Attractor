@@ -230,7 +230,7 @@ void initProgramControls(int baseX, int baseY) {
     .setLabel("DRAW\nLINES")
     .setPosition(baseX, baseY + cSpaceY * 4)
     .setSize(50, 20)
-    .setValue(true)
+    .setValue(false)
     //.setMode(ControlP5.SWITCH)
     ;
   styleMain("drawTail");

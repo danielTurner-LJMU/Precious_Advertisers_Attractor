@@ -10,7 +10,7 @@ JSONArray advertisers;  // JSON array of individual advertisers
 //-------- OBJECT CREATION ----------//
 DataObjectAd[] dataObjectsAd;     // Array to store advertiser objects
 
-boolean drawTail = true;          //Show/hide all lines
+boolean drawTail = false;          //Show/hide all lines
 int historyLength = 300;          // Number of points stored in trail history
 boolean randomLineWeight = false;  // Toggle for randomised line thickness
 
@@ -46,6 +46,7 @@ void loadDataAd() {
   String fullDataPath = parentFolderPath + subFolderAd + "/" + dataFileNameAd;
   dataFileAd = loadJSONObject(fullDataPath);
   extractDataAd(); // Parse the JSON into objects
+
 }
 
 void extractDataAd() {
@@ -67,21 +68,65 @@ void extractDataAd() {
   //String[] myKeys = (String[]) dataFileLogin.keys().toArray(new String[dataFileLogin.size()]);
   //printArray(myKeys);
 
-  // Access array by known key in JSON file
-  advertisers = dataFileAd.getJSONArray("custom_audiences_all_types_v2");
-  dataObjectsAd = new DataObjectAd[advertisers.size()];
+  if (dataFileAd.hasKey("custom_audiences_all_types_v2")) {
+    // Access array by known key in JSON file
+    advertisers = dataFileAd.getJSONArray("custom_audiences_all_types_v2");
+    dataObjectsAd = new DataObjectAd[advertisers.size()];
 
-  for (int i = 0; i < advertisers.size(); i++) {
-    JSONObject thisAdvertiser = advertisers.getJSONObject(i);
+    for (int i = 0; i < advertisers.size(); i++) {
+      JSONObject thisAdvertiser = advertisers.getJSONObject(i);
 
-    // Extract required fields from JSON entry
-    String advertiserName = thisAdvertiser.getString("advertiser_name");
-    Boolean visit = thisAdvertiser.getBoolean("has_in_person_store_visit");
-    Boolean remarket = thisAdvertiser.getBoolean("has_remarketing_custom_audience");
-    Boolean hasCustomerFile = thisAdvertiser.getBoolean("has_data_file_custom_audience");
+      // Extract required fields from JSON entry
+      String advertiserName = thisAdvertiser.getString("advertiser_name");
+      advertiserName = fixEncoding(advertiserName);
+      Boolean visit = thisAdvertiser.getBoolean("has_in_person_store_visit");
+      Boolean remarket = thisAdvertiser.getBoolean("has_remarketing_custom_audience");
+      Boolean hasCustomerFile = thisAdvertiser.getBoolean("has_data_file_custom_audience");
 
-    // Create new advertiser object
-    dataObjectsAd[i] = new DataObjectAd(i, advertiserName, visit, remarket, hasCustomerFile);
+      // Create new advertiser object
+      dataObjectsAd[i] = new DataObjectAd(i, advertiserName, visit, remarket, hasCustomerFile);
+    }
+  } else if (dataFileAd.hasKey("label_values")) {
+    JSONArray labelValues = dataFileAd.getJSONArray("label_values");
+
+    // First pass - count total entries so you can size the array
+    int totalEntries = 0;
+    for (int i = 0; i < labelValues.size(); i++) {
+      totalEntries += labelValues.getJSONObject(i).getJSONArray("vec").size();
+    }
+    println("number of JSON Objects = " + totalEntries);
+
+    dataObjectsAd = new DataObjectAd[totalEntries]; // Now initialised correctly
+
+    // Second pass - populate the array
+    int index = 0;
+    for (int i = 0; i < labelValues.size(); i++) {
+      JSONArray vec = labelValues.getJSONObject(i).getJSONArray("vec");
+      for (int j = 0; j < vec.size(); j++) {
+        //Check encoding of string for Unicode errors
+        String name = vec.getJSONObject(j).getString("value");
+        String advertiserName = fixEncoding(name);
+        dataObjectsAd[index] = new DataObjectAd(index, advertiserName);
+        index++;
+      }
+    }
+  } else {
+    println("Unrecognised ad data format — no matching key found");
+    // Set advertisers to an empty array so the rest of the program doesn't crash
+    dataObjectsAd = new DataObjectAd[0];
+  }
+}
+
+//Find Unicode encoding errors and fix - most are related to non-latin fonts so don't display but gets rid of long strings.
+String fixEncoding(String input) {
+  try {
+    byte[] bytes = input.getBytes("ISO-8859-1"); // Convert back to raw bytes
+   
+    //println(input + " converted to: " + new String(bytes, "UTF-8"));
+    return new String(bytes, "UTF-8");            // Re-read as UTF-8
+  }
+  catch (Exception e) {
+    return input; // If it fails, return the original string unchanged
   }
 }
 
@@ -118,6 +163,16 @@ class DataObjectAd
     myVisit = visit;
     myRemarket = remarket;
     myCustomerFile = customerFile;
+    drawMe = true;
+  }
+
+  // New format - name only, booleans default to false
+  DataObjectAd(int id, String siteName) {
+    ID = id;
+    mySiteName = siteName;
+    myCustomerFile = false;
+    myRemarket = false;
+    myVisit = false;
     drawMe = true;
   }
 

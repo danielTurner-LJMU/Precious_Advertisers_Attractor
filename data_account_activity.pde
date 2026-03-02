@@ -94,6 +94,8 @@ void extractDataLogin() {
 
 // Extracts the text inside the first pair of parentheses in a string (e.g., OS from user agent)
 String extractBetweenParentheses(String input) {
+  if (input == null || input.isEmpty()) return "No Platform Info";
+
   int start = input.indexOf('(');
   int end = input.indexOf(')', start);
 
@@ -255,7 +257,7 @@ class DataObjectLogin
       pg.textSize(fontSize);
       float yLoc = -(r*0.5); // Start top edge of the circle
       pg.fill(0);
-      
+
       if (drawCity) {
         pg.text(city +", " + country, (r*0.5)+5, yLoc);
         yLoc+=fontSize;
