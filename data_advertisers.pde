@@ -32,6 +32,7 @@ boolean xWhite = false;         //draw X's white/black
 color xColor = color(0, 0, 0);  //colour to draw X's
 
 boolean drawAdNames = false;    // Toggle to draw advertiser names as text
+float textPadding = 5;          // Padding for advertiser name drawn next to x
 
 //**** Line variables
 boolean colourLine = true;      // Toggle coloured/black lines
@@ -46,7 +47,6 @@ void loadDataAd() {
   String fullDataPath = parentFolderPath + subFolderAd + "/" + dataFileNameAd;
   dataFileAd = loadJSONObject(fullDataPath);
   extractDataAd(); // Parse the JSON into objects
-
 }
 
 void extractDataAd() {
@@ -121,7 +121,7 @@ void extractDataAd() {
 String fixEncoding(String input) {
   try {
     byte[] bytes = input.getBytes("ISO-8859-1"); // Convert back to raw bytes
-   
+
     //println(input + " converted to: " + new String(bytes, "UTF-8"));
     return new String(bytes, "UTF-8");            // Re-read as UTF-8
   }
@@ -225,6 +225,7 @@ class DataObjectAd
     acceleration.mult(0);
 
     theta = velocity.heading() + PI/2;
+
 
     history.add(location.copy());
     if (history.size() > historyLength) {
@@ -345,10 +346,17 @@ class DataObjectAd
     }
 
     // Draw label (Advertiser anme)
+
     if (drawAdNames) {
+
+      float rightEdge = abs(newR * cos(theta)) + abs(newR * sin(theta));
+      rightEdge += xThickness / 2.0;
+
+      float textX = rightEdge + textPadding;
+
       pg.fill(0);
-      pg.rotate(-theta);
-      pg.text(mySiteName, sqrt(newR2*newR2)-(newR/4)+(xThickness/2), textCentreY);
+      pg.rotate(-theta);   // cancel rotation so text is upright
+      pg.text(mySiteName, textX, textCentreY);
     }
     pg.popMatrix();
   }
