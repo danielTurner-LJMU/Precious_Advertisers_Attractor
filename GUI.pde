@@ -119,7 +119,7 @@ void initProgramControls(int baseX, int baseY) {
     .setLabel("ACTIVITY SIZE")
     .setPosition(baseX, baseY + cSpaceY * 1.35)
     .setSize(sliderWidth, 20)
-    .setRange(1, 100)
+    .setRange(0, 2.5)
     .setValue(targetRadius);
 
   styleMain("targetRadius");

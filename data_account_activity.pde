@@ -15,10 +15,10 @@ float dateCut;              //modulo operator for working out line return
 float dateScale;            //scale factor converting date spread to line length
 
 //Layout parameters
-float border = 10;
+float border = 25;
 float borderAsPixels = 0;
 
-int numRows = 10;            // Number of rows in the timeline view
+int numRows = 18;            // Number of rows in the timeline view
 float rowGap;                // Gap between rows
 float yOffset;               // Vertical offset for layout
 float lineLength, totalLineLength;
@@ -30,8 +30,18 @@ DataObjectLogin[] dataObjectsLogin;  // Array to store each login as an object
 
 //-------- TARGET PROPERTIES --------//
 float targetActivateChance = 0.995;  // Probability of a target being (de)activated
-float targetRadius = 30;             // Default radius of target shapes
+float targetRadius = 1;             // Default radius of target shapes
 float targetOpacity = 150;           // Opacity of the visual circles
+int safeCount = 1;                   // Base number of visits - used for scaling circles
+int maxLocationCount = 0;            //Maximum number of activity from a location calculated lower down
+float minVisualRadius = 2;           // Minimum circle radius for small counts
+float maxVisualRadius = 50;          // Maximum radius for largest counts
+
+//-------- HASH MAPS: For storing data totals ----------//
+HashMap<String, Integer> locationCounts = new HashMap<String, Integer>();
+HashMap<String, Integer> ipCounts = new HashMap<String, Integer>();
+HashMap<String, Integer> platformCounts = new HashMap<String, Integer>();
+HashMap<String, Integer> actionCounts = new HashMap<String, Integer>();
 
 // Flags for drawing additional data
 boolean drawCity = false;
@@ -70,7 +80,21 @@ void extractDataLogin() {
     String userAgent = thisActivity.getString("user_agent"); // Raw platform string
     String platformInfo = extractBetweenParentheses(userAgent); // Extract OS info from user agent
 
+    // Precompute location key to match HashMap
+    String locationKey = city + ", " + country;
+
     long timestamp = thisActivity.getLong("timestamp");
+
+    //Check Unicode errors
+    city = fixEncoding(city);
+    // Combine city + country into one location key
+    String location = city + ", " + country;
+
+    // Update aggregate counts
+    incrementMap(locationCounts, location);
+    incrementMap(ipCounts, ip);
+    incrementMap(platformCounts, platformInfo);
+    incrementMap(actionCounts, action);
 
     // Create a new DataObjectLogin with extracted data
     dataObjectsLogin[i] = new DataObjectLogin(i, action, siteName, city, country, ip, platformInfo, timestamp);
@@ -79,6 +103,21 @@ void extractDataLogin() {
   // Define the start and end dates based on first and last entries
   startDate = dataObjectsLogin[dataObjectsLogin.length-1].timeStamp;
   endDate = dataObjectsLogin[0].timeStamp;
+
+  for (String loc : locationCounts.keySet()) {
+    println(loc + " : " + locationCounts.get(loc));
+  }
+
+  //Add location count for each location to the objects
+  for (int i = 0; i < dataObjectsLogin.length; i++) {
+    DataObjectLogin obj = dataObjectsLogin[i];
+    obj.locationCount = locationCounts.get(obj.locationKey);
+  }
+
+  //find largest location count
+  for (int count : locationCounts.values()) {
+    if (count > maxLocationCount) maxLocationCount = count;
+  }
 
   /*
   // Example code for extracting unique values from the data using reflection
@@ -104,6 +143,11 @@ String extractBetweenParentheses(String input) {
   } else {
     return "No Platform Info"; // Return an empty string if no valid parentheses found
   }
+}
+
+// Updates HashMaps
+void incrementMap(HashMap<String, Integer> map, String key) {
+  map.put(key, map.getOrDefault(key, 0) + 1);
 }
 
 /**
@@ -144,6 +188,7 @@ class DataObjectLogin
 {
   int ID;
   String action, siteName, city, country, IP, platformInfo, date;
+  String locationKey;
   long timeStamp;
   float zeroDate; // Timestamp normalized against start date
 
@@ -153,6 +198,7 @@ class DataObjectLogin
   boolean active = true;
   boolean hideMe = false;
 
+  int locationCount = 0; //the number of times a location was stored - passed from HashMap
   float radiusMultiplier;  // Used to vary circle sizes
   float r; //total shape radius
 
@@ -168,19 +214,24 @@ class DataObjectLogin
     IP = ip;
     platformInfo = pInfo;
 
+    // Precompute location key
+    locationKey = city + ", " + country;
+
     // Convert timestamp into readable date
     Date tempDate = convertDate(time);
     date = tempDate.toString();
-
-    // Set random values for appearance
-    radiusMultiplier = random(0.1, 2);
-    r = targetRadius*radiusMultiplier;
-    attraction = random(1, 100);
   }
 
   // Prepare object for visual layout by calculating relative date
   void initDraw() {
     zeroDate = timeStamp - startDate;
+
+    // Make sure locationCount >= 1 for log
+    float safeCount = max(locationCount, 1);
+    radiusMultiplier = log(safeCount) / log(maxLocationCount); // log-normalized to [0,1]
+    r = minVisualRadius + radiusMultiplier * (maxVisualRadius - minVisualRadius);//Map normalized value to radius range
+    r = r * targetRadius;  // targetRadius from slider
+    attraction = random(1, 100);
   }
 
   // Randomly toggle activity state based on chance (if not hidden)
@@ -216,7 +267,8 @@ class DataObjectLogin
     location.y = (int(zeroDate/dateCut)*rowGap)+yOffset;
 
 
-    r = targetRadius*radiusMultiplier; // Update radius
+    r = minVisualRadius + radiusMultiplier * (maxVisualRadius - minVisualRadius);
+    r *= targetRadius;
   }
 
   // Draw the visual representation of a login/activity
