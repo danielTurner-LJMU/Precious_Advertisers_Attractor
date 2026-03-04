@@ -118,7 +118,7 @@ class ControlFrame extends PApplet {
         .setLabel(labelText)
         .plugTo(parent)
         .setBroadcast(false)      // Temporarily disable event broadcast to avoid triggering event now
-        .setValue(true)          // Set initial value silently
+        .setValue(dataObjectsAd[i].drawMe)          // Set initial value silently - drawn from object
         .setBroadcast(true)      // Re-enable event broadcast
         .setColorBackground(cGrey)
         .setColorActive(cTheme)

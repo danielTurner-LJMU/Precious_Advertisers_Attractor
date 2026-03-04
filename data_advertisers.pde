@@ -25,8 +25,9 @@ float fixedMaxForce = 0.1;     // Fixed max force (if enabled)
 
 boolean drawX = true;           //show/hide all X's
 boolean sqCaps = false;         //draw with square/rounded caps
-float xScale = 1;               //size of x's
-float xThickness = 1;           //stroke weight for X's
+float xScale = 2;               //size of x's
+float xThickness = 8;           //stroke weight for X's
+int numXToDrawAtStart= 50;      //set the number of X's to draw in the initial phase
 
 boolean xWhite = false;         //draw X's white/black
 color xColor = color(0, 0, 0);  //colour to draw X's
@@ -156,6 +157,7 @@ class DataObjectAd
   color myColor;            // Colour selected from palette
   float randomStrokeThick;   //randomised strokeWeight for when 'randomLineWeight' = true
 
+  //original JSON data format
   DataObjectAd(int id, String siteName, boolean visit, boolean remarket, boolean customerFile) {
 
     ID = id;
@@ -163,7 +165,14 @@ class DataObjectAd
     myVisit = visit;
     myRemarket = remarket;
     myCustomerFile = customerFile;
-    drawMe = true;
+
+    //start only draws certain number of advertisers to show motion.
+    //can be very laggy when data has huge number of advertsiers
+    if (id < numXToDrawAtStart) {
+      drawMe = true;
+    } else {
+      drawMe = false;
+    }
   }
 
   // New format - name only, booleans default to false
@@ -173,7 +182,14 @@ class DataObjectAd
     myCustomerFile = false;
     myRemarket = false;
     myVisit = false;
-    drawMe = true;
+
+    //start only draws certain number of advertisers to show motion.
+    //can be very laggy when data has huge number of advertsiers
+    if (id < numXToDrawAtStart) {
+      drawMe = true;
+    } else {
+      drawMe = false;
+    }
   }
 
   // Initiate advertiser objects

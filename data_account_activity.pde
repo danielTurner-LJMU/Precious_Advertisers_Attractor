@@ -92,21 +92,18 @@ void extractDataLogin() {
 
     // Update aggregate counts
     incrementMap(locationCounts, location);
-    incrementMap(ipCounts, ip);
+    String groupedIP = normaliseIP(ip); //check and group IPv6
+    incrementMap(ipCounts, groupedIP);
     incrementMap(platformCounts, platformInfo);
     incrementMap(actionCounts, action);
 
     // Create a new DataObjectLogin with extracted data
-    dataObjectsLogin[i] = new DataObjectLogin(i, action, siteName, city, country, ip, platformInfo, timestamp);
+    dataObjectsLogin[i] = new DataObjectLogin(i, action, siteName, city, country, groupedIP, platformInfo, timestamp);
   }
 
   // Define the start and end dates based on first and last entries
   startDate = dataObjectsLogin[dataObjectsLogin.length-1].timeStamp;
   endDate = dataObjectsLogin[0].timeStamp;
-
-  for (String loc : locationCounts.keySet()) {
-    println(loc + " : " + locationCounts.get(loc));
-  }
 
   //Add location count for each location to the objects
   for (int i = 0; i < dataObjectsLogin.length; i++) {
@@ -129,6 +126,20 @@ void extractDataLogin() {
    println("Unique actions:");
    for (String action : uniqueActions) println(action);
    */
+   
+     // ------- **** HashMap Printouts **** --------- //
+  //for (String loc : locationCounts.keySet()) {
+  //  println(loc + " : " + locationCounts.get(loc));
+  //}
+
+  //for (String ip : ipCounts.keySet()) {
+  //  println(ip + " : " + ipCounts.get(ip));
+  //}
+  
+  //  for (String platform : platformCounts.keySet()) {
+  //  println(platform + " : " + platformCounts.get(platform));
+  //}
+  
 }
 
 // Extracts the text inside the first pair of parentheses in a string (e.g., OS from user agent)
@@ -143,6 +154,27 @@ String extractBetweenParentheses(String input) {
   } else {
     return "No Platform Info"; // Return an empty string if no valid parentheses found
   }
+}
+
+//Check if IP is IPv6 or 4. IPv6 are more fragemnted so this checks first 4 blocks and groups them if they are the same.
+//If IPv4 - simply returns IP address
+String normaliseIP(String ip) {
+
+  if (ip == null) return "unknown";
+
+  // Detect IPv6
+  if (ip.contains(":")) {
+
+    String[] parts = ip.split(":");
+
+    // Only group if at least 4 blocks exist
+    if (parts.length >= 4) {
+      return parts[0] + ":" + parts[1] + ":" + parts[2] + ":" + parts[3];
+    }
+  }
+
+  // Otherwise assume IPv4
+  return ip;
 }
 
 // Updates HashMaps
@@ -279,9 +311,12 @@ class DataObjectLogin
 
     /* debugging sections allows you to see which logins are activated */
     //if (active) {
+    //  pg.noStroke();
     //  pg.fill(250, 106, 248, targetOpacity);
     //} else {
-    //  pg.fill(150, targetOpacity);
+    //  pg.noFill();//fill(150, targetOpacity);
+    //  pg.strokeWeight(4);
+    //  pg.stroke(250, 106, 248, targetOpacity);
     // }
 
     // Set fill color depending on export mode: PDF is for Riso so greyscale
