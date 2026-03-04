@@ -212,7 +212,7 @@ void initProgramControls(int baseX, int baseY) {
     .setSize(sliderWidth, 20)
     .setRange(30, 1000)
     .setValue(200);
-    ;
+  ;
 
   styleMain("historyLength");
 
@@ -336,14 +336,29 @@ void initMainControls() {
   // --- INPUT GROUP --- //
 
   cp5.addTextlabel("Input")
-    .setText("INPUT")
+    .setText("INPUT FOLDER: " + folderName)
     .setPosition(baseX, baseY + (cSpaceY * 0))
     .setColorValue(cGrey)
     .setFont(subFont)
     ;
 
+  cp5.addTextlabel("numAds")
+    .setText("Number of Advertisers: " + dataObjectsAd.length)
+    .setPosition(baseX, baseY + (cSpaceY * 0.25))
+    .setColorValue(cGrey)
+    .setFont(cp5FontInconsolata)
+    //.setTextSize(10)
+    ;
+
+  cp5.addTextlabel("accActivity")
+    .setText("Account Activity Events: " + dataObjectsLogin.length)
+    .setPosition(baseX, baseY + (cSpaceY * 0.4))
+    .setColorValue(cGrey)
+    .setFont(cp5FontInconsolata)
+    ;
+
   // --- ARTWORK SIZE --- //
-  baseY = 130; //update start position on y-axis
+  baseY = 100; //update start position on y-axis
 
   cp5.addTextlabel("Artwork Size")
     .setText("ARTWORK SIZE")
@@ -364,7 +379,7 @@ void initMainControls() {
     .setColorActive(cTheme)
     .setColorLabel(cGrey)
     //.addItem("A6", 1)
-   // .addItem("A5", 2)
+    // .addItem("A5", 2)
     .addItem("A4", 3)
     .addItem("A3", 4)
     .addItem("Square", 5)
@@ -375,7 +390,7 @@ void initMainControls() {
   }
 
   // --- CONTROLLERS GROUP --- //
-  baseY = 220; //update start position on y-axis
+  baseY = 180; //update start position on y-axis
 
   cp5.addTextlabel("Controls")
     .setText("CONTROLS")

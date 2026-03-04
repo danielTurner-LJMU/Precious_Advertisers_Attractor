@@ -143,19 +143,20 @@ void draw1() {
   drawOverlays();
 
   //draw parent folder name to screen
-  textFont(subFont);
-  textSize(14);
-  textAlign(LEFT);
-  fill(cGrey);
-  text(folderName, 200, 80);
+  //textFont(subFont);
+  //textSize(14);
+  //textAlign(LEFT);
+  //fill(cGrey);
+  //text(folderName, 200, 80);
 }
 
 //cleanup functions
 void cleanup0() {
 
   showController("confirm", false);
-
+  showController("selectDataPath", false);
 }
 
 void cleanup1() {
+
 }
