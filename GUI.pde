@@ -211,9 +211,11 @@ void initProgramControls(int baseX, int baseY) {
     .setPosition(baseX, baseY + cSpaceY * 3.5)
     .setSize(sliderWidth, 20)
     .setRange(30, 1000)
-    .setValue(historyLength);
-  ;
+    .setValue(200);
+    ;
+
   styleMain("historyLength");
+
 
   cp5.addSlider("strokeThick")
     .setLabel("LINE THICKNESS")
@@ -361,8 +363,8 @@ void initMainControls() {
     .setColorForeground(cTheme)
     .setColorActive(cTheme)
     .setColorLabel(cGrey)
-    .addItem("A6", 1)
-    .addItem("A5", 2)
+    //.addItem("A6", 1)
+   // .addItem("A5", 2)
     .addItem("A4", 3)
     .addItem("A3", 4)
     .addItem("Square", 5)
@@ -479,7 +481,7 @@ void controlEvent(ControlEvent theEvent) {
 
   if (c != null) {
     String name = c.getName();
-    
+
     // Handle toggle state changes for dataObjectsAd from the controlFrame
     // This code checks if the control event came from a toggle named "adToggle_#"
     // and uses the toggle's ID to update the corresponding data object's `drawMe` flag,
@@ -488,7 +490,7 @@ void controlEvent(ControlEvent theEvent) {
       int id = c.getId();
       dataObjectsAd[id].drawMe = c.getValue() == 1.0; // set boolean to match toggle state
     }
-    
+
     // ColorWheel controls to update colours stored in "palette" array
     // it subsequently updates the 'myColor' variable in each advertiser object
     if (name != null && name.startsWith("wheel")) {

@@ -15,6 +15,7 @@
  * in the main canvas.
  */
 
+
 class ControlFrame extends PApplet {
 
   ControlP5 cp5;
@@ -247,12 +248,15 @@ class ControlFrame extends PApplet {
       draggingThumb = true;
       dragOffsetY = mouseY - scrollThumbY;
     }
+
+ 
   }
 
   public void mouseReleased() {
 
     windowDragging = false;
     draggingThumb = false;
+
   }
 
   public void mouseDragged() {
@@ -280,6 +284,7 @@ class ControlFrame extends PApplet {
       float thumbPos = scrollThumbY - scrollTrackY;
       scrollOffset = map(thumbPos, 0, scrollRange, 0, maxOffset);
     }
+
   }
 
   public void mouseWheel(MouseEvent event) {
@@ -293,6 +298,8 @@ class ControlFrame extends PApplet {
     // Update custom scroll thumb position to match scrollOffset
     scrollThumbY = map(scrollOffset, 0, maxScroll, scrollTrackY, scrollTrackY + scrollTrackHeight - scrollThumbHeight);
   }
+
+ 
 
   public void setAllOn() {
     for (int i = 0; i < totalToggles; i++) {

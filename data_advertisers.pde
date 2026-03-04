@@ -11,7 +11,7 @@ JSONArray advertisers;  // JSON array of individual advertisers
 DataObjectAd[] dataObjectsAd;     // Array to store advertiser objects
 
 boolean drawTail = false;          //Show/hide all lines
-int historyLength = 300;          // Number of points stored in trail history
+int historyLength = 200;          // Number of points stored in trail history
 boolean randomLineWeight = false;  // Toggle for randomised line thickness
 
 //controls for attraction behaviour of X objects.
@@ -195,8 +195,9 @@ class DataObjectAd
   // Initiate advertiser objects
   void initDraw() {
 
-    location.x = random(pg.width);
-    location.y = random(pg.height);
+    PVector spawn = getRandomOffscreenPosition(spawnBorder);
+    location.x = spawn.x;
+    location.y = spawn.y;
 
     acceleration = new PVector(0, 0);
     velocity = new PVector(0, 0);
@@ -376,4 +377,41 @@ class DataObjectAd
     }
     pg.popMatrix();
   }
+}
+
+//-------- SPAWN LOCATION OUTSIDE CANVAS ----------//
+//return random locations outside of the canvas edge
+int spawnBorder = 50;
+
+PVector getRandomOffscreenPosition(int border) {
+
+  int side = int(random(4));  // 0=top, 1=right, 2=bottom, 3=left
+  
+  float x = 0;
+  float y = 0;
+
+  switch (side) {
+
+    case 0: // TOP
+      x = random(pg.width);
+      y = random(-spawnBorder, 0);
+      break;
+
+    case 1: // RIGHT
+      x = random(pg.width, pg.width + spawnBorder);
+      y = random(pg.height);
+      break;
+
+    case 2: // BOTTOM
+      x = random(pg.width);
+      y = random(pg.height, pg.height + spawnBorder);
+      break;
+
+    case 3: // LEFT
+      x = random(-spawnBorder, 0);
+      y = random(pg.height);
+      break;
+  }
+
+  return new PVector(x, y);
 }
