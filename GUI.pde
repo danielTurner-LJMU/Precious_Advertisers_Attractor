@@ -305,7 +305,8 @@ void initProgramControls(int baseX, int baseY) {
     .setPosition(baseX, baseY + cSpaceY*5.7)
     .setSize(100, 40)
     ;
-  styleMain("pauseMotion");
+  //styleMain("pauseMotion");
+  controllerLocked("pauseMotion", true);
 
   cp5.addToggle("showAdvertisers")
     .setLabel("SHOW/HIDE\nADVERTISERS")
@@ -324,6 +325,13 @@ void initProgramControls(int baseX, int baseY) {
   ;
   styleMain("fontSize");
 
+  cp5.addBang("generate")
+    .setLabel("GENERATE")
+    .setPosition(baseX, baseY + cSpaceY*6.5)
+    .setSize(100, 40);
+  //styleMain("generate");
+  controllerLocked("generate", true);
+
 
   // Launch control frame
   cf = new ControlFrame(this, "Control Panel");
@@ -334,6 +342,7 @@ void initMainControls() {
   int baseY = 20; //base location for y-pos of controllers
 
   // --- INPUT GROUP --- //
+  //prints out chosen folder and data overview.
 
   cp5.addTextlabel("Input")
     .setText("INPUT FOLDER: " + folderName)
@@ -342,20 +351,36 @@ void initMainControls() {
     .setFont(subFont)
     ;
 
-  cp5.addTextlabel("numAds")
-    .setText("Number of Advertisers: " + dataObjectsAd.length)
+  String mainDataReadout = String.format("Number of Advertisers: %-10d Account Activity Events: %d",
+    dataObjectsAd.length, dataObjectsLogin.length);
+
+  cp5.addTextlabel("baseData")
+    .setText(mainDataReadout)
     .setPosition(baseX, baseY + (cSpaceY * 0.25))
     .setColorValue(cGrey)
     .setFont(cp5FontInconsolata)
-    //.setTextSize(10)
     ;
 
-  cp5.addTextlabel("accActivity")
-    .setText("Account Activity Events: " + dataObjectsLogin.length)
+  String subDataReadout = String.format("Number of Locations logged: %-9d IP Addresses Logged: %d",
+    locationCounts.size(), ipCounts.size());
+
+  cp5.addTextlabel("subData")
+    .setText(subDataReadout)
     .setPosition(baseX, baseY + (cSpaceY * 0.4))
     .setColorValue(cGrey)
     .setFont(cp5FontInconsolata)
     ;
+
+  String subDataReadout1 = String.format("Platforms Used: %-26d Activity Types: %d",
+    platformCounts.size(), actionCounts.size());
+
+  cp5.addTextlabel("subData1")
+    .setText(subDataReadout1)
+    .setPosition(baseX, baseY + (cSpaceY * 0.55))
+    .setColorValue(cGrey)
+    .setFont(cp5FontInconsolata)
+    ;
+
 
   // --- ARTWORK SIZE --- //
   baseY = 100; //update start position on y-axis
@@ -403,7 +428,7 @@ void initMainControls() {
 
 
   // --- OUTPUT GROUP --- //
-  baseY = 875; //update start position on y-axis
+  baseY = 900; //update start position on y-axis
 
   cp5.addTextlabel("Output")
     .setText("OUTPUT")
@@ -456,6 +481,14 @@ void outputSize(int a) {
   //set scale value to match imScale
   Controller c = cp5.getController("imScale");
   c.setValue(imScale);
+
+  //make sure pause button is reset (silently) so that the stage updates and draws
+  ((Toggle) cp5.getController("pauseMotion")).changeValue(0);
+  pauseMotion = false;
+
+  //unlock Generate and ouase buttons
+  controllerLocked("generate", false);
+  controllerLocked("pauseMotion", false);
 }
 
 void selectDataPath() {
@@ -610,6 +643,12 @@ void showController(String theControllerName, boolean show) {
   }
 }
 
+void generate() {
+
+  generateLength = historyLength;
+  autoGenerate = true;
+}
+
 //// ------ CONTROLLER STYLING -------- ///
 
 //Style settings for the app main screen
@@ -634,6 +673,38 @@ void styleMain(String theControllerName) {
   }
 }
 
+// grey out when controlled are locked
+void styleLocked(String theControllerName) {
+
+  Controller c = cp5.getController(theControllerName);
+
+  c.setColorBackground(color(200));
+  c.setColorForeground(color(200)); //needs updating
+  c.setColorActive(200);
+  c.getCaptionLabel().setColor(color(200));
+  c.getCaptionLabel().setFont(cp5FontInconsolata);
+  c.getValueLabel().setFont(cp5FontInconsolata);
+  c.getCaptionLabel().setSize(14);
+  c.getValueLabel().setColor(color(200));
+  c.getValueLabel().setSize(14);
+
+  //catch bang buttons and reset foreground colour to grey
+  if (c instanceof Bang) {
+    c.setColorForeground(color(200));
+  }
+}
+
+void controllerLocked(String theControllerName, boolean enabled) {
+
+  Controller c = cp5.getController(theControllerName);
+  c.setLock(enabled);
+
+  if (!enabled) {
+    styleMain(theControllerName);
+  } else {
+    styleLocked(theControllerName);
+  }
+}
 
 //Style settings for the app intro screen
 

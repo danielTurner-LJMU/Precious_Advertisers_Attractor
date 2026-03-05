@@ -122,19 +122,23 @@ void draw1() {
    *** Am sure there are more I could exclude ****
    */
   if (bufferCreated) {
-    if (!pauseMotion) {
-      drawBuffer(); //draws to offscreen buffer
-      shapesDrawn = true;
-    } else {
-      if (!shapesDrawn) {
+    if (!autoGenerate) { //check if we are autogenerating
+      if (!pauseMotion) {
         drawBuffer(); //draws to offscreen buffer
         shapesDrawn = true;
-        //hide all helper graphics
-        borderVisible = false;
-        rowsVisible = false;
+      } else {
+        if (!shapesDrawn) {
+          drawBuffer(); //draws to offscreen buffer
+          shapesDrawn = true;
+          //hide all helper graphics
+          borderVisible = false;
+          rowsVisible = false;
+        }
       }
+      drawPreview(); //copies offscreen buffer to the stage
+    } else {
+      autoGenerateInBackground();
     }
-    drawPreview(); //copies offscreen buffer to the stage
   }
   //draw background rectangle to cover GUI area
   fill(cBlack);
@@ -158,5 +162,4 @@ void cleanup0() {
 }
 
 void cleanup1() {
-
 }
