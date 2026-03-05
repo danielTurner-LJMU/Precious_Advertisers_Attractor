@@ -342,6 +342,7 @@ void initMainControls() {
   int baseY = 20; //base location for y-pos of controllers
 
   // --- INPUT GROUP --- //
+  //prints out chosen folder and data overview.
 
   cp5.addTextlabel("Input")
     .setText("INPUT FOLDER: " + folderName)
@@ -350,20 +351,36 @@ void initMainControls() {
     .setFont(subFont)
     ;
 
-  cp5.addTextlabel("numAds")
-    .setText("Number of Advertisers: " + dataObjectsAd.length)
+  String mainDataReadout = String.format("Number of Advertisers: %-10d Account Activity Events: %d",
+    dataObjectsAd.length, dataObjectsLogin.length);
+
+  cp5.addTextlabel("baseData")
+    .setText(mainDataReadout)
     .setPosition(baseX, baseY + (cSpaceY * 0.25))
     .setColorValue(cGrey)
     .setFont(cp5FontInconsolata)
-    //.setTextSize(10)
     ;
 
-  cp5.addTextlabel("accActivity")
-    .setText("Account Activity Events: " + dataObjectsLogin.length)
+  String subDataReadout = String.format("Number of Locations logged: %-9d IP Addresses Logged: %d",
+    locationCounts.size(), ipCounts.size());
+
+  cp5.addTextlabel("subData")
+    .setText(subDataReadout)
     .setPosition(baseX, baseY + (cSpaceY * 0.4))
     .setColorValue(cGrey)
     .setFont(cp5FontInconsolata)
     ;
+
+  String subDataReadout1 = String.format("Platforms Used: %-26d Activity Types: %d",
+    platformCounts.size(), actionCounts.size());
+
+  cp5.addTextlabel("subData1")
+    .setText(subDataReadout1)
+    .setPosition(baseX, baseY + (cSpaceY * 0.55))
+    .setColorValue(cGrey)
+    .setFont(cp5FontInconsolata)
+    ;
+
 
   // --- ARTWORK SIZE --- //
   baseY = 100; //update start position on y-axis
