@@ -305,7 +305,8 @@ void initProgramControls(int baseX, int baseY) {
     .setPosition(baseX, baseY + cSpaceY*5.7)
     .setSize(100, 40)
     ;
-  styleMain("pauseMotion");
+  //styleMain("pauseMotion");
+  controllerLocked("pauseMotion", true);
 
   cp5.addToggle("showAdvertisers")
     .setLabel("SHOW/HIDE\nADVERTISERS")
@@ -323,6 +324,13 @@ void initProgramControls(int baseX, int baseY) {
     .setValue(fontSize);
   ;
   styleMain("fontSize");
+
+  cp5.addBang("generate")
+    .setLabel("GENERATE")
+    .setPosition(baseX, baseY + cSpaceY*6.5)
+    .setSize(100, 40);
+  //styleMain("generate");
+  controllerLocked("generate", true);
 
 
   // Launch control frame
@@ -403,7 +411,7 @@ void initMainControls() {
 
 
   // --- OUTPUT GROUP --- //
-  baseY = 875; //update start position on y-axis
+  baseY = 900; //update start position on y-axis
 
   cp5.addTextlabel("Output")
     .setText("OUTPUT")
@@ -456,6 +464,14 @@ void outputSize(int a) {
   //set scale value to match imScale
   Controller c = cp5.getController("imScale");
   c.setValue(imScale);
+
+  //make sure pause button is reset (silently) so that the stage updates and draws
+  ((Toggle) cp5.getController("pauseMotion")).changeValue(0);
+  pauseMotion = false;
+
+  //unlock Generate and ouase buttons
+  controllerLocked("generate", false);
+  controllerLocked("pauseMotion", false);
 }
 
 void selectDataPath() {
@@ -610,6 +626,12 @@ void showController(String theControllerName, boolean show) {
   }
 }
 
+void generate() {
+
+  generateLength = historyLength;
+  autoGenerate = true;
+}
+
 //// ------ CONTROLLER STYLING -------- ///
 
 //Style settings for the app main screen
@@ -634,6 +656,38 @@ void styleMain(String theControllerName) {
   }
 }
 
+// grey out when controlled are locked
+void styleLocked(String theControllerName) {
+
+  Controller c = cp5.getController(theControllerName);
+
+  c.setColorBackground(color(200));
+  c.setColorForeground(color(200)); //needs updating
+  c.setColorActive(200);
+  c.getCaptionLabel().setColor(color(200));
+  c.getCaptionLabel().setFont(cp5FontInconsolata);
+  c.getValueLabel().setFont(cp5FontInconsolata);
+  c.getCaptionLabel().setSize(14);
+  c.getValueLabel().setColor(color(200));
+  c.getValueLabel().setSize(14);
+
+  //catch bang buttons and reset foreground colour to grey
+  if (c instanceof Bang) {
+    c.setColorForeground(color(200));
+  }
+}
+
+void controllerLocked(String theControllerName, boolean enabled) {
+
+  Controller c = cp5.getController(theControllerName);
+  c.setLock(enabled);
+
+  if (!enabled) {
+    styleMain(theControllerName);
+  } else {
+    styleLocked(theControllerName);
+  }
+}
 
 //Style settings for the app intro screen
 
