@@ -19,9 +19,9 @@ boolean randomLineWeight = false;  // Toggle for randomised line thickness
 //so their behaviour is uniform. When uniform, the user can control the
 //maximum speed and maximum force for the steering behaviour.
 
-boolean fixedSpeed = false;    // Use uniform speed and force for all objects?
-float fixedMaxSpeed = 8;       // Fixed max speed (if enabled)
-float fixedMaxForce = 0.1;     // Fixed max force (if enabled)
+//boolean fixedSpeed = false;    // Use uniform speed and force for all objects?
+//float fixedMaxSpeed = 8;       // Fixed max speed (if enabled)
+//float fixedMaxForce = 0.1;     // Fixed max force (if enabled)
 
 boolean drawX = true;           //show/hide all X's
 boolean sqCaps = false;         //draw with square/rounded caps
@@ -33,7 +33,9 @@ boolean xWhite = false;         //draw X's white/black
 color xColor = color(0, 0, 0);  //colour to draw X's
 
 boolean drawAdNames = false;    // Toggle to draw advertiser names as text
-float textPadding = 5;          // Padding for advertiser name drawn next to x
+boolean drawAdBlocks = false;   // Draw block behind Advert Names
+float textPadding = 8;          // Padding for advertiser name drawn next to x
+float innerPad = 4;             // Padding between rectangle and text
 
 //**** Line variables
 boolean colourLine = true;      // Toggle coloured/black lines
@@ -146,7 +148,7 @@ class DataObjectAd
   ArrayList<PVector> history = new ArrayList<PVector>();  //array to store vectors of past locations
   PVector location = new PVector(0, 0);
   PVector velocity, acceleration;
-  float maxSpeed, maxForce;
+  //float maxSpeed, maxForce;
   float myMaxSpeed, myMaxForce;
 
   // Visual + Drawing Settings
@@ -201,11 +203,11 @@ class DataObjectAd
 
     acceleration = new PVector(0, 0);
     velocity = new PVector(0, 0);
-    myMaxSpeed = random(4, 15);
-    myMaxForce = random(0.01, 0.1);
+    myMaxSpeed = random(4, 30);
+    myMaxForce = random(0.01, 0.2);
 
-    maxSpeed = myMaxSpeed;
-    maxForce = myMaxForce;
+    //maxSpeed = myMaxSpeed;
+    //maxForce = myMaxForce;
 
     r = 5.0;
 
@@ -225,19 +227,19 @@ class DataObjectAd
 
   void changeSpeed() {
     // Switch between fixed or random (personal) speed/force
-    if (fixedSpeed) {
-      maxSpeed = fixedMaxSpeed;
-      maxForce = fixedMaxForce;
-    } else {
-      maxSpeed = myMaxSpeed;
-      maxForce = myMaxForce;
-    }
+    //if (fixedSpeed) {
+    //  maxSpeed = fixedMaxSpeed;
+    //  maxForce = fixedMaxForce;
+    //} else {
+    //  maxSpeed = myMaxSpeed;
+    //  maxForce = myMaxForce;
+    //}
   }
 
   // Update Movement and Trail
   void update() {
     velocity.add(acceleration);
-    velocity.limit(maxSpeed);
+    velocity.limit(myMaxSpeed);
     location.add(velocity);
     acceleration.mult(0);
 
@@ -294,9 +296,9 @@ class DataObjectAd
   void seek(PVector target) {
 
     PVector desired = PVector.sub(target, location);
-    desired.setMag(maxSpeed);
+    desired.setMag(myMaxSpeed);
     PVector steer = PVector.sub(desired, velocity);
-    steer.limit(maxForce);
+    steer.limit(myMaxForce);
     applyForce(steer);
   }
 
@@ -347,7 +349,7 @@ class DataObjectAd
   }
 
   //Draw 'X' Shape and Optional Text
-  void drawAd(float textCentreY) {
+  void drawAd(float baseline, float ascent, float textHeight) {
 
     pg.pushMatrix();
     pg.translate(location.x, location.y);
@@ -366,14 +368,46 @@ class DataObjectAd
 
     if (drawAdNames) {
 
+      //calculate right edge of the X
       float rightEdge = abs(newR * cos(theta)) + abs(newR * sin(theta));
       rightEdge += xThickness / 2.0;
 
+      //Add textPadding to calculate position to draw text
       float textX = rightEdge + textPadding;
 
-      pg.fill(0);
-      pg.rotate(-theta);   // cancel rotation so text is upright
-      pg.text(mySiteName, textX, textCentreY);
+      //calculate text width
+      float tw = pg.textWidth(mySiteName);
+
+      float rectX = textX - innerPad;
+      float rectY = baseline - ascent - innerPad;
+      float rectW = tw + (innerPad * 2.0);
+      float rectH = textHeight + (innerPad * 2.0);
+
+      pg.pushMatrix();
+      pg.rotate(-theta); // cancel rotation so text is upright
+      pg.rectMode(CORNER);
+      pg.noStroke();
+
+      if (drawAdBlocks) {
+        //if x colour is set to black we want black rectangles and white text - opposite if not
+        if (!xWhite) {
+          pg.fill(0);
+          pg.rect(rectX, rectY, rectW, rectH);
+          pg.fill(255);
+          pg.text(mySiteName, textX, baseline);
+        } else {
+          pg.fill(255);
+          pg.rect(rectX, rectY, rectW, rectH);
+          pg.fill(0);
+          pg.text(mySiteName, textX, baseline);
+        }
+      } else {
+        //if no rectangles text is always black.
+        pg.fill(0);
+        pg.text(mySiteName, textX, baseline);
+      }
+
+      pg.popMatrix();
     }
     pg.popMatrix();
   }
@@ -386,31 +420,31 @@ int spawnBorder = 50;
 PVector getRandomOffscreenPosition(int border) {
 
   int side = int(random(4));  // 0=top, 1=right, 2=bottom, 3=left
-  
+
   float x = 0;
   float y = 0;
 
   switch (side) {
 
-    case 0: // TOP
-      x = random(pg.width);
-      y = random(-spawnBorder, 0);
-      break;
+  case 0: // TOP
+    x = random(pg.width);
+    y = random(-spawnBorder, 0);
+    break;
 
-    case 1: // RIGHT
-      x = random(pg.width, pg.width + spawnBorder);
-      y = random(pg.height);
-      break;
+  case 1: // RIGHT
+    x = random(pg.width, pg.width + spawnBorder);
+    y = random(pg.height);
+    break;
 
-    case 2: // BOTTOM
-      x = random(pg.width);
-      y = random(pg.height, pg.height + spawnBorder);
-      break;
+  case 2: // BOTTOM
+    x = random(pg.width);
+    y = random(pg.height, pg.height + spawnBorder);
+    break;
 
-    case 3: // LEFT
-      x = random(-spawnBorder, 0);
-      y = random(pg.height);
-      break;
+  case 3: // LEFT
+    x = random(-spawnBorder, 0);
+    y = random(pg.height);
+    break;
   }
 
   return new PVector(x, y);

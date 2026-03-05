@@ -140,14 +140,6 @@ void outputMultiPagePDF() {
 
   /////----- END -------///////
 
-  // Reset text size before drawing text elements
-  pg.textSize(fontSize);
-
-  float textCentre = (textDescent() + textAscent())*0.5; //find vertical centre of font
-
-  // Apply a scalar adjustment because text ascent/descent might not be accurate
-  float scalar = 0.8;
-  textCentre *= scalar;
 
   // --- Temporarily disable advertiser name drawing ---
   // We need to prevent names from drawing during individual color pages,
@@ -173,9 +165,16 @@ void outputMultiPagePDF() {
 
     // If X's are set to white, draw them now — they appear on every page
     // to cut through all line layers visually
+    pg.textFont(labelFontMono);
+    pg.textSize(fontSize);
+    float ascent = pg.textAscent();
+    float descent = pg.textDescent();
+    float textHeight = ascent + descent;
+    float baseline = (ascent + descent) * 0.5 * 0.8; //0.8. = scalar: used as ascent/descent might not be accurate
+
     for (DataObjectAd i : dataObjectsAd) {
       if (xWhite) {
-        i.drawAd(textCentre);
+        i.drawAd(baseline, ascent, textHeight);
       }
     }
     pg.popMatrix();
@@ -199,12 +198,18 @@ void outputMultiPagePDF() {
   drawDates();
 
   // Draw advertiser names and X's (this time, names are visible again)
+  pg.textFont(labelFontMono);
+  pg.textSize(fontSize);
+  float ascent = pg.textAscent();
+  float descent = pg.textDescent();
+  float textHeight = ascent + descent;
+  float baseline = (ascent + descent) * 0.5 * 0.8; //0.8. = scalar: used as ascent/descent might not be accurate
   for (DataObjectAd i : dataObjectsAd) {
     if (i.drawMe) {//check if it is selected from toggle list
-      i.drawAd(textCentre);
+      i.drawAd(baseline, ascent, textHeight);
     }
   }
-  
+
   pg.popMatrix();
   pg.endDraw();
   pg.dispose(); // Dispose of PDF resources

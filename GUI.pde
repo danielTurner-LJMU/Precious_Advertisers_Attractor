@@ -168,23 +168,23 @@ void initProgramControls(int baseX, int baseY) {
     ;
   styleMain("drawAction");
 
-  cp5.addSlider("fixedMaxSpeed")
-    .setLabel("MAX SPEED")
-    .setPosition(baseX, baseY + cSpaceY * 2.5)
-    .setSize(sliderWidth, 20)
-    .setRange(1, 30)
-    .setValue(fixedMaxSpeed);
+  //cp5.addSlider("fixedMaxSpeed")
+  //  .setLabel("MAX SPEED")
+  //  .setPosition(baseX, baseY + cSpaceY * 2.5)
+  //  .setSize(sliderWidth, 20)
+  //  .setRange(1, 30)
+  //  .setValue(fixedMaxSpeed);
 
-  styleMain("fixedMaxSpeed");
+  //styleMain("fixedMaxSpeed");
 
-  cp5.addSlider("fixedMaxForce")
-    .setLabel("MAX FORCE")
-    .setPosition(baseX, baseY + cSpaceY * 2.75)
-    .setSize(sliderWidth, 20)
-    .setRange(0.01, 0.8)
-    .setValue(fixedMaxForce);
+  //cp5.addSlider("fixedMaxForce")
+  //  .setLabel("MAX FORCE")
+  //  .setPosition(baseX, baseY + cSpaceY * 2.75)
+  //  .setSize(sliderWidth, 20)
+  //  .setRange(0.01, 0.8)
+  //  .setValue(fixedMaxForce);
 
-  styleMain("fixedMaxForce");
+  //styleMain("fixedMaxForce");
 
   cp5.addSlider("xScale")
     .setLabel("X SCALE")
@@ -237,33 +237,33 @@ void initProgramControls(int baseX, int baseY) {
     ;
   styleMain("drawTail");
 
-  cp5.addToggle("fixedSpeed")
-    .setLabel("FIXED\nSPEED")
-    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 4)
-    .setSize(50, 20)
-    ;
-  styleMain("fixedSpeed");
-
   cp5.addToggle("drawX")
     .setLabel("DRAW\nX'S")
-    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 4)
+    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 4)
     .setSize(50, 20)
     ;
   styleMain("drawX");
 
+  cp5.addToggle("sqCaps")
+    .setLabel("SQUARE\nCAPS")
+    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 4)
+    .setSize(50, 20)
+    ;
+  styleMain("sqCaps");
+  
   cp5.addToggle("drawAdNames")
     .setLabel("DRAW\nADVERT\nNAMES")
     .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 4)
     .setSize(50, 20)
     ;
   styleMain("drawAdNames");
-
-  cp5.addToggle("sqCaps")
-    .setLabel("SQUARE\nCAPS")
+  
+    cp5.addToggle("drawAdBlocks")
+    .setLabel("DRAW\nADVERT\nBLOCKS")
     .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 4)
     .setSize(50, 20)
     ;
-  styleMain("sqCaps");
+  styleMain("drawAdBlocks");
 
   cp5.addToggle("xWhite")
     .setLabel("BLACK/\nWHITE")
@@ -523,9 +523,9 @@ void controlEvent(ControlEvent theEvent) {
   }
 
 
-  if (theEvent.isFrom("fixedMaxSpeed")||theEvent.isFrom("fixedMaxForce")) {
-    for (DataObjectAd i : dataObjectsAd) i.changeSpeed();
-  }
+  //if (theEvent.isFrom("fixedMaxSpeed")||theEvent.isFrom("fixedMaxForce")) {
+  //  for (DataObjectAd i : dataObjectsAd) i.changeSpeed();
+  //}
 
   if (c != null) {
     String name = c.getName();
@@ -585,14 +585,14 @@ void controlEvent(ControlEvent theEvent) {
   }
 }
 
-void fixedSpeed() {
+//void fixedSpeed() {
 
-  fixedSpeed = !fixedSpeed;
+//  fixedSpeed = !fixedSpeed;
 
-  for (DataObjectAd i : dataObjectsAd) {
-    i.changeSpeed();
-  }
-}
+//  for (DataObjectAd i : dataObjectsAd) {
+//    i.changeSpeed();
+//  }
+//}
 
 void xWhite() {
 
