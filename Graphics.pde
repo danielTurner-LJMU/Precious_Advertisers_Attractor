@@ -194,15 +194,6 @@ void drawBuffer() {
 
   //-----------------------------///
 
-  
-
-
-  //float textCentre = (textDescent() + textAscent())*0.5; //find vertical centre of font
-
-  //// Apply a scalar adjustment because text ascent/descent might not be accurate
-  //float scalar = 0.8;
-  //textCentre *= scalar;
-
   //apply multiply mode so we get a sense of risograph output
   pg.blendMode(MULTIPLY);
   for (DataObjectAd i : dataObjectsAd) {
@@ -355,10 +346,10 @@ void drawDates() {
   } else {
     pg.translate(borderAsPixels, yOffset);
   }
-  pg.line(0, -5, 0, -lineLength);
+  pg.line(0, -5, 0, -lineLength-fontSize);
   pg.square(-5, -5, 10);
   pg.fill(0);
-  pg.text(date, 10, -lineLength + pg.textAscent());
+  pg.text(date, 10, -lineLength + pg.textAscent()-fontSize);
   pg.popMatrix();
 
   pg.noFill();
@@ -370,9 +361,9 @@ void drawDates() {
   } else {
     pg.translate(loginLineX2, y2);
   }
-  pg.line(0, 5, 0, lineLength);
+  pg.line(0, 5, 0, lineLength+fontSize);
   pg.square(-5, -5, 10);
-  pg.text(date, -10, lineLength);
+  pg.text(date, -10, lineLength+fontSize);
   pg.popMatrix();
 
   //reset text alignment

@@ -31,7 +31,7 @@ class ControlFrame extends PApplet {
 
   int totalToggles = dataObjectsAd.length; //match number of toggles to number of advertisers
   int toggleHeight = 25;
-  int visibleHeight = 500;
+  int visibleHeight = 900;
   int toggleStartY = dragBarHeight + 50;
 
   //scrollbar
@@ -55,7 +55,7 @@ class ControlFrame extends PApplet {
   }
 
   public void settings() {
-    size(400, 600);
+    size(400, 1000);
   }
 
   public void setup() {
