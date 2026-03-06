@@ -102,6 +102,15 @@ void createImageBuffer(float printX, float printY) {
   for (DataObjectLogin i : dataObjectsLogin) {
     i.initDraw();
   }
+
+  // Set initial text widths
+  pg.beginDraw();
+  pg.textFont(labelFontMono);
+  pg.textSize(fontSize);
+  for (DataObjectAd i : dataObjectsAd) {
+    i.cachedTextWidth = pg.textWidth(i.mySiteName);
+  }
+  pg.endDraw();
 }
 
 
@@ -169,7 +178,7 @@ void drawBuffer() {
 
   //if changing login Lines slider make the helper visible
   if (rowsVisible) {
-      drawLoginLine();
+    drawLoginLine();
   }
 
   for (DataObjectLogin i : dataObjectsLogin) {
@@ -216,7 +225,7 @@ void drawBuffer() {
 
   //if changing border value then draw the border helper
   if (borderVisible) {
-      drawBorder();
+    drawBorder();
   }
 
   pg.endDraw();

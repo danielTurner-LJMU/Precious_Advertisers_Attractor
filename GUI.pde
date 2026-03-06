@@ -252,7 +252,7 @@ void initProgramControls(int baseX, int baseY) {
       .setRGB(palette[i])
       .setLabel("Color " + (i + 1));
   }
- //------------ GAP -------------//
+  //------------ GAP -------------//
 
 
   cp5.addToggle("showAdvertisers")
@@ -271,10 +271,10 @@ void initProgramControls(int baseX, int baseY) {
     .setValue(fontSize);
   ;
   styleMain("fontSize");
-   //------------ GAP -------------//
-   
-  
-   cp5.addToggle("pauseMotion")
+  //------------ GAP -------------//
+
+
+  cp5.addToggle("pauseMotion")
     .setLabel("PAUSE")
     .setPosition(baseX, baseY + cSpaceY*5.7)
     .setSize(100, 40)
@@ -533,6 +533,16 @@ void controlEvent(ControlEvent theEvent) {
     }
   }
 
+  //re-calculate text widths
+  if (theEvent.isFrom("fontSize")) {
+    if (pg != null && dataObjectsAd != null) {
+      pg.textFont(labelFontMono);
+      pg.textSize(fontSize);
+      for (DataObjectAd i : dataObjectsAd) {
+        i.cachedTextWidth = pg.textWidth(i.mySiteName);
+      }
+    }
+  }
   //
   if (pauseMotion) {
     if (theEvent.isFrom("imScale")) {

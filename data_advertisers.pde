@@ -162,6 +162,11 @@ class DataObjectAd
   color myColor;            // Colour selected from palette
   float randomStrokeThick;   //randomised strokeWeight for when 'randomLineWeight' = true
 
+  //Performace enhancement - Changing number of target searches to set number of frames instead of every frame
+  int targetRefreshCounter = 0;
+  DataObjectLogin cachedTarget = null;
+  float cachedTextWidth = 0;
+
   //original JSON data format
   DataObjectAd(int id, String siteName, boolean visit, boolean remarket, boolean customerFile) {
 
@@ -251,17 +256,21 @@ class DataObjectAd
 
     history.add(location.copy());
     if (history.size() > historyLength) {
-      int range = history.size() - historyLength;
-      for (int i = 0; i < range; i++) {
-        if (i < history.size()) {
-          history.remove(i);
-        }
+      // With this - subList().clear() is a single operation
+      if (history.size() > historyLength) {
+        history.subList(0, history.size() - historyLength).clear();
       }
     }
   }
 
   //Seek Closest Active Login Object
   void findTarget() {
+
+    targetRefreshCounter++;
+    if (targetRefreshCounter % 10 != 0 && cachedTarget != null) {
+      seek(cachedTarget.active ? cachedTarget.location : new PVector(pg.width/2, pg.height/2));
+      return;
+    }
 
     // Set initial closest distance to a very large number
     float closestDistance = Float.MAX_VALUE;
@@ -284,6 +293,10 @@ class DataObjectAd
         closestTarget = login;
       }
     }
+
+    // Cache the result
+    cachedTarget = closestTarget;
+    targetRefreshCounter = 0;
 
     // If no active login objects were found, seek the centre of the canvas
     if (closestTarget == null) {
@@ -378,12 +391,9 @@ class DataObjectAd
       //Add textPadding to calculate position to draw text
       float textX = rightEdge + textPadding;
 
-      //calculate text width
-      float tw = pg.textWidth(mySiteName);
-
       float rectX = textX - innerPad;
       float rectY = baseline - ascent - innerPad;
-      float rectW = tw + (innerPad * 2.0);
+      float rectW = cachedTextWidth + (innerPad * 2.0);
       float rectH = textHeight + (innerPad * 2.0);
 
       pg.pushMatrix();
