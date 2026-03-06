@@ -71,12 +71,8 @@ float fontSize = 10;
 //creates offscreen image buffer to draw to screen
 void createImageBuffer(float printX, float printY) {
 
-  //println("buffer Created = " + printX + " - " + printY);
-  //if (pgRaster == null) {
   pgRaster = createGraphics(int(printX), int(printY));
-  //pgPDF = createGraphics(int(printX), int(printY), PDF, fileName);
   pg = pgRaster;
-  //}
 
   bufferCreated = true;
 
@@ -173,16 +169,14 @@ void drawBuffer() {
 
   //if changing login Lines slider make the helper visible
   if (rowsVisible) {
-    if (!pauseMotion) { //have to check this as these lines do not clear out when the motion is paused
       drawLoginLine();
-    }
   }
 
   for (DataObjectLogin i : dataObjectsLogin) {
     i.update();
     i.activate();
     i.drawLogin();
-    i.drawLoginText();
+    //i.drawLoginText();
   }
 
   drawDates();
@@ -222,9 +216,7 @@ void drawBuffer() {
 
   //if changing border value then draw the border helper
   if (borderVisible) {
-    if (!pauseMotion) { //have to check this as these lines do not clear out when the motion is paused
       drawBorder();
-    }
   }
 
   pg.endDraw();
@@ -264,6 +256,7 @@ void drawHelperDates() {
   float dateLength = textWidth(dateReadout);
   int padding = 10;
   rectMode(CORNER);
+  textAlign(LEFT);
 
   //draw the rect and date
   pushMatrix();
@@ -276,6 +269,7 @@ void drawHelperDates() {
   popMatrix();
 
   rectMode(CENTER); //reset rect mode
+  textAlign(CENTER); //reset text align
 }
 
 //Login activity is drawn along a line that is spread
@@ -384,6 +378,20 @@ void calculatePreviewOffset() {
   dragOffsetY = mouseY - dragStartLoc.y;
 }
 
+//Reverse transformation to find mouseLocation on buffer
+PVector screenToBuffer(float mx, float my) {
+  // Reverse the translate
+  float bx = mx - (previewCentreX + dragOffsetX);
+  float by = my - (previewCentreY + dragOffsetY);
+  // Reverse the scale
+  bx /= imScale;
+  by /= imScale;
+  // Reverse the CENTER image mode offset (shift from centre back to top-left origin)
+  bx += pg.width / 2.0;
+  by += pg.height / 2.0;
+  return new PVector(bx, by);
+}
+
 void drawPreview() {
 
   //set scale value to match imScale
@@ -411,4 +419,55 @@ void drawPreview() {
   if (datesVisible) {
     drawHelperDates();
   }
+}
+
+//drawing the rollover information for login objects
+void drawHoverTooltip() {
+  if (hoveredLogin == null) return;
+
+  String[] lines = {
+    hoveredLogin.date,
+    hoveredLogin.city + ", " + hoveredLogin.country,
+    hoveredLogin.IP,
+    hoveredLogin.platformInfo
+  };
+
+  int padding = 10;
+  int lineH = 18;
+  textFont(labelFontMono);
+  textSize(13);
+
+  // Calculate rectangle size based on widest line
+  float maxW = 0;
+  for (String l : lines) {
+    float w = textWidth(l);
+    if (w > maxW) maxW = w;
+  }
+  float rectW = maxW + padding * 2;
+  float rectH = lines.length * lineH + padding * 2;
+
+  // Offset tooltip to the right of the cursor
+  float tx = mouseX + 15;
+  float ty = mouseY;
+
+  // Nudge left if it would go off the right edge of the screen
+  if (tx + rectW > width) tx = mouseX - rectW - 15;
+
+  // Draw background rect
+  noStroke();
+  fill(cTheme, 200);
+  rectMode(CORNER);
+  rect(tx, ty, rectW, rectH);
+
+  // Draw text lines
+  fill(cBlack);
+  textAlign(LEFT);
+  for (int i = 0; i < lines.length; i++) {
+    if (lines[i] != null && !lines[i].isEmpty()) {
+      text(lines[i], tx + padding, ty + padding + (i + 1) * lineH - 4);
+    }
+  }
+  textAlign(CENTER);
+
+  rectMode(CENTER); // reset to match rest of sketch
 }

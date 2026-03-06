@@ -115,7 +115,7 @@ void draw1() {
   background(0);
 
   /* We are doing some balancing of performance here. When the 'pause' button is selected
-   the offsecreen buffer only updates when a GUI element is selected.
+   the offscreen buffer only updates when a GUI element is selected.
    If you look in the GUI tab, I have excluded 'imScale' from this process.
    This makes for smoother exploration of the piece as the buffer is not re-drawn
    when we change the image scale.
@@ -136,6 +136,8 @@ void draw1() {
         }
       }
       drawPreview(); //copies offscreen buffer to the stage
+      checkHover(); //check for rollovers on login objects
+      drawHoverTooltip();
     } else {
       autoGenerateInBackground();
     }
@@ -146,6 +148,7 @@ void draw1() {
 
   drawOverlays();
 
+ 
   //draw parent folder name to screen
   //textFont(subFont);
   //textSize(14);

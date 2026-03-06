@@ -69,6 +69,7 @@ void mouseReleased() {
 
   if (state == 1) {
     dragEnabled = false;
+     if (pauseMotion) shapesDrawn = false; //re-draw buffer to clear helper lines
   }
 
   //hide all helper graphics
@@ -76,6 +77,26 @@ void mouseReleased() {
   rowsVisible = false;
   datesVisible = false;
 }
+
+// Checking if mouse is over login objects
+
+void checkHover() {
+  // Only check when in state 1 and mouse is in the preview area
+  if (state != 1 || mouseX <= guiWidth) {
+    hoveredLogin = null;
+    return;
+  }
+  hoveredLogin = null;
+  for (DataObjectLogin obj : dataObjectsLogin) {
+    if (isMouseOverLogin(obj, (float)mouseX, (float)mouseY)) {
+      hoveredLogin = obj;
+      //println(obj);
+      break;
+    }
+  }
+}
+
+
 
 // Function: generateFileName - builds a timestamped filename for exports
 String generateFileName(String fileType) {
@@ -191,9 +212,9 @@ void outputMultiPagePDF() {
   pg.scale(pdfScaleFactor); // Always rescale for each new page
 
   // Draw the login text elements (e.g. date, IP etc.)
-  for (DataObjectLogin i : dataObjectsLogin) {
-    i.drawLoginText();
-  }
+  //for (DataObjectLogin i : dataObjectsLogin) {
+  //  i.drawLoginText();
+  //}
 
   drawDates();
 

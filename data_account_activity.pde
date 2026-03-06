@@ -67,7 +67,7 @@ void extractDataLogin() {
   // Use the first entry to extract keys (field names) for reference/debugging
   JSONObject accActivity1 = accountActivity.getJSONObject(0);
   String[] myKeys = (String[]) accActivity1.keys().toArray(new String[accActivity1.size()]);
-  printArray(myKeys);
+  //printArray(myKeys);
 
   // Loop through each login entry and extract data
   for (int i = 0; i < accountActivity.size(); i++) {
@@ -126,8 +126,8 @@ void extractDataLogin() {
    println("Unique actions:");
    for (String action : uniqueActions) println(action);
    */
-   
-     // ------- **** HashMap Printouts **** --------- //
+
+  // ------- **** HashMap Printouts **** --------- //
   //for (String loc : locationCounts.keySet()) {
   //  println(loc + " : " + locationCounts.get(loc));
   //}
@@ -135,11 +135,10 @@ void extractDataLogin() {
   //for (String ip : ipCounts.keySet()) {
   //  println(ip + " : " + ipCounts.get(ip));
   //}
-  
+
   //  for (String platform : platformCounts.keySet()) {
   //  println(platform + " : " + platformCounts.get(platform));
   //}
-  
 }
 
 // Extracts the text inside the first pair of parentheses in a string (e.g., OS from user agent)
@@ -336,39 +335,46 @@ class DataObjectLogin
   }
 
   // Optionally draw associated text labels for each login
-  void drawLoginText() {
-    pg.pushMatrix();
-    pg.translate(location.x, location.y);
+  //void drawLoginText() {
+  //  pg.pushMatrix();
+  //  pg.translate(location.x, location.y);
 
-    if (!hideMe) {
-      pg.textSize(fontSize);
-      float yLoc = -(r*0.5); // Start top edge of the circle
-      pg.fill(0);
+  //  if (!hideMe) {
+  //    pg.textSize(fontSize);
+  //    float yLoc = -(r*0.5); // Start top edge of the circle
+  //    pg.fill(0);
 
-      if (drawCity) {
-        pg.text(city +", " + country, (r*0.5)+5, yLoc);
-        yLoc+=fontSize;
-      }
-      if (drawIP) {
-        pg.text(IP, (r*0.5)+5, yLoc);
-        yLoc+=fontSize;
-      }
-      if (drawPlatform) {
-        if (platformInfo != null) {
-          pg.text(platformInfo, (r*0.5)+5, yLoc);
-          yLoc+=fontSize;
-        }
-      }
-      if (drawDate) {
-        pg.text(date, (r*0.5)+5, yLoc);
-        yLoc+=fontSize;
-      }
-      if (drawAction) {
-        pg.text(action, (r*0.5)+5, yLoc);
-        yLoc+=fontSize;
-      }
-    }
+  //    if (drawCity) {
+  //      pg.text(city +", " + country, (r*0.5)+5, yLoc);
+  //      yLoc+=fontSize;
+  //    }
+  //    if (drawIP) {
+  //      pg.text(IP, (r*0.5)+5, yLoc);
+  //      yLoc+=fontSize;
+  //    }
+  //    if (drawPlatform) {
+  //      if (platformInfo != null) {
+  //        pg.text(platformInfo, (r*0.5)+5, yLoc);
+  //        yLoc+=fontSize;
+  //      }
+  //    }
+  //    if (drawDate) {
+  //      pg.text(date, (r*0.5)+5, yLoc);
+  //      yLoc+=fontSize;
+  //    }
+  //    if (drawAction) {
+  //      pg.text(action, (r*0.5)+5, yLoc);
+  //      yLoc+=fontSize;
+  //    }
+  //  }
 
-    pg.popMatrix();
-  }
+  //  pg.popMatrix();
+  //}
+}
+
+//Check for mouseOver
+boolean isMouseOverLogin(DataObjectLogin obj, float mx, float my) {
+  PVector buf = screenToBuffer(mx, my);
+  float d = dist(buf.x, buf.y, obj.location.x, obj.location.y);
+  return d <= obj.r / 2.0;
 }

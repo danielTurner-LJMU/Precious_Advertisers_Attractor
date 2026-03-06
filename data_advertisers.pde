@@ -44,6 +44,9 @@ float strokeThick = 1;          // Base stroke weight
 int step = 1;                   // Distance between vertices on tail line
 color pdfBlack = color(0, 150); // Semi-transparent black for PDF export to risograph
 
+//Checking for rollovers
+DataObjectLogin hoveredLogin = null;
+
 void loadDataAd() {
 
   // Build path to JSON file and load
@@ -97,7 +100,7 @@ void extractDataAd() {
     for (int i = 0; i < labelValues.size(); i++) {
       totalEntries += labelValues.getJSONObject(i).getJSONArray("vec").size();
     }
-    println("number of JSON Objects = " + totalEntries);
+    //println("number of JSON Objects = " + totalEntries);
 
     dataObjectsAd = new DataObjectAd[totalEntries]; // Now initialised correctly
 

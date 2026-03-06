@@ -6,6 +6,7 @@ ControlP5 cp5;
 int sButtonW = 150, sButtonH = 50;
 int lButtonW = 250, lButtonH = 85;
 int sliderWidth = 350;
+int sliderHeight = 19;
 
 //color palette
 color cBlack = #282829; //Black/grey Colour
@@ -74,7 +75,7 @@ void initProgramControls(int baseX, int baseY) {
   cp5.addSlider("imScale")
     .setLabel("SCALE")
     .setPosition(baseX, baseY + cSpaceY * 0.25)
-    .setSize(sliderWidth, 20)
+    .setSize(sliderWidth, sliderHeight)
     .setRange(0, 1)
     ;
 
@@ -86,7 +87,7 @@ void initProgramControls(int baseX, int baseY) {
     .setLabel("TIME RANGE")
     .setBroadcast(false)
     .setPosition(baseX, baseY + cSpaceY * 0.5)
-    .setSize(sliderWidth, 20)
+    .setSize(sliderWidth, sliderHeight)
     .setHandleSize(20)
     .setRange(startDate, endDate)
     .setRangeValues(startDate, endDate)
@@ -99,7 +100,7 @@ void initProgramControls(int baseX, int baseY) {
   cp5.addSlider("numRows")
     .setLabel("NUMBER OF ROWS")
     .setPosition(baseX, baseY + cSpaceY * 0.75)
-    .setSize(sliderWidth, 20)
+    .setSize(sliderWidth, sliderHeight)
     .setRange(1, 50)
     ;
 
@@ -108,17 +109,19 @@ void initProgramControls(int baseX, int baseY) {
   cp5.addSlider("border")
     .setLabel("BORDER")
     .setPosition(baseX, baseY + cSpaceY * 1)
-    .setSize(sliderWidth, 20)
+    .setSize(sliderWidth, sliderHeight)
     .setRange(-10, 40)
     .setValue(border);
   ;
 
   styleMain("border");
 
+  //------------ GAP -------------//
+
   cp5.addSlider("targetRadius")
     .setLabel("ACTIVITY SIZE")
     .setPosition(baseX, baseY + cSpaceY * 1.35)
-    .setSize(sliderWidth, 20)
+    .setSize(sliderWidth, sliderHeight)
     .setRange(0, 2.5)
     .setValue(targetRadius);
 
@@ -127,69 +130,20 @@ void initProgramControls(int baseX, int baseY) {
   cp5.addSlider("targetOpacity")
     .setLabel("ACTIVITY OPACITY")
     .setPosition(baseX, baseY + cSpaceY * 1.6)
-    .setSize(sliderWidth, 20)
+    .setSize(sliderWidth, sliderHeight)
     .setRange(0, 255)
     .setValue(targetOpacity);
 
   styleMain("targetOpacity");
 
-  cp5.addToggle("drawCity")
-    .setLabel("DRAW\nCITY")
-    .setPosition(baseX, baseY + cSpaceY * 1.85)
-    .setSize(50, 20)
-    ;
-  styleMain("drawCity");
+  //------------ GAP -------------//
 
-  cp5.addToggle("drawIP")
-    .setLabel("DRAW\nIP")
-    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 1.85)
-    .setSize(50, 20)
-    ;
-  styleMain("drawIP");
 
-  cp5.addToggle("drawPlatform")
-    .setLabel("DRAW\nPLATFORM")
-    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 1.85)
-    .setSize(50, 20)
-    ;
-  styleMain("drawPlatform");
-
-  cp5.addToggle("drawDate")
-    .setLabel("DRAW\nDATE")
-    .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 1.85)
-    .setSize(50, 20)
-    ;
-  styleMain("drawDate");
-
-  cp5.addToggle("drawAction")
-    .setLabel("DRAW\nACTION")
-    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 1.85)
-    .setSize(50, 20)
-    ;
-  styleMain("drawAction");
-
-  //cp5.addSlider("fixedMaxSpeed")
-  //  .setLabel("MAX SPEED")
-  //  .setPosition(baseX, baseY + cSpaceY * 2.5)
-  //  .setSize(sliderWidth, 20)
-  //  .setRange(1, 30)
-  //  .setValue(fixedMaxSpeed);
-
-  //styleMain("fixedMaxSpeed");
-
-  //cp5.addSlider("fixedMaxForce")
-  //  .setLabel("MAX FORCE")
-  //  .setPosition(baseX, baseY + cSpaceY * 2.75)
-  //  .setSize(sliderWidth, 20)
-  //  .setRange(0.01, 0.8)
-  //  .setValue(fixedMaxForce);
-
-  //styleMain("fixedMaxForce");
 
   cp5.addSlider("xScale")
     .setLabel("X SCALE")
-    .setPosition(baseX, baseY + cSpaceY * 3)
-    .setSize(sliderWidth, 20)
+    .setPosition(baseX, baseY + cSpaceY * 1.95)
+    .setSize(sliderWidth, sliderHeight)
     .setRange(1, 20)
     .setValue(xScale);
 
@@ -197,19 +151,18 @@ void initProgramControls(int baseX, int baseY) {
 
   cp5.addSlider("xThickness")
     .setLabel("X WEIGHT")
-    .setPosition(baseX, baseY + cSpaceY * 3.25)
-    .setSize(sliderWidth, 20)
+    .setPosition(baseX, baseY + cSpaceY * 2.2)
+    .setSize(sliderWidth, sliderHeight)
     .setRange(1, 200)
     .setValue(xThickness);
 
   styleMain("xThickness");
 
 
-
   cp5.addSlider("historyLength")
     .setLabel("LINE LENGTH")
-    .setPosition(baseX, baseY + cSpaceY * 3.5)
-    .setSize(sliderWidth, 20)
+    .setPosition(baseX, baseY + cSpaceY * 2.45)
+    .setSize(sliderWidth, sliderHeight)
     .setRange(30, 1000)
     .setValue(200);
   ;
@@ -219,62 +172,63 @@ void initProgramControls(int baseX, int baseY) {
 
   cp5.addSlider("strokeThick")
     .setLabel("LINE THICKNESS")
-    .setPosition(baseX, baseY + cSpaceY * 3.75)
-    .setSize(sliderWidth, 20)
+    .setPosition(baseX, baseY + cSpaceY * 2.7)
+    .setSize(sliderWidth, sliderHeight)
     .setRange(1, 400)
     .setValue(strokeThick);
 
   styleMain("strokeThick");
+  //------------ GAP -------------//
 
 
-  // create a toggle and change the default look to a (on/off) switch look
   cp5.addToggle("drawTail")
     .setLabel("DRAW\nLINES")
-    .setPosition(baseX, baseY + cSpaceY * 4)
+    .setPosition(baseX, baseY + cSpaceY * 3.05)
     .setSize(50, 20)
     .setValue(false)
-    //.setMode(ControlP5.SWITCH)
     ;
   styleMain("drawTail");
 
   cp5.addToggle("drawX")
     .setLabel("DRAW\nX'S")
-    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 4)
+    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 3.05)
     .setSize(50, 20)
     ;
   styleMain("drawX");
 
   cp5.addToggle("sqCaps")
     .setLabel("SQUARE\nCAPS")
-    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 4)
+    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 3.05)
     .setSize(50, 20)
     ;
   styleMain("sqCaps");
-  
+
   cp5.addToggle("drawAdNames")
     .setLabel("DRAW\nADVERT\nNAMES")
-    .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 4)
+    .setPosition(baseX + cSpaceX * 3, baseY + cSpaceY * 3.05)
     .setSize(50, 20)
     ;
   styleMain("drawAdNames");
-  
-    cp5.addToggle("drawAdBlocks")
+
+  cp5.addToggle("drawAdBlocks")
     .setLabel("DRAW\nADVERT\nBLOCKS")
-    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 4)
+    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 3.05)
     .setSize(50, 20)
     ;
   styleMain("drawAdBlocks");
 
   cp5.addToggle("xWhite")
     .setLabel("BLACK/\nWHITE")
-    .setPosition(baseX + cSpaceX * 5, baseY + cSpaceY * 4)
+    .setPosition(baseX + cSpaceX * 5, baseY + cSpaceY * 3.05)
     .setSize(50, 20)
     ;
   styleMain("xWhite");
+  //------------ GAP -------------//
+
 
   cp5.addToggle("randomLineWeight")
     .setLabel("RANDOM\nLINE\nWEIGHT")
-    .setPosition(baseX, baseY + cSpaceY * 4.75)
+    .setPosition(baseX, baseY + cSpaceY * 3.85)
     .setSize(50, 20)
     .setBroadcast(false)
     .setValue(false)
@@ -284,7 +238,7 @@ void initProgramControls(int baseX, int baseY) {
 
   cp5.addToggle("colourLine")
     .setLabel("COLOURED\nLINES")
-    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 4.75)
+    .setPosition(baseX + cSpaceX, baseY + cSpaceY * 3.85)
     .setSize(50, 20)
     .setBroadcast(false)
     .setValue(true)
@@ -294,13 +248,33 @@ void initProgramControls(int baseX, int baseY) {
 
   //Add colour wheels
   for (int i = 0; i < palette.length; i++) {
-    wheels[i] = cp5.addColorWheel("wheel" + i, baseX + cSpaceX + (i+1) * 70, int(baseY + cSpaceY * 4.75), 60)
+    wheels[i] = cp5.addColorWheel("wheel" + i, baseX + cSpaceX + (i+1) * 75, int(baseY + cSpaceY * 3.85), 60)
       .setRGB(palette[i])
       .setLabel("Color " + (i + 1));
   }
+ //------------ GAP -------------//
 
 
-  cp5.addToggle("pauseMotion")
+  cp5.addToggle("showAdvertisers")
+    .setLabel("SHOW/HIDE\nADVERTISERS")
+    .setPosition(baseX, baseY + cSpaceY*4.85)
+    .setSize(100, 40)
+    .setValue(false);
+  styleMain("showAdvertisers");
+
+  cp5.addSlider("fontSize")
+    .setLabel("FONT SIZE")
+    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 4.85)
+    .setSize(110, 20)
+    .setRange(10, 28)
+    .setNumberOfTickMarks(10)
+    .setValue(fontSize);
+  ;
+  styleMain("fontSize");
+   //------------ GAP -------------//
+   
+  
+   cp5.addToggle("pauseMotion")
     .setLabel("PAUSE")
     .setPosition(baseX, baseY + cSpaceY*5.7)
     .setSize(100, 40)
@@ -308,26 +282,9 @@ void initProgramControls(int baseX, int baseY) {
   //styleMain("pauseMotion");
   controllerLocked("pauseMotion", true);
 
-  cp5.addToggle("showAdvertisers")
-    .setLabel("SHOW/HIDE\nADVERTISERS")
-    .setPosition(baseX+ cSpaceX * 2, baseY + cSpaceY*5.7)
-    .setSize(100, 40)
-    .setValue(false);
-  styleMain("showAdvertisers");
-
-  cp5.addSlider("fontSize")
-    .setLabel("FONT SIZE")
-    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 5.7)
-    .setSize(110, 20)
-    .setRange(10, 28)
-    .setNumberOfTickMarks(10)
-    .setValue(fontSize);
-  ;
-  styleMain("fontSize");
-
   cp5.addBang("generate")
     .setLabel("GENERATE")
-    .setPosition(baseX, baseY + cSpaceY*6.5)
+    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY*5.7)
     .setSize(100, 40);
   //styleMain("generate");
   controllerLocked("generate", true);
@@ -383,7 +340,7 @@ void initMainControls() {
 
 
   // --- ARTWORK SIZE --- //
-  baseY = 100; //update start position on y-axis
+  baseY = 120; //update start position on y-axis
 
   cp5.addTextlabel("Artwork Size")
     .setText("ARTWORK SIZE")
@@ -415,7 +372,7 @@ void initMainControls() {
   }
 
   // --- CONTROLLERS GROUP --- //
-  baseY = 180; //update start position on y-axis
+  baseY = 200; //update start position on y-axis
 
   cp5.addTextlabel("Controls")
     .setText("CONTROLS")
@@ -428,7 +385,7 @@ void initMainControls() {
 
 
   // --- OUTPUT GROUP --- //
-  baseY = 900; //update start position on y-axis
+  baseY = 875; //update start position on y-axis
 
   cp5.addTextlabel("Output")
     .setText("OUTPUT")
