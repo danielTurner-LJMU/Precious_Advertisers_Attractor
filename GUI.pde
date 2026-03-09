@@ -262,9 +262,16 @@ void initProgramControls(int baseX, int baseY) {
     .setValue(false);
   styleMain("showAdvertisers");
 
+  cp5.addToggle("drawRangeDates")
+    .setLabel("DRAW START/END\nDATES")
+    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY*4.85)
+    .setSize(100, 40)
+    .setValue(true);
+  styleMain("drawRangeDates");
+  
   cp5.addSlider("fontSize")
     .setLabel("FONT SIZE")
-    .setPosition(baseX + cSpaceX * 2, baseY + cSpaceY * 4.85)
+    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 4.85)
     .setSize(110, 20)
     .setRange(10, 28)
     .setNumberOfTickMarks(10)
@@ -552,14 +559,6 @@ void controlEvent(ControlEvent theEvent) {
   }
 }
 
-//void fixedSpeed() {
-
-//  fixedSpeed = !fixedSpeed;
-
-//  for (DataObjectAd i : dataObjectsAd) {
-//    i.changeSpeed();
-//  }
-//}
 
 void xWhite() {
 
@@ -614,6 +613,12 @@ void generate() {
 
   generateLength = historyLength;
   autoGenerate = true;
+}
+
+
+// ControlP5 hook - called by the Save PDF bang button
+void outputMultiPagePDF() {
+  outputMultiPagePDF(fileNameAppend);
 }
 
 //// ------ CONTROLLER STYLING -------- ///

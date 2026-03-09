@@ -3,6 +3,11 @@ import processing.pdf.*; // Import PDF library for exporting visuals
 import java.util.*; // Import utilities for date/time functions
 
 String title = "Advertisers"; // Window and project title
+/* Append for filename:
+ Final program will have participants pseuso label passed here so works are
+ attributable. All testing/development images will be appended "test"
+ */
+String fileNameAppend = "test";
 
 int guiWidth = 500; //stores the right edge location of the GUI area
 
@@ -69,7 +74,7 @@ void mouseReleased() {
 
   if (state == 1) {
     dragEnabled = false;
-     if (pauseMotion) shapesDrawn = false; //re-draw buffer to clear helper lines
+    if (pauseMotion) shapesDrawn = false; //re-draw buffer to clear helper lines
   }
 
   //hide all helper graphics
@@ -78,8 +83,19 @@ void mouseReleased() {
   datesVisible = false;
 }
 
-// Checking if mouse is over login objects
+//Hidden key command to test various opacities for risograph reproduction
+void keyPressed() {
+  if (state != 1 || !bufferCreated) return;
 
+  boolean cmdOrCtrl = keyEvent.isMetaDown() || keyEvent.isControlDown();
+  boolean shiftDown = keyEvent.isShiftDown();
+
+  if (shiftDown && cmdOrCtrl && (key == 'r' || key == 'R')) {
+    exportOpacityTestPDFs();
+  }
+}
+
+// Checking if mouse is over login objects
 void checkHover() {
   // Only check when in state 1 and mouse is in the preview area
   if (state != 1 || mouseX <= guiWidth) {
@@ -98,21 +114,20 @@ void checkHover() {
 
 
 
-// Function: generateFileName - builds a timestamped filename for exports
-String generateFileName(String fileType) {
+// Function: generateFileName - builds a timestamped filename with appended string for exports
 
+String generateFileName(String fileType, String label) {
   String saveLocation = "x - output/";
   String fileName = "Precious_Advertisers - " +
     year() + "-" + month() + "-" + day() +
     " - " + hour() + "-" + minute() + "-" + second();
-
-  return(saveLocation + fileName + " - " + currentPrintSize + "." + fileType);
+  return(saveLocation + fileName + " - " + currentPrintSize + " - " + label + "." + fileType);
 }
 
 // Function: outputTiff - saves current frame as TIFF
 void outputTiff() {
 
-  String outputFileName = generateFileName("tif");
+  String outputFileName = generateFileName("tif", fileNameAppend);
   pg.save(outputFileName);
 }
 
@@ -120,119 +135,177 @@ void outputTiff() {
 void outputTiffAndPDF() {
 
   outputTiff();
-  outputMultiPagePDF();
+  outputMultiPagePDF(fileNameAppend);
 }
 
 // Function: outputMultiPagePDF - exports artwork as multi-page PDF
-void outputMultiPagePDF() {
+void outputMultiPagePDF(String label) {
 
-  String outputFileName = generateFileName("pdf");
+  String outputFileName = generateFileName("pdf", label);
   PVector bufferSize = printSize[printSizeSelect];
 
-  //PDF buffer is created using the PDF scale factor to convert from DPI to points
   pgPDF = createGraphics(int(bufferSize.x*pdfScaleFactor), int(bufferSize.y*pdfScaleFactor), PDF, outputFileName);
-  pg = pgPDF; // switch to PDF context
+  pg = pgPDF;
 
-  PGraphicsPDF pdf = (PGraphicsPDF) pgPDF; // cast to PDF renderer
+  PGraphicsPDF pdf = (PGraphicsPDF) pgPDF;
 
   calculateBorder();
   calculateLoginLine();
 
+  // Pre-calculate text measurements once
   pg.beginDraw();
-  pg.pushMatrix();
-  pg.scale(pdfScaleFactor); //Scale all drawing by the PDF scale factor
-
-  /////----- LOGIN CIRCLE LAYER -------///////
-
-  //draw login circles
-  for (DataObjectLogin i : dataObjectsLogin) {
-    i.drawLogin();
-  }
-
-  pg.popMatrix();
-  pdf.nextPage();
-
-  /////----- COLOURED LINE LAYERS -------///////
-
-  step = ceil(strokeThick/8); // calculate spacing
-  if (step < 10) {
-    step = 10;
-  }
-
-  /////----- END -------///////
-
-
-  // --- Temporarily disable advertiser name drawing ---
-  // We need to prevent names from drawing during individual color pages,
-  // since drawAd() includes the name and we only want the white crosses.
-  // We'll store the current state and restore it after this section.
-  boolean drawNamesState = drawAdNames;
-  drawAdNames = false;
-
-  // Loop through the palette and draw one colour layer per PDF page
-  for (int p = 0; p < palette.length; p++) {
-    pg.pushMatrix();
-    pg.scale(pdfScaleFactor); // Scale drawing for PDF resolution
-
-    for (DataObjectAd i : dataObjectsAd) {
-      // Only draw if object is active (toggled on)
-      if (i.drawMe) {
-        //check if it is using the relevant from palette array
-        if (i.cVal == p) {
-          i.drawAdLines(); // Draw the colored line layer
-        }
-      }
-    }
-
-    // If X's are set to white, draw them now — they appear on every page
-    // to cut through all line layers visually
-    pg.textFont(labelFontMono);
-    pg.textSize(fontSize);
-    float ascent = pg.textAscent();
-    float descent = pg.textDescent();
-    float textHeight = ascent + descent;
-    float baseline = (ascent + descent) * 0.5 * 0.8; //0.8. = scalar: used as ascent/descent might not be accurate
-
-    for (DataObjectAd i : dataObjectsAd) {
-      if (xWhite) {
-        i.drawAd(baseline, ascent, textHeight);
-      }
-    }
-    pg.popMatrix();
-    pdf.nextPage(); // Move to the next page in the PDF
-  }
-
-  // Restore the original drawAdNames value for future pages
-  drawAdNames = drawNamesState;
-
-
-  /////----- BLACK PRINT LAYERS -------///////
-
-  pg.pushMatrix();
-  pg.scale(pdfScaleFactor); // Always rescale for each new page
-
-  // Draw the login text elements (e.g. date, IP etc.)
-  //for (DataObjectLogin i : dataObjectsLogin) {
-  //  i.drawLoginText();
-  //}
-
-  drawDates();
-
-  // Draw advertiser names and X's (this time, names are visible again)
   pg.textFont(labelFontMono);
   pg.textSize(fontSize);
   float ascent = pg.textAscent();
   float descent = pg.textDescent();
   float textHeight = ascent + descent;
-  float baseline = (ascent + descent) * 0.5 * 0.8; //0.8. = scalar: used as ascent/descent might not be accurate
+  float baseline = (ascent + descent) * 0.5 * 0.8;
+
+  // Recalculate cached text widths at PDF scale
   for (DataObjectAd i : dataObjectsAd) {
-    if (i.drawMe) {//check if it is selected from toggle list
-      i.drawAd(baseline, ascent, textHeight);
+    i.cachedTextWidth = pg.textWidth(i.mySiteName);
+  }
+
+  /////----- PAGE 1: LOGIN CIRCLES -------///////
+
+  pg.pushMatrix();
+  pg.scale(pdfScaleFactor);
+
+  for (DataObjectLogin i : dataObjectsLogin) {
+    i.drawLogin();
+  }
+
+  // White knockouts on login circle page
+  pg.textFont(labelFontMono);
+  pg.textSize(fontSize);
+
+  for (DataObjectAd i : dataObjectsAd) {
+    if (!i.drawMe) continue;
+
+    if (xWhite) {
+      i.drawAdX();
+    }
+
+    if (xWhite && drawAdBlocks) {
+      i.drawAdLabel(baseline, ascent, textHeight, color(255), color(255), true);
+    }
+
+    if (!xWhite && drawAdNames && drawAdBlocks) {
+      i.drawAdLabel(baseline, ascent, textHeight, color(255), color(255), false);
     }
   }
 
   pg.popMatrix();
+  pdf.nextPage();
+
+  /////----- PAGES 2-N: COLOUR LINE LAYERS -------///////
+
+  step = ceil(strokeThick/8);
+  if (step < 10) step = 10;
+
+  for (int p = 0; p < palette.length; p++) {
+    pg.pushMatrix();
+    pg.scale(pdfScaleFactor);
+
+    // Draw this colour's lines
+    for (DataObjectAd i : dataObjectsAd) {
+      if (i.drawMe && i.cVal == p) {
+        i.drawAdLines();
+      }
+    }
+
+    // Draw white knockouts on every colour page
+    pg.textFont(labelFontMono);
+    pg.textSize(fontSize);
+
+    for (DataObjectAd i : dataObjectsAd) {
+      if (!i.drawMe) continue;
+
+      // White X knockout (if xWhite)
+      if (xWhite) {
+        i.drawAdX();
+      }
+
+      // White rect knockout (if xWhite + drawAdBlocks)
+      if (xWhite && drawAdBlocks) {
+        i.drawAdLabel(baseline, ascent, textHeight, color(255), color(255), true);
+      }
+
+      // White text knockout (if NOT xWhite + drawAdNames + drawAdBlocks)
+      if (!xWhite && drawAdNames && drawAdBlocks) {
+        i.drawAdLabel(baseline, ascent, textHeight, color(255), color(255), false);
+      }
+    }
+
+    pg.popMatrix();
+    pdf.nextPage();
+  }
+
+  /////----- FINAL PAGE: BLACK LAYER -------///////
+
+  pg.pushMatrix();
+  pg.scale(pdfScaleFactor);
+
+  //if we want to draw start/end dates
+  if (drawRangeDates) {
+    drawDates();
+  }
+
+  pg.textFont(labelFontMono);
+  pg.textSize(fontSize);
+
+  for (DataObjectAd i : dataObjectsAd) {
+    if (!i.drawMe) continue;
+
+    if (!xWhite) {
+      // Black X
+      i.drawAdX();
+    }
+
+    if (drawAdNames) {
+      if (!drawAdBlocks) {
+        // Plain black text, no rect
+        i.drawAdLabel(baseline, ascent, textHeight, color(0), color(0), false);
+      } else if (xWhite) {
+        // Rect was already knocked out on colour pages - just draw black text
+        i.drawAdLabel(baseline, ascent, textHeight, color(0), color(0), false);
+      } else {
+        // Black rect + white text knockout
+        i.drawAdLabel(baseline, ascent, textHeight, color(0), color(255), true);
+      }
+    }
+  }
+
+  // Draw opacity label if this is a test export
+  if (label.startsWith("opacity_")) {
+    pg.textFont(labelFontMono);
+    pg.textSize(36);
+    pg.fill(0);
+    pg.noStroke();
+    pg.textAlign(LEFT);
+    pg.text("line opacity: " + (int)alpha(pdfBlack), 50, 50 + pg.textAscent());
+  }
+
+  pg.popMatrix();
   pg.endDraw();
-  pg.dispose(); // Dispose of PDF resources
-  pg = pgRaster; // Switch back to raster graphics buffer
+  pg.dispose();
+  pg = pgRaster; // Switch back to raster buffer
+}
+
+// function to handle exporting muliple PDFs - Used to test opacity to draw lines for risograph reproduction
+
+void exportOpacityTestPDFs() {
+  int[] opacityValues = { 150, 172, 195, 217, 240 };
+  color originalPdfBlack = pdfBlack;
+
+  println("--- Starting opacity test export ---");
+  for (int i = 0; i < opacityValues.length; i++) {
+    int opacity = opacityValues[i];
+    pdfBlack = color(0, opacity);
+    println("Exporting opacity variant: " + opacity);
+    outputMultiPagePDF("opacity_" + opacity);
+  }
+
+  pdfBlack = originalPdfBlack;
+  println("--- Opacity test export complete ---");
 }

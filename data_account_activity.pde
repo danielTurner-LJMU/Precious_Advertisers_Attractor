@@ -44,11 +44,11 @@ HashMap<String, Integer> platformCounts = new HashMap<String, Integer>();
 HashMap<String, Integer> actionCounts = new HashMap<String, Integer>();
 
 // Flags for drawing additional data
-boolean drawCity = false;
-boolean drawIP = false;
-boolean drawPlatform = false;
-boolean drawAction = false;
-boolean drawDate = false;
+//boolean drawCity = false;
+//boolean drawIP = false;
+//boolean drawPlatform = false;
+//boolean drawAction = false;
+//boolean drawDate = false;
 
 // Load JSON login data and parse it
 void loadDataLogin() {
@@ -334,42 +334,6 @@ class DataObjectLogin
     pg.popMatrix();
   }
 
-  // Optionally draw associated text labels for each login
-  //void drawLoginText() {
-  //  pg.pushMatrix();
-  //  pg.translate(location.x, location.y);
-
-  //  if (!hideMe) {
-  //    pg.textSize(fontSize);
-  //    float yLoc = -(r*0.5); // Start top edge of the circle
-  //    pg.fill(0);
-
-  //    if (drawCity) {
-  //      pg.text(city +", " + country, (r*0.5)+5, yLoc);
-  //      yLoc+=fontSize;
-  //    }
-  //    if (drawIP) {
-  //      pg.text(IP, (r*0.5)+5, yLoc);
-  //      yLoc+=fontSize;
-  //    }
-  //    if (drawPlatform) {
-  //      if (platformInfo != null) {
-  //        pg.text(platformInfo, (r*0.5)+5, yLoc);
-  //        yLoc+=fontSize;
-  //      }
-  //    }
-  //    if (drawDate) {
-  //      pg.text(date, (r*0.5)+5, yLoc);
-  //      yLoc+=fontSize;
-  //    }
-  //    if (drawAction) {
-  //      pg.text(action, (r*0.5)+5, yLoc);
-  //      yLoc+=fontSize;
-  //    }
-  //  }
-
-  //  pg.popMatrix();
-  //}
 }
 
 //Check for mouseOver

@@ -58,6 +58,9 @@ float dragOffsetY = 0;
 boolean dragEnabled = false;
 PVector dragStartLoc;
 
+//Draw the start and end dates for the date range to the buffer?
+boolean drawRangeDates = true;
+
 //helper booleans - used to control visibility of graphics that show what user is affecting when they change values
 boolean borderVisible = false;
 boolean rowsVisible = false;
@@ -188,7 +191,10 @@ void drawBuffer() {
     //i.drawLoginText();
   }
 
-  drawDates();
+  //if we want to draw start/end dates
+  if (drawRangeDates) {
+    drawDates();
+  }
 
   step = ceil(strokeThick/8); // calculate spacing based on stroke weight
   if (step < 10) {
@@ -219,7 +225,14 @@ void drawBuffer() {
 
   for (DataObjectAd i : dataObjectsAd) {
     if (i.drawMe) {//check if it is selected from toggle list
-      i.drawAd(baseline, ascent, textHeight);
+      i.drawAdX();
+      if (drawAdBlocks) {
+        // With a rect: rect uses xColor, text colour flips to contrast
+        i.drawAdLabel(baseline, ascent, textHeight, xColor, xWhite ? color(0) : color(255), true);
+      } else {
+        // No rect: text is always black
+        i.drawAdLabel(baseline, ascent, textHeight, color(0), color(0), false);
+      }
     }
   }
 

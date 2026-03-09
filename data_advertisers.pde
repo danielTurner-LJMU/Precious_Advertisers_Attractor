@@ -364,64 +364,51 @@ class DataObjectAd
     randomStrokeThick = random(strokeThick*0.2, strokeThick);
   }
 
-  //Draw 'X' Shape and Optional Text
-  void drawAd(float baseline, float ascent, float textHeight) {
+  // Draw just the X shape - seperated from rect/text drawing to help with PDF layer separation
+  void drawAdX() {
+    if (!drawX) return;
+    pg.pushMatrix();
+    pg.translate(location.x, location.y);
+    pg.rotate(theta);
+    newR = r * xScale;
+    pg.stroke(xColor);
+    pg.strokeWeight(xThickness);
+    pg.line(-newR, -newR, newR, newR);
+    pg.line(newR, -newR, -newR, newR);
+    pg.popMatrix();
+  }
 
+  // Draw just the label (rect + text) - seperated to help with PDF layer separation
+  void drawAdLabel(float baseline, float ascent, float textHeight, color rectColor, color textColor, boolean drawRect) {
+    if (!drawAdNames) return;
     pg.pushMatrix();
     pg.translate(location.x, location.y);
     pg.rotate(theta);
 
-    // Draw 'x' shape
-    if (drawX) {
-      newR = r * xScale;
-      pg.stroke(xColor);
-      pg.strokeWeight(xThickness);
-      pg.line(-newR, -newR, newR, newR);
-      pg.line(newR, -newR, -newR, newR);
+    newR = r * xScale;
+    float rightEdge = abs(newR * cos(theta)) + abs(newR * sin(theta));
+    rightEdge += xThickness / 2.0;
+    float textX = rightEdge + textPadding;
+
+    float rectX = textX - innerPad;
+    float rectY = baseline - ascent - innerPad;
+    float rectW = cachedTextWidth + (innerPad * 2.0);
+    float rectH = textHeight + (innerPad * 2.0);
+
+    pg.pushMatrix();
+    pg.rotate(-theta);
+    pg.rectMode(CORNER);
+    pg.noStroke();
+
+    if (drawRect && drawAdBlocks) {
+      pg.fill(rectColor);
+      pg.rect(rectX, rectY, rectW, rectH);
     }
 
-    // Draw label (Advertiser anme)
+    pg.fill(textColor);
+    pg.text(mySiteName, textX, baseline);
 
-    if (drawAdNames) {
-
-      //calculate right edge of the X
-      float rightEdge = abs(newR * cos(theta)) + abs(newR * sin(theta));
-      rightEdge += xThickness / 2.0;
-
-      //Add textPadding to calculate position to draw text
-      float textX = rightEdge + textPadding;
-
-      float rectX = textX - innerPad;
-      float rectY = baseline - ascent - innerPad;
-      float rectW = cachedTextWidth + (innerPad * 2.0);
-      float rectH = textHeight + (innerPad * 2.0);
-
-      pg.pushMatrix();
-      pg.rotate(-theta); // cancel rotation so text is upright
-      pg.rectMode(CORNER);
-      pg.noStroke();
-
-      if (drawAdBlocks) {
-        //if x colour is set to black we want black rectangles and white text - opposite if not
-        if (!xWhite) {
-          pg.fill(0);
-          pg.rect(rectX, rectY, rectW, rectH);
-          pg.fill(255);
-          pg.text(mySiteName, textX, baseline);
-        } else {
-          pg.fill(255);
-          pg.rect(rectX, rectY, rectW, rectH);
-          pg.fill(0);
-          pg.text(mySiteName, textX, baseline);
-        }
-      } else {
-        //if no rectangles text is always black.
-        pg.fill(0);
-        pg.text(mySiteName, textX, baseline);
-      }
-
-      pg.popMatrix();
-    }
+    pg.popMatrix();
     pg.popMatrix();
   }
 }
