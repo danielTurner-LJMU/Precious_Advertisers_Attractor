@@ -1,3 +1,14 @@
+/**
+ * data_account_activity.pde
+ *
+ * Loads and parses Facebook account activity (login) data from JSON.
+ * Aggregates activity by location, IP address, platform, and action type.
+ *
+ * Defines DataObjectLogin: each instance represents a single login event,
+ * positioned along a multi-row timeline based on its timestamp.
+ * Circle size reflects the frequency of activity from that location.
+ */
+
 import java.lang.reflect.Field; // Used for reflection to access object fields dynamically
 
 // File path and name for login activity data
@@ -42,13 +53,6 @@ HashMap<String, Integer> locationCounts = new HashMap<String, Integer>();
 HashMap<String, Integer> ipCounts = new HashMap<String, Integer>();
 HashMap<String, Integer> platformCounts = new HashMap<String, Integer>();
 HashMap<String, Integer> actionCounts = new HashMap<String, Integer>();
-
-// Flags for drawing additional data
-//boolean drawCity = false;
-//boolean drawIP = false;
-//boolean drawPlatform = false;
-//boolean drawAction = false;
-//boolean drawDate = false;
 
 // Load JSON login data and parse it
 void loadDataLogin() {
@@ -116,29 +120,6 @@ void extractDataLogin() {
     if (count > maxLocationCount) maxLocationCount = count;
   }
 
-  /*
-  // Example code for extracting unique values from the data using reflection
-   String[] uniqueActions = getUniqueFieldValues(dataObjectsLogin, "action");
-   String[] uniqueSites = getUniqueFieldValues(dataObjectsLogin, "siteName");
-   String[] uniqueCities = getUniqueFieldValues(dataObjectsLogin, "city");
-   String[] uniqueIPs = getUniqueFieldValues(dataObjectsLogin, "IP");
-   
-   println("Unique actions:");
-   for (String action : uniqueActions) println(action);
-   */
-
-  // ------- **** HashMap Printouts **** --------- //
-  //for (String loc : locationCounts.keySet()) {
-  //  println(loc + " : " + locationCounts.get(loc));
-  //}
-
-  //for (String ip : ipCounts.keySet()) {
-  //  println(ip + " : " + ipCounts.get(ip));
-  //}
-
-  //  for (String platform : platformCounts.keySet()) {
-  //  println(platform + " : " + platformCounts.get(platform));
-  //}
 }
 
 // Extracts the text inside the first pair of parentheses in a string (e.g., OS from user agent)

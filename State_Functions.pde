@@ -1,3 +1,11 @@
+/**
+ * State_Functions.pde
+ *
+ * Manages application state transitions between the intro screen (state 0)
+ * and the main program (state 1). Each state has its own setup(), draw(),
+ * and cleanup() functions, allowing for clean separation of program phases.
+ */
+
 int state = 0; //stores the current state
 
 //store centre of canvas - used for button layout
@@ -148,13 +156,6 @@ void draw1() {
 
   drawOverlays();
 
- 
-  //draw parent folder name to screen
-  //textFont(subFont);
-  //textSize(14);
-  //textAlign(LEFT);
-  //fill(cGrey);
-  //text(folderName, 200, 80);
 }
 
 //cleanup functions

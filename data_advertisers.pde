@@ -1,5 +1,16 @@
-// parentFolderPath is the path that is selected by the user.
+/**
+ * data_advertisers.pde
+ *
+ * Loads and parses the Facebook advertiser JSON data export.
+ * Handles two known JSON formats from Facebook's data download.
+ *
+ * Defines DataObjectAd: a steered vehicle that seeks active login
+ * locations on the canvas, drawing trailing lines and X markers.
+ * Each object represents one advertiser that has used the account
+ * holder's data or activity.
+ */
 
+// parentFolderPath is the path that is selected by the user.
 String subFolderAd = "/ads_information"; //sub Folder we want to access
 String dataFileNameAd = "advertisers_using_your_activity_or_information.json"; //name of the JSON file
 
@@ -13,15 +24,6 @@ DataObjectAd[] dataObjectsAd;     // Array to store advertiser objects
 boolean drawTail = false;          //Show/hide all lines
 int historyLength = 200;          // Number of points stored in trail history
 boolean randomLineWeight = false;  // Toggle for randomised line thickness
-
-//controls for attraction behaviour of X objects.
-//by default the pick random max speeds and forces but this can be changed
-//so their behaviour is uniform. When uniform, the user can control the
-//maximum speed and maximum force for the steering behaviour.
-
-//boolean fixedSpeed = false;    // Use uniform speed and force for all objects?
-//float fixedMaxSpeed = 8;       // Fixed max speed (if enabled)
-//float fixedMaxForce = 0.1;     // Fixed max force (if enabled)
 
 boolean drawX = true;           //show/hide all X's
 boolean sqCaps = false;         //draw with square/rounded caps
@@ -57,23 +59,22 @@ void loadDataAd() {
 
 void extractDataAd() {
 
-  //--------------------------------------------------//
-  ///////**** Individual Entry 'keys'****//////////
-
-  //    "advertiser_name": "Some Advertiser",
-  //    "has_data_file_custom_audience": true,
-  //    "has_remarketing_custom_audience": false,
-  //    "has_in_person_store_visit": false
-  //--------------------------------------------------//
-
-  /*The line below extracts the 'key' names from the JSON object.
-   this is a way of finding all the arrays within this object without
-   having to manually trawl through the file. As we can only access the data
-   by knowing the 'key' name it is a useful function */
-
-  //String[] myKeys = (String[]) dataFileLogin.keys().toArray(new String[dataFileLogin.size()]);
-  //printArray(myKeys);
-
+  /*
+ * Facebook has changed the format of this JSON file over time, so two formats are handled here.
+   *
+   * Format 1 — "custom_audiences_all_types_v2" (older export):
+   *   A flat array of advertiser objects, each containing the advertiser name plus
+   *   three booleans describing how your data was used (remarketing, customer file,
+   *   in-person visit). These are passed to the full DataObjectAd constructor.
+   *
+   * Format 2 — "label_values" (newer export):
+   *   A nested structure where advertisers are grouped inside labelled arrays ("vec").
+   *   Only the advertiser name is available, so a simpler DataObjectAd constructor is used.
+   *   A first pass counts the total entries before the array can be initialised,
+   *   as Processing requires a fixed array size upfront.
+   *
+   * If neither key is found, an empty array is created to prevent the program from crashing.
+   */
   if (dataFileAd.hasKey("custom_audiences_all_types_v2")) {
     // Access array by known key in JSON file
     advertisers = dataFileAd.getJSONArray("custom_audiences_all_types_v2");
@@ -100,7 +101,6 @@ void extractDataAd() {
     for (int i = 0; i < labelValues.size(); i++) {
       totalEntries += labelValues.getJSONObject(i).getJSONArray("vec").size();
     }
-    //println("number of JSON Objects = " + totalEntries);
 
     dataObjectsAd = new DataObjectAd[totalEntries]; // Now initialised correctly
 
@@ -214,9 +214,6 @@ class DataObjectAd
     myMaxSpeed = random(4, 30);
     myMaxForce = random(0.01, 0.2);
 
-    //maxSpeed = myMaxSpeed;
-    //maxForce = myMaxForce;
-
     r = 5.0;
 
     newR = r * xScale;
@@ -233,17 +230,6 @@ class DataObjectAd
     history.clear();
   }
 
-  void changeSpeed() {
-    // Switch between fixed or random (personal) speed/force
-    //if (fixedSpeed) {
-    //  maxSpeed = fixedMaxSpeed;
-    //  maxForce = fixedMaxForce;
-    //} else {
-    //  maxSpeed = myMaxSpeed;
-    //  maxForce = myMaxForce;
-    //}
-  }
-
   // Update Movement and Trail
   void update() {
     velocity.add(acceleration);
@@ -256,7 +242,7 @@ class DataObjectAd
 
     history.add(location.copy());
     if (history.size() > historyLength) {
-      // With this - subList().clear() is a single operation
+      // SIngle operation to clear history - subList().clear()
       if (history.size() > historyLength) {
         history.subList(0, history.size() - historyLength).clear();
       }

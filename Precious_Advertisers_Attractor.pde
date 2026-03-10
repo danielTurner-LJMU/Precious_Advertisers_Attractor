@@ -1,3 +1,23 @@
+/**
+ * Precious: Advertisers — Attractor
+ * 
+ * Part of "Precious" — a series of Processing programs that generate 
+ * artworks from personal Facebook data exports.
+ *
+ * This program visualises Facebook advertiser data as animated attractor
+ * objects (X markers) that seek activity events across a timeline, 
+ * leaving trailing lines as they move. Designed for risograph print output.
+ *
+ * Author: Daniel Turner
+ * Institution: Liverpool John Moores University
+ * PhD Project: Precious: Reclaiming Value for Personal Data
+ * Year: 2026
+ * License: See LICENSE file
+ *
+ * Built with Processing 4
+ * Dependencies: ControlP5 (GUI), processing.pdf (export)
+ */
+
 import processing.pdf.*; // Import PDF library for exporting visuals
 
 import java.util.*; // Import utilities for date/time functions
@@ -139,7 +159,26 @@ void outputTiffAndPDF() {
   outputMultiPagePDF(fileNameAppend);
 }
 
-// Function: outputMultiPagePDF - exports artwork as multi-page PDF
+/**
+ * Exports the artwork as a multi-page PDF structured for risograph printing.
+ *
+ * Each page represents a separate ink colour layer:
+ *   Page 1:   Login activity circles (the timeline base layer)
+ *   Pages 2-N: One page per palette colour, containing only the lines
+ *              drawn by advertisers assigned that colour
+ *   Final page: Black layer — X markers, advertiser labels, and date markers
+ *
+ * White "knockout" shapes are drawn on each page to prevent colours from
+ * printing on top of X markers and text, preserving legibility across layers.
+ *
+ * PDF output is scaled using pdfScaleFactor (72/300dpi) so that the file
+ * opens at the correct physical size in Illustrator or Photoshop at 300dpi.
+ *
+ * After export, the graphics context is switched back to the raster buffer (pgRaster).
+ *
+ * @param label  A string appended to the output filename (e.g. "test", or a participant ID)
+ */
+ 
 void outputMultiPagePDF(String label) {
 
   String outputFileName = generateFileName("pdf", label);

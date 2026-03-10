@@ -1,3 +1,11 @@
+/**
+ * Preferences.pde
+ *
+ * Handles saving and loading of user preferences — specifically the path
+ * to the selected Facebook data folder, which is persisted between sessions
+ * in a local text file (preciousPrefs.txt).
+ */
+
 /// --- PREFERENCE FILES AND DATA PATH VARIABLES --- ///
 
 PrintWriter output; // Preferences file writer (for saving settings)

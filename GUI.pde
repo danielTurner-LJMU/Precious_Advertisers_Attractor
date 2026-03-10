@@ -1,6 +1,16 @@
+/**
+ * GUI.pde
+ *
+ * Builds and manages the ControlP5 interface across two states:
+ * the intro/folder select screen and the main program controls.
+ *
+ * Contains all controller initialisation, styling, and event handling.
+ * The controlEvent() function acts as a central dispatcher, routing
+ * ControlP5 events to the appropriate program responses.
+ */
+
 import controlP5.*;  // GUI library
 ControlP5 cp5;
-
 
 // Button sizes
 int sButtonW = 150, sButtonH = 50;
@@ -55,7 +65,7 @@ void initIntroControls() {
     .setSize(sButtonW, sButtonH)
     ;
 
-  //sets label stlyeing (name of controlller, Caption Label, alignment of caption label)
+  //sets label styling (name of controlller, Caption Label, alignment of caption label)
   styleIntro("selectDataPath", "Select Data Folder", "Top");
 
   cp5.addButton("confirm")

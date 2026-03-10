@@ -1,3 +1,14 @@
+/**
+ * Graphics.pde
+ *
+ * Manages the offscreen image buffers used for rendering and export.
+ * Handles drawing the timeline layout, advertiser layers, date markers, 
+ * border guides, and preview display.
+ *
+ * Supports both raster (TIFF) and vector (PDF) output. The PDF export
+ * separates artwork into layers by colour, designed for risograph printing.
+ */
+
 //------- graphic objects to draw fullscale image to ---------//
 
 PGraphics pgRaster; //Standard PGraphic - Used to draw full scale preview and for raster output
@@ -294,11 +305,27 @@ void drawHelperDates() {
   textAlign(CENTER); //reset text align
 }
 
-//Login activity is drawn along a line that is spread
-//across numerous rows.
-//This function calculates the length of each individual line and
-//the gap between the rows. The variables calculated here are used to position
-//the login objects.
+/**
+ * Calculates the geometry of the multi-row timeline used to position login events.
+ *
+ * Login events are distributed across a series of horizontal rows rather than
+ * a single line, so that the full date range fits within the canvas. Each row
+ * represents a continuous segment of the timeline — when the line reaches the
+ * right edge it wraps to the next row, similar to text wrapping on a page.
+ *
+ * Variables calculated here are used by DataObjectLogin.update() to position
+ * each login event on the canvas based on its timestamp.
+ *
+ * Calculated values:
+ *   rowGap          — vertical distance between rows
+ *   loginLineX1/X2  — left and right x-coordinates of each row
+ *   lineLength      — width of a single row
+ *   totalLineLength — combined length of all rows
+ *   dateSpread      — total time range (endDate - startDate) in seconds
+ *   dateScale       — conversion factor from seconds to pixels
+ *   dateCut         — the time duration represented by each row
+ *   yOffset         — vertical offset to centre rows within the bordered area
+ */
 void calculateLoginLine() {
 
   //calculate spacing between rows
@@ -400,7 +427,23 @@ void calculatePreviewOffset() {
   dragOffsetY = mouseY - dragStartLoc.y;
 }
 
-//Reverse transformation to find mouseLocation on buffer
+/**
+ * Converts a screen coordinate (mouse position) to the corresponding
+ * coordinate within the offscreen image buffer.
+ *
+ * The preview image is drawn to screen using a chain of transformations:
+ * it is translated to the preview centre, offset by any drag movement,
+ * and scaled by imScale. It is also drawn in CENTER image mode, meaning
+ * its origin is at its centre rather than its top-left corner.
+ *
+ * This function reverses all of those transformations in order, allowing
+ * a screen position (e.g. the mouse) to be mapped back to the correct
+ * pixel location on the buffer — used for detecting rollovers on login objects.
+ *
+ * @param mx  Mouse x position in screen coordinates
+ * @param my  Mouse y position in screen coordinates
+ * @return    A PVector containing the equivalent position in buffer coordinates
+ */
 PVector screenToBuffer(float mx, float my) {
   // Reverse the translate
   float bx = mx - (previewCentreX + dragOffsetX);
