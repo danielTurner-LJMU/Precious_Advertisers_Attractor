@@ -2,7 +2,8 @@ import processing.pdf.*; // Import PDF library for exporting visuals
 
 import java.util.*; // Import utilities for date/time functions
 
-String title = "Advertisers"; // Window and project title
+String title = "Precious: Advertisers"; // Window and project title
+
 /* Append for filename:
  Final program will have participants pseuso label passed here so works are
  attributable. All testing/development images will be appended "test"
