@@ -419,13 +419,13 @@ void initMainControls() {
 
   styleMain("outputTiff");
 
-  cp5.addBang("outputMultiPagePDF")
+  cp5.addBang("savePDF")
     .setLabel("Save PDF")
     .setPosition(baseX + (cSpaceX * 2), baseY + cSpaceY * 0.25)
     .setSize(100, 40)
     ;
 
-  styleMain("outputMultiPagePDF");
+  styleMain("savePDF");
 
   cp5.addBang("outputTiffAndPDF")
     .setLabel("Save image and PDF")
@@ -627,8 +627,9 @@ void generate() {
 
 
 // ControlP5 hook - called by the Save PDF bang button
-void outputMultiPagePDF() {
+void savePDF() {
 
+  currentExportBaseName = generateBaseName(fileNameAppend); // generate once
   String outputFileName = generateFileName("pdf", fileNameAppend);
   outputMultiPagePDF(fileNameAppend);
   saveColophon(new String[]{ outputFileName });

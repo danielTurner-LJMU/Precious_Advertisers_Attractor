@@ -50,25 +50,13 @@ String sessionID = generateSessionID();
 void saveColophon(String[] exportedFiles) {
 
   String[] lines = buildColophon(exportedFiles);
-  String colophonPath = generateFileName("txt", fileNameAppend + "_colophon");//generateColophonPath();
+  String colophonPath = generateColophonPath();
   saveStrings(colophonPath, lines);
   println("Colophon saved: " + colophonPath);
 }
 
 
 // ---- INTERNAL FUNCTIONS ---- //
-
-// Generates the output path for the colophon file,
-// matching the timestamp and participant label of the artwork exports.
-//String generateColophonPath() {
-
-//  String saveLocation = "x - output/";
-//  String fileName = "Precious_Advertisers - " +
-//    year() + "-" + nf(month(), 2) + "-" + nf(day(), 2) +
-//    " - " + nf(hour(), 2) + "-" + nf(minute(), 2) + "-" + nf(second(), 2);
-//  return saveLocation + fileName + " - " + currentPrintSize + " - " + fileNameAppend + "_colophon.txt";
-//}
-
 
 // Generates a short random hex session ID (6 characters)
 String generateSessionID() {
@@ -159,7 +147,8 @@ String[] formatHashMap(HashMap<String, Integer> map, int keyWidth) {
     public int compare(Map.Entry<String, Integer> a, Map.Entry<String, Integer> b) {
       return b.getValue().compareTo(a.getValue());
     }
-  });
+  }
+  );
 
   String[] lines = new String[entries.size()];
   for (int i = 0; i < entries.size(); i++) {
@@ -226,12 +215,60 @@ String[] buildColophon(String[] exportedFiles) {
   lines.add(DIVIDER);
   lines.add("");
   for (String f : exportedFiles) {
-    // Strip the output folder prefix for cleaner display
-    lines.add("  " + f.replace("x - output/", ""));
+    // Extract just the filename after the last slash
+    lines.add("  " + f.substring(f.lastIndexOf("/") + 1));
   }
   lines.add("");
 
+  // ---- PRINT SETTINGS ---- //
 
+  lines.add(DIVIDER);
+  lines.add("PRINT SETTINGS");
+  lines.add(DIVIDER);
+  lines.add("");
+  lines.add("  Paper size       " + currentPrintSize);
+  lines.add("");
+
+  // Palette colours — iterate over however many are in the array
+  StringBuilder paletteLine = new StringBuilder("  ");
+  for (int i = 0; i < palette.length; i++) {
+    paletteLine.append("Colour " + (i+1) + "   " + colorToHex(palette[i]));
+    if (i < palette.length - 1) paletteLine.append("    ");
+  }
+  lines.add(paletteLine.toString());
+  lines.add("");
+
+  // Layout settings — grouped into rows of three for compactness
+  lines.add("  " + padRight("Rows", 16) + padRight(str((int)numRows), 12) +
+    padRight("Border", 16) + padRight(str((int)border) + "%", 12) +
+    padRight("Font size", 16) + str((int)fontSize));
+
+  lines.add("  " + padRight("Line length", 16) + padRight(str((int)historyLength), 12) +
+    padRight("Line wt", 16) + padRight(str((int)strokeThick), 12) +
+    padRight("X scale", 16) + str((int)xScale));
+
+  lines.add("  " + padRight("X weight", 16) + padRight(str((int)xThickness), 12) +
+    padRight("Activity", 16) + padRight(str((int)targetRadius), 12) +
+    padRight("Opacity", 16) + str((int)targetOpacity));
+
+  lines.add("");
+
+  // Toggle settings — grouped into rows of three
+  lines.add("  " + padRight("Draw lines", 16) + padRight(yn(drawTail), 12) +
+    padRight("Draw X's", 16) + padRight(yn(drawX), 12) +
+    padRight("Sq. caps", 16) + yn(sqCaps));
+
+  lines.add("  " + padRight("Ad names", 16) + padRight(yn(drawAdNames), 12) +
+    padRight("Ad blocks", 16) + padRight(yn(drawAdBlocks), 12) +
+    padRight("X black", 16) + yn(!xWhite));
+
+  lines.add("  " + padRight("Coloured lines", 16) + padRight(yn(colourLine), 12) +
+    padRight("Random wt", 16) + padRight(yn(randomLineWeight), 12) +
+    padRight("Dates", 16) + yn(drawRangeDates));
+
+  lines.add("");
+  
+  
   // ---- SOURCE DATA ---- //
 
   lines.add(DIVIDER);
@@ -245,7 +282,7 @@ String[] buildColophon(String[] exportedFiles) {
   lines.add("  Total advertisers       " + nf(dataObjectsAd.length, 0));
   lines.add("");
   lines.add("  Full data range     " + formatDateOnly(dataObjectsLogin[dataObjectsLogin.length-1].timeStamp)
-            + "  —  " + formatDateOnly(dataObjectsLogin[0].timeStamp));
+    + "  —  " + formatDateOnly(dataObjectsLogin[0].timeStamp));
   lines.add("  Visualised range    " + formatDateOnly(visStart) + "  —  " + formatDateOnly(visEnd));
   lines.add("");
 
@@ -300,55 +337,6 @@ String[] buildColophon(String[] exportedFiles) {
 
   lines.add("");
   lines.add("  " + adsHidden + " advertiser" + (adsHidden == 1 ? "" : "s") + " not visualised in this artwork.");
-  lines.add("");
-
-
-  // ---- PRINT SETTINGS ---- //
-
-  lines.add(DIVIDER);
-  lines.add("PRINT SETTINGS");
-  lines.add(DIVIDER);
-  lines.add("");
-  lines.add("  Paper size       " + currentPrintSize);
-  lines.add("");
-
-  // Palette colours — iterate over however many are in the array
-  StringBuilder paletteLine = new StringBuilder("  ");
-  for (int i = 0; i < palette.length; i++) {
-    paletteLine.append("Colour " + (i+1) + "   " + colorToHex(palette[i]));
-    if (i < palette.length - 1) paletteLine.append("    ");
-  }
-  lines.add(paletteLine.toString());
-  lines.add("");
-
-  // Layout settings — grouped into rows of three for compactness
-  lines.add("  " + padRight("Rows",        16) + padRight(str((int)numRows),   12) +
-            padRight("Border",    16) + padRight(str((int)border) + "%", 12) +
-            padRight("Font size", 16) + str((int)fontSize));
-
-  lines.add("  " + padRight("Line length", 16) + padRight(str((int)historyLength), 12) +
-            padRight("Line wt",    16) + padRight(str((int)strokeThick),   12) +
-            padRight("X scale",    16) + str((int)xScale));
-
-  lines.add("  " + padRight("X weight",    16) + padRight(str((int)xThickness),   12) +
-            padRight("Activity",   16) + padRight(str((int)targetRadius),  12) +
-            padRight("Opacity",    16) + str((int)targetOpacity));
-
-  lines.add("");
-
-  // Toggle settings — grouped into rows of three
-  lines.add("  " + padRight("Draw lines",    16) + padRight(yn(drawTail),        12) +
-            padRight("Draw X's",      16) + padRight(yn(drawX),           12) +
-            padRight("Sq. caps",      16) + yn(sqCaps));
-
-  lines.add("  " + padRight("Ad names",      16) + padRight(yn(drawAdNames),     12) +
-            padRight("Ad blocks",     16) + padRight(yn(drawAdBlocks),    12) +
-            padRight("X black",       16) + yn(!xWhite));
-
-  lines.add("  " + padRight("Coloured lines",16) + padRight(yn(colourLine),      12) +
-            padRight("Random wt",     16) + padRight(yn(randomLineWeight), 12) +
-            padRight("Dates",         16) + yn(drawRangeDates));
-
   lines.add("");
 
   // ---- FOOTER ---- //

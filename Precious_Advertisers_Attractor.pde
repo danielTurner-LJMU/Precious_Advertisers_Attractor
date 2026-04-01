@@ -24,6 +24,10 @@ import java.util.*; // Import utilities for date/time functions
 
 String title = "Precious: Advertisers"; // Window and project title
 
+// Stores the base name for the current export — generated once and reused
+// by generateFileName() and generateColophonPath() throughout that export.
+String currentExportBaseName = "";
+
 /* Append for filename:
  Final program will have participants pseuso label passed here so works are
  attributable. All testing/development images will be appended "test"
@@ -135,19 +139,32 @@ void checkHover() {
 
 
 
-// Function: generateFileName - builds a timestamped filename with appended string for exports
+// Builds the shared base name from the current timestamp and label.
+// Call this once at the start of an export and store in currentExportBaseName.
+String generateBaseName(String label) {
+  return "Precious_Advertisers - " +
+    year() + "-" + nf(month(), 2) + "-" + nf(day(), 2) +
+    " - " + nf(hour(), 2) + "-" + nf(minute(), 2) + "-" + nf(second(), 2) +
+    " - " + currentPrintSize + " - " + label;
+}
 
+// Returns the full file path using the stored base name.
+// Always uses currentExportBaseName so all files share the same folder.
 String generateFileName(String fileType, String label) {
-  String fileName = "Precious_Advertisers - " + year() + "-" + month() + "-" + day() +
-    " - " + hour() + "-" + minute() + "-" + second() + " - " + currentPrintSize + " - " + label;
-  String saveLocation = "x - output/" + fileName +"/";
+  return "x - output/" + currentExportBaseName + "/" + currentExportBaseName + "." + fileType;
+}
 
-  return(saveLocation + fileName  + "." + fileType);
+// Returns the colophon path using the stored base name.
+// Replaces generateColophonPath() in Colophon.pde — delete that version.
+String generateColophonPath() {
+  return "x - output/" + currentExportBaseName + "/" + currentExportBaseName + "_colophon.txt";
 }
 
 // Function: outputTiff - saves current frame as TIFF
 void outputTiff() {
 
+  currentExportBaseName = generateBaseName(fileNameAppend); // generate once
+  
   String outputFileName = generateFileName("tif", fileNameAppend);
   pg.save(outputFileName);
   saveColophon(new String[]{ outputFileName });
@@ -155,6 +172,8 @@ void outputTiff() {
 
 // Function: outputTiffAndPDF - exports both TIFF and PDF versions
 void outputTiffAndPDF() {
+
+  currentExportBaseName = generateBaseName(fileNameAppend); // generate once
 
   String tiffFileName = generateFileName("tif", fileNameAppend);
   String pdfFileName  = generateFileName("pdf", fileNameAppend);
