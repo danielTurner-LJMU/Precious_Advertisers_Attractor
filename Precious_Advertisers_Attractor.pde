@@ -1,11 +1,11 @@
 /**
  * Precious: Advertisers — Attractor
- * 
- * Part of "Precious" — a series of Processing programs that generate 
+ *
+ * Part of "Precious" — a series of Processing programs that generate
  * artworks from personal Facebook data exports.
  *
  * This program visualises Facebook advertiser data as animated attractor
- * objects (X markers) that seek activity events across a timeline, 
+ * objects (X markers) that seek activity events across a timeline,
  * leaving trailing lines as they move. Designed for risograph print output.
  *
  * Author: Daniel Turner
@@ -150,13 +150,19 @@ void outputTiff() {
 
   String outputFileName = generateFileName("tif", fileNameAppend);
   pg.save(outputFileName);
+  saveColophon(new String[]{ outputFileName });
 }
 
 // Function: outputTiffAndPDF - exports both TIFF and PDF versions
 void outputTiffAndPDF() {
 
-  outputTiff();
+  String tiffFileName = generateFileName("tif", fileNameAppend);
+  String pdfFileName  = generateFileName("pdf", fileNameAppend);
+
+  pg.save(tiffFileName);
   outputMultiPagePDF(fileNameAppend);
+
+  saveColophon(new String[]{ tiffFileName, pdfFileName });
 }
 
 /**
@@ -178,7 +184,7 @@ void outputTiffAndPDF() {
  *
  * @param label  A string appended to the output filename (e.g. "test", or a participant ID)
  */
- 
+
 void outputMultiPagePDF(String label) {
 
   String outputFileName = generateFileName("pdf", label);

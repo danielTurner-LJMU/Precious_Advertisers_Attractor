@@ -628,7 +628,10 @@ void generate() {
 
 // ControlP5 hook - called by the Save PDF bang button
 void outputMultiPagePDF() {
+
+  String outputFileName = generateFileName("pdf", fileNameAppend);
   outputMultiPagePDF(fileNameAppend);
+  saveColophon(new String[]{ outputFileName });
 }
 
 //// ------ CONTROLLER STYLING -------- ///
