@@ -50,7 +50,7 @@ String sessionID = generateSessionID();
 void saveColophon(String[] exportedFiles) {
 
   String[] lines = buildColophon(exportedFiles);
-  String colophonPath = generateColophonPath();
+  String colophonPath = generateFileName("txt", fileNameAppend + "_colophon");//generateColophonPath();
   saveStrings(colophonPath, lines);
   println("Colophon saved: " + colophonPath);
 }
@@ -60,14 +60,14 @@ void saveColophon(String[] exportedFiles) {
 
 // Generates the output path for the colophon file,
 // matching the timestamp and participant label of the artwork exports.
-String generateColophonPath() {
+//String generateColophonPath() {
 
-  String saveLocation = "x - output/";
-  String fileName = "Precious_Advertisers - " +
-    year() + "-" + nf(month(), 2) + "-" + nf(day(), 2) +
-    " - " + nf(hour(), 2) + "-" + nf(minute(), 2) + "-" + nf(second(), 2);
-  return saveLocation + fileName + " - " + currentPrintSize + " - " + fileNameAppend + "_colophon.txt";
-}
+//  String saveLocation = "x - output/";
+//  String fileName = "Precious_Advertisers - " +
+//    year() + "-" + nf(month(), 2) + "-" + nf(day(), 2) +
+//    " - " + nf(hour(), 2) + "-" + nf(minute(), 2) + "-" + nf(second(), 2);
+//  return saveLocation + fileName + " - " + currentPrintSize + " - " + fileNameAppend + "_colophon.txt";
+//}
 
 
 // Generates a short random hex session ID (6 characters)

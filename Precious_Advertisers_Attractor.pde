@@ -138,11 +138,11 @@ void checkHover() {
 // Function: generateFileName - builds a timestamped filename with appended string for exports
 
 String generateFileName(String fileType, String label) {
-  String saveLocation = "x - output/";
-  String fileName = "Precious_Advertisers - " +
-    year() + "-" + month() + "-" + day() +
-    " - " + hour() + "-" + minute() + "-" + second();
-  return(saveLocation + fileName + " - " + currentPrintSize + " - " + label + "." + fileType);
+  String fileName = "Precious_Advertisers - " + year() + "-" + month() + "-" + day() +
+    " - " + hour() + "-" + minute() + "-" + second() + " - " + currentPrintSize + " - " + label;
+  String saveLocation = "x - output/" + fileName +"/";
+
+  return(saveLocation + fileName  + "." + fileType);
 }
 
 // Function: outputTiff - saves current frame as TIFF
