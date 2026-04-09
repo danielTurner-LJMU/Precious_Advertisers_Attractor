@@ -287,7 +287,7 @@ String[] buildColophon(String[] exportedFiles) {
 
   lines.add(DIVIDER);
   lines.add("P R E C I O U S  :  A D V E R T I S E R S");
-  lines.add("Reclaiming Value for Personal Data");
+  lines.add("Reclaiming Value from Personal Data");
   lines.add("Daniel Turner  —  LJMU  —  PhD Project, 2026");
   lines.add(DIVIDER);
   lines.add("");
