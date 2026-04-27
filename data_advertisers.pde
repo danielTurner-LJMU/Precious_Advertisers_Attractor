@@ -39,6 +39,20 @@ boolean drawAdBlocks = false;   // Draw block behind Advert Names
 float textPadding = 8;          // Padding for advertiser name drawn next to x
 float innerPad = 4;             // Padding between rectangle and text
 
+
+//----- STEERING BEHAVIOUR CONTROLS ------//
+//Tight turns cause artefacting on lines when they overlap themselves.
+//These variables limit turn capactiy to try and aleviate issue.
+
+float maxTurnAtLowSpeed  = 4.0;  // max degrees turn per frame at low speed
+float maxTurnAtHighSpeed = 0.5;  // max degrees turn per frame at full speed
+float minVelocityToSteer = 0.5;  // minimum speed before turn limiting applies
+float arrivalRadiusProportion = 0.05; // 5% of shorter buffer edge
+// Used to calculate when x object should find a new target
+//This is to stop the objects congregating around individual points - keep them on the move
+//- calculated from buffer size in calculateBorder()
+float arrivalRadius = 0;
+
 //**** Line variables
 boolean colourLine = true;      // Toggle coloured/black lines
 color[] palette = {#F229AC, #04B2D9, #F2CB05}; //Line colour palette
@@ -167,6 +181,10 @@ class DataObjectAd
   DataObjectLogin cachedTarget = null;
   float cachedTextWidth = 0;
 
+  // Cache of recently visited targets - prevents re-visiting same targets
+  ArrayList<DataObjectLogin> recentTargets = new ArrayList<DataObjectLogin>();
+  int recentTargetMemory = 5; // number of recent targets to remember
+
   //original JSON data format
   DataObjectAd(int id, String siteName, boolean visit, boolean remarket, boolean customerFile) {
 
@@ -228,6 +246,9 @@ class DataObjectAd
 
     //clear the arraylist storing previous points
     history.clear();
+    
+    //clear recent targets
+    recentTargets.clear();
   }
 
   // Update Movement and Trail
@@ -254,8 +275,27 @@ class DataObjectAd
 
     targetRefreshCounter++;
     if (targetRefreshCounter % 10 != 0 && cachedTarget != null) {
-      seek(cachedTarget.active ? cachedTarget.location : new PVector(pg.width/2, pg.height/2));
-      return;
+
+      // Check if we are close enough to cached target to move on
+      if (cachedTarget.active) {
+        float d = PVector.dist(location, cachedTarget.location);
+        if (d < arrivalRadius) {
+          // Add current target to recent targets before moving on
+          recentTargets.add(cachedTarget);
+          // Trim list to recentTargetMemory size
+          if (recentTargets.size() > recentTargetMemory) {
+            recentTargets.remove(0);
+          }
+          cachedTarget = null;
+        } else {
+          seek(cachedTarget.location);
+          return;
+        }
+      } else {
+        // Cached target is no longer active — seek centre of canvas
+        seek(new PVector(pg.width/2, pg.height/2));
+        return;
+      }
     }
 
     // Set initial closest distance to a very large number
@@ -270,6 +310,9 @@ class DataObjectAd
       // Skip any login objects that are not currently active
       if (!login.active) continue;
 
+      // Skip recently visited targets
+      if (recentTargets.contains(login)) continue;
+
       // Calculate the distance between this advertiser and the active login object
       float d = PVector.dist(location, login.location);
 
@@ -280,27 +323,58 @@ class DataObjectAd
       }
     }
 
+    // If no unvisited target found, clear recent targets and try again
+    // This prevents the advertiser getting stuck if all active targets are recent
+    if (closestTarget == null) {
+      recentTargets.clear();
+      for (DataObjectLogin login : dataObjectsLogin) {
+        if (!login.active) continue;
+        float d = PVector.dist(location, login.location);
+        if (d < closestDistance) {
+          closestDistance = d;
+          closestTarget = login;
+        }
+      }
+    }
+
     // Cache the result
     cachedTarget = closestTarget;
     targetRefreshCounter = 0;
 
     // If no active login objects were found, seek the centre of the canvas
-    if (closestTarget == null) {
+    if (cachedTarget == null) {
       seek(new PVector(pg.width / 2, pg.height / 2));
     } else {
-
-      // Otherwise, seek the closest active login object's location
-      seek(closestTarget.location);
+      // Otherwise seek the cached target location
+      seek(cachedTarget.location);
     }
   }
 
   // Steering behavior to move towards the target
   void seek(PVector target) {
-
     PVector desired = PVector.sub(target, location);
     desired.setMag(myMaxSpeed);
     PVector steer = PVector.sub(desired, velocity);
     steer.limit(myMaxForce);
+
+    if (velocity.mag() > minVelocityToSteer) {
+      float currentAngle = velocity.heading();
+      float targetAngle = desired.heading();
+      float diff = targetAngle - currentAngle;
+
+      while (diff >  PI) diff -= TWO_PI;
+      while (diff < -PI) diff += TWO_PI;
+
+      float maxTurnAngle = radians(map(velocity.mag(), 0, myMaxSpeed, maxTurnAtLowSpeed, maxTurnAtHighSpeed));
+
+      if (abs(diff) > maxTurnAngle) {
+        float newAngle = currentAngle + constrain(diff, -maxTurnAngle, maxTurnAngle);
+        PVector limitedVelocity = new PVector(cos(newAngle), sin(newAngle));
+        limitedVelocity.mult(velocity.mag());
+        velocity.set(limitedVelocity);
+      }
+    }
+
     applyForce(steer);
   }
 

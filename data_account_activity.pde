@@ -40,7 +40,8 @@ DataObjectLogin[] dataObjectsLogin;  // Array to store each login as an object
 
 
 //-------- TARGET PROPERTIES --------//
-float targetActivateChance = 0.995;  // Probability of a target being (de)activated
+int maxActiveTargets = 300;          //max number of target allowed to be active
+float targetActivateChance = 0.9;  // Probability of a target being (de)activated
 float targetRadius = 1;             // Default radius of target shapes
 float targetOpacity = 150;           // Opacity of the visual circles
 int safeCount = 1;                   // Base number of visits - used for scaling circles
@@ -119,7 +120,6 @@ void extractDataLogin() {
   for (int count : locationCounts.values()) {
     if (count > maxLocationCount) maxLocationCount = count;
   }
-
 }
 
 // Extracts the text inside the first pair of parentheses in a string (e.g., OS from user agent)
@@ -246,14 +246,23 @@ class DataObjectLogin
     attraction = random(1, 100);
   }
 
-  // Randomly toggle activity state based on chance (if not hidden)
-  void activate() {
+  //// Randomly toggle activity state based on chance (if not hidden)
+  //void activate() {
+  //  if (!hideMe) {
+  //    float value = random(1);
+  //    if (value > targetActivateChance) {
+  //      active = !active;
+  //      attraction = random(1, 100);
+  //    }
+  //  } else {
+  //    active = false;
+  //  }
+  //}
+
+  void setActive(boolean state) {
     if (!hideMe) {
-      float value = random(1);
-      if (value > targetActivateChance) {
-        active = !active;
-        attraction = random(1, 100);
-      }
+      active = state;
+      if (state) attraction = random(1, 100);
     } else {
       active = false;
     }
@@ -289,21 +298,23 @@ class DataObjectLogin
     pg.pushMatrix();
     pg.translate(location.x, location.y);
 
-    /* debugging sections allows you to see which logins are activated */
-    //if (active) {
-    //  pg.noStroke();
-    //  pg.fill(250, 106, 248, targetOpacity);
-    //} else {
-    //  pg.noFill();//fill(150, targetOpacity);
-    //  pg.strokeWeight(4);
-    //  pg.stroke(250, 106, 248, targetOpacity);
-    // }
+
 
     // Set fill color depending on export mode: PDF is for Riso so greyscale
     if (pg == pgPDF) {
       pg.fill(0, targetOpacity);
     } else {
+      //pg.fill(250, 106, 248, targetOpacity);
+          /* debugging sections allows you to see which logins are activated */
+    if (!active) {
+      //pg.noStroke();
       pg.fill(250, 106, 248, targetOpacity);
+    } else {
+      pg.fill(23, 244, 250, targetOpacity);
+      //pg.noFill();//fill(150, targetOpacity);
+      //pg.strokeWeight(4);
+      //pg.stroke(250, 106, 248, targetOpacity);
+     }
     }
 
     // Only draw if not hidden
@@ -314,7 +325,6 @@ class DataObjectLogin
 
     pg.popMatrix();
   }
-
 }
 
 //Check for mouseOver

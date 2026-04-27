@@ -233,6 +233,17 @@ void initProgramControls(int baseX, int baseY) {
     .setSize(50, 20)
     ;
   styleMain("xWhite");
+
+  //cp5.addToggle("drawRangeDates")
+  //  .setLabel("DRAW\nDATES")
+  //  .setPosition(baseX + cSpaceX * 6, baseY + cSpaceY * 3.05)
+  //  .setSize(50, 20)
+  //  .setBroadcast(false)
+  //  .setValue(true)
+  //  .setBroadcast(true)
+  //  ;
+  //styleMain("drawRangeDates");
+
   //------------ GAP -------------//
 
 
@@ -278,7 +289,7 @@ void initProgramControls(int baseX, int baseY) {
     .setSize(100, 40)
     .setValue(true);
   styleMain("drawRangeDates");
-  
+
   cp5.addSlider("fontSize")
     .setLabel("FONT SIZE")
     .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY * 4.85)

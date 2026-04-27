@@ -2,7 +2,7 @@
  * Graphics.pde
  *
  * Manages the offscreen image buffers used for rendering and export.
- * Handles drawing the timeline layout, advertiser layers, date markers, 
+ * Handles drawing the timeline layout, advertiser layers, date markers,
  * border guides, and preview display.
  *
  * Supports both raster (TIFF) and vector (PDF) output. The PDF export
@@ -89,6 +89,10 @@ void createImageBuffer(float printX, float printY) {
   pg = pgRaster;
 
   bufferCreated = true;
+  poolSeeded = false;  // Reset pool so it reseeds for the new buffer
+
+  // Calculate arrival radius as proportion of shorter buffer edge
+  arrivalRadius = min(printX, printY) * arrivalRadiusProportion;
 
   previewCentreX = ((width-guiWidth)/2) + guiWidth;
   previewCentreY = height/2;
@@ -136,7 +140,7 @@ void autoGenerateInBackground() {
 
     for (DataObjectLogin i : dataObjectsLogin) {
       i.update();
-      i.activate();
+      //i.activate();
     }
 
     for (DataObjectAd i : dataObjectsAd) {
@@ -175,6 +179,67 @@ void autoGenerateInBackground() {
   }
 }
 
+boolean poolSeeded = false;
+int lastMaxActiveTargets = -1;
+ArrayList<DataObjectLogin> activeList   = new ArrayList<DataObjectLogin>();
+ArrayList<DataObjectLogin> inactiveList = new ArrayList<DataObjectLogin>();
+
+void updateActivePool() {
+  // Seed on first run or after buffer reset
+  if (!poolSeeded) {
+    for (DataObjectLogin obj : dataObjectsLogin) obj.setActive(false);
+    activeList.clear();
+    inactiveList.clear();
+    // Only add non-hidden objects
+    for (DataObjectLogin obj : dataObjectsLogin) {
+      if (!obj.hideMe) inactiveList.add(obj);
+    }
+    java.util.Collections.shuffle(inactiveList);
+    int count = min(maxActiveTargets, inactiveList.size());
+    for (int i = 0; i < count; i++) {
+      DataObjectLogin obj = inactiveList.remove(0);
+      obj.setActive(true);
+      activeList.add(obj);
+    }
+    poolSeeded = true;
+    lastMaxActiveTargets = maxActiveTargets;
+    return;
+  }
+
+  // Resize if maxActiveTargets has changed
+  if (maxActiveTargets != lastMaxActiveTargets) {
+    while (activeList.size() > maxActiveTargets) {
+      DataObjectLogin obj = activeList.remove(activeList.size() - 1);
+      obj.setActive(false);
+      inactiveList.add(obj);
+    }
+    while (activeList.size() < maxActiveTargets && inactiveList.size() > 0) {
+      int idx = (int) random(inactiveList.size());
+      DataObjectLogin obj = inactiveList.remove(idx);
+      obj.setActive(true);
+      activeList.add(obj);
+    }
+    lastMaxActiveTargets = maxActiveTargets;
+    return;
+  }
+
+  // Swap — runs every frame with targetActivateChance probability
+  if (random(1) > targetActivateChance) return;
+  if (activeList.size() == 0 || inactiveList.size() == 0) return;
+
+  // Deactivate one random active object
+  int outIdx = (int) random(activeList.size());
+  DataObjectLogin leaving = activeList.remove(outIdx);
+  leaving.setActive(false);
+  inactiveList.add(leaving);
+
+  // Activate one random inactive object
+  int inIdx = (int) random(inactiveList.size());
+  DataObjectLogin arriving = inactiveList.remove(inIdx);
+  arriving.setActive(true);
+  activeList.add(arriving);
+}
+
 void drawBuffer() {
 
   calculateBorder();
@@ -195,9 +260,10 @@ void drawBuffer() {
     drawLoginLine();
   }
 
+  updateActivePool();
   for (DataObjectLogin i : dataObjectsLogin) {
     i.update();
-    i.activate();
+    //i.activate();
     i.drawLogin();
     //i.drawLoginText();
   }
