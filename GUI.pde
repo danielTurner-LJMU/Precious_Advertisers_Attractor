@@ -306,7 +306,14 @@ void initProgramControls(int baseX, int baseY) {
   //styleMain("generate");
   controllerLocked("generate", true);
 
-
+cp5.addSlider("pointsDist")
+    .setLabel("Point Dist")
+    .setPosition(baseX + cSpaceX * 4, baseY + cSpaceY*5.7)
+    .setSize(110, 20)
+    .setRange(0, 1)
+    .setValue(pointsDist);
+  ;
+  styleMain("pointsDist");
   // Launch control frame
   cf = new ControlFrame(this, "Control Panel");
 }

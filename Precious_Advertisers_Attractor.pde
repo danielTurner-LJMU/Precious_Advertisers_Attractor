@@ -42,6 +42,7 @@ void setup() {
   //if their location is outside the initial stage size
   size(1920, 1080);
   startState(); // Initialize the application state
+ 
 }
 
 // routes to state-specific rendering functions

@@ -2,7 +2,7 @@
  * Graphics.pde
  *
  * Manages the offscreen image buffers used for rendering and export.
- * Handles drawing the timeline layout, advertiser layers, date markers, 
+ * Handles drawing the timeline layout, advertiser layers, date markers,
  * border guides, and preview display.
  *
  * Supports both raster (TIFF) and vector (PDF) output. The PDF export
@@ -212,6 +212,8 @@ void drawBuffer() {
     step = 10;
   }
 
+  // Force historyLength to be a clean multiple of step
+  historyLength = (historyLength / step) * step;
   //-----------------------------///
 
   //apply multiply mode so we get a sense of risograph output

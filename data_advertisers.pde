@@ -17,6 +17,7 @@ String dataFileNameAd = "advertisers_using_your_activity_or_information.json"; /
 JSONObject dataFileAd;  // Full JSON object loaded from file
 JSONArray advertisers;  // JSON array of individual advertisers
 
+float pointsDist = 0.1; //Trying to sort Jagged Lines
 
 //-------- OBJECT CREATION ----------//
 DataObjectAd[] dataObjectsAd;     // Array to store advertiser objects
@@ -308,42 +309,222 @@ class DataObjectAd
     acceleration.add(force);
   }
 
-  //Draw trailing lines
   void drawAdLines() {
-    if (drawTail) {
-      pg.beginShape();
+  if (!drawTail || history.size() < 2) return;
 
-      //Check if we are exporting a PDF. If so set the stroke colour to black, semi-transparent
-      //As this is for riso-reproduction this will allow for some multiplying of colour within
-      //each colour layer/PDF page.
-      if (pg == pgPDF) {
-        if (colourLine) {      //if we are drawing coloured lines
-          pg.stroke(pdfBlack);
-        } else {               //if we are drawing black lines
-          pg.stroke(0);
-        }
-      } else {
-        pg.stroke(myColor);
-      }
+  color lineColor;
+  if (pg == pgPDF) {
+    lineColor = colourLine ? pdfBlack : color(0);
+  } else {
+    lineColor = colourLine ? myColor : color(0);
+  }
 
-      if (randomLineWeight) {
-        pg.strokeWeight(randomStrokeThick);
-      } else {
-        pg.strokeWeight(strokeThick);
-      }
+  float hw = (randomLineWeight ? randomStrokeThick : strokeThick) * 0.5;
 
-      pg.noFill();
-      for (int i = 0; i < history.size(); i+=step) {
-        PVector v = history.get(i);
-        pg.curveVertex(v.x, v.y);
-      }
+  // Build point list using distance threshold
+  float minPointDist = 2.0;
+  ArrayList<PVector> pts = new ArrayList<PVector>();
+  PVector lastAdded = history.get(0);
+  pts.add(lastAdded);
 
-      //these two are needed to take the path right up to the vehicle
-      pg.curveVertex(location.x, location.y);
-      pg.curveVertex(location.x, location.y);
-      pg.endShape();
+  for (int i = 1; i < history.size(); i++) {
+    PVector v = history.get(i);
+    if (PVector.dist(lastAdded, v) >= minPointDist) {
+      pts.add(v);
+      lastAdded = v;
     }
   }
+  pts.add(location.copy());
+
+  if (pts.size() < 2) return;
+
+  // Build left and right edge arrays
+  ArrayList<PVector> left  = new ArrayList<PVector>();
+  ArrayList<PVector> right = new ArrayList<PVector>();
+
+  for (int i = 0; i < pts.size(); i++) {
+    PVector tangent;
+    if (i == 0) {
+      tangent = PVector.sub(pts.get(1), pts.get(0));
+    } else if (i == pts.size() - 1) {
+      tangent = PVector.sub(pts.get(i), pts.get(i - 1));
+    } else {
+      PVector t1 = PVector.sub(pts.get(i), pts.get(i - 1));
+      PVector t2 = PVector.sub(pts.get(i + 1), pts.get(i));
+      tangent = PVector.add(t1, t2);
+    }
+    tangent.normalize();
+    PVector perp = new PVector(-tangent.y, tangent.x);
+    left.add(PVector.add(pts.get(i), PVector.mult(perp, hw)));
+    right.add(PVector.sub(pts.get(i), PVector.mult(perp, hw)));
+  }
+
+  // Clamp inner edge vertices on tight curves to prevent self-intersection
+// Clamp inner edge vertices on tight curves to prevent self-intersection
+for (int i = 1; i < pts.size() - 1; i++) {
+  PVector prev = pts.get(i - 1);
+  PVector curr = pts.get(i);
+  PVector next = pts.get(i + 1);
+
+  PVector t1 = PVector.sub(curr, prev).normalize();
+  PVector t2 = PVector.sub(next, curr).normalize();
+
+  // Cross product determines turn direction
+  float cross = t1.x * t2.y - t1.y * t2.x;
+  
+  // Dot product tells us how sharp the turn is
+  // -1 = complete reversal, 0 = 90 degrees, 1 = straight
+  float dot = t1.dot(t2);
+
+  // Only clamp if turn is sharp enough to cause self-intersection
+  // i.e. curve radius < hw
+  float segLen = PVector.dist(prev, curr);
+  if (dot < 0 && segLen < hw * 2) {
+    if (cross > 0) {
+      left.set(i, curr.copy());  // left is inner edge
+    } else {
+      right.set(i, curr.copy()); // right is inner edge
+    }
+  }
+}
+
+  pg.noStroke();
+  pg.fill(lineColor);
+
+  if (sqCaps) {
+    // Square caps — project rectangles at each end as part of single shape
+    PVector startTangent = PVector.sub(pts.get(0), pts.get(min(3, pts.size()-1))).normalize();
+    PVector endTangent   = PVector.sub(pts.get(pts.size()-1), pts.get(max(0, pts.size()-4))).normalize();
+
+    PVector sl = PVector.add(left.get(0),  PVector.mult(startTangent, hw));
+    PVector sr = PVector.add(right.get(0), PVector.mult(startTangent, hw));
+    PVector el = PVector.add(left.get(left.size()-1),   PVector.mult(endTangent, hw));
+    PVector er = PVector.add(right.get(right.size()-1), PVector.mult(endTangent, hw));
+
+    pg.beginShape();
+    pg.vertex(sl.x, sl.y);
+    pg.vertex(sr.x, sr.y);
+    for (int i = 0; i < right.size(); i++) {
+      pg.vertex(right.get(i).x, right.get(i).y);
+    }
+    pg.vertex(er.x, er.y);
+    pg.vertex(el.x, el.y);
+    for (int i = left.size() - 1; i >= 0; i--) {
+      pg.vertex(left.get(i).x, left.get(i).y);
+    }
+    pg.endShape(CLOSE);
+
+  } else {
+    // Round caps — single closed shape with bezier semicircles at each end
+    float k = hw * 0.5523;
+
+    PVector startTangent = PVector.sub(pts.get(0), pts.get(min(3, pts.size()-1))).normalize();
+    PVector endTangent   = PVector.sub(pts.get(pts.size()-1), pts.get(max(0, pts.size()-4))).normalize();
+
+    PVector sLeft  = left.get(0);
+    PVector sRight = right.get(0);
+    PVector sh1    = PVector.add(sLeft,  PVector.mult(startTangent, k * 2));
+    PVector sh2    = PVector.add(sRight, PVector.mult(startTangent, k * 2));
+
+    PVector eLeft  = left.get(left.size()-1);
+    PVector eRight = right.get(right.size()-1);
+    PVector eh1    = PVector.add(eLeft,  PVector.mult(endTangent, k * 2));
+    PVector eh2    = PVector.add(eRight, PVector.mult(endTangent, k * 2));
+
+    pg.beginShape();
+    pg.vertex(sLeft.x, sLeft.y);
+    for (int i = 1; i < left.size(); i++) {
+      pg.vertex(left.get(i).x, left.get(i).y);
+    }
+    pg.bezierVertex(
+      eh1.x, eh1.y,
+      eh2.x, eh2.y,
+      eRight.x, eRight.y
+    );
+    for (int i = right.size() - 2; i >= 0; i--) {
+      pg.vertex(right.get(i).x, right.get(i).y);
+    }
+    pg.bezierVertex(
+      sh2.x, sh2.y,
+      sh1.x, sh1.y,
+      sLeft.x, sLeft.y
+    );
+    pg.endShape(CLOSE);
+  }
+}
+
+  //void drawAdLines() {
+  //  if (!drawTail || history.size() < 2) return;
+
+  //  if (pg == pgPDF) {
+  //    if (colourLine) {
+  //      pg.stroke(pdfBlack);
+  //    } else {
+  //      pg.stroke(0);
+  //    }
+  //  } else {
+  //    pg.stroke(myColor);
+  //  }
+
+  //  if (randomLineWeight) {
+  //    pg.strokeWeight(randomStrokeThick);
+  //  } else {
+  //    pg.strokeWeight(strokeThick);
+  //  }
+
+  //  pg.noFill();
+
+  //  //float minDist = strokeThick * pointsDist; // minimum distance between points
+
+  //  // Build filtered list - skip points too close OR causing sharp direction reversal
+  //  ArrayList<PVector> filtered = new ArrayList<PVector>();
+  //  PVector last = history.get(0);
+  //  filtered.add(last);
+  //  PVector lastDir = null;
+
+  //  for (int i = step; i < history.size(); i += step) {
+  //    PVector v = history.get(i);
+  //    PVector dir = PVector.sub(v, last);
+
+  //    //if (PVector.dist(last, v) >= strokeThick * pointsDist) {
+  //      if (lastDir != null) {
+  //        float angle = PVector.angleBetween(lastDir, dir);
+  //        if (angle < radians(120)) {
+  //          filtered.add(v);
+  //          last = v;
+  //          lastDir = dir;
+  //        }
+  //      } else {
+  //        filtered.add(v);
+  //        last = v;
+  //        lastDir = dir;
+  //      }
+  //    //}
+  //  }
+  //  filtered.add(location.copy());
+
+  //  if (filtered.size() < 4) return;
+
+  //  // Project phantom start point BEHIND the first point
+  //  PVector p0 = filtered.get(0);
+  //  PVector p1 = filtered.get(1);
+  //  PVector startTangent = PVector.sub(p0, p1);
+  //  PVector phantomStart = PVector.add(p0, startTangent);
+
+  //  // Project phantom end point BEYOND the last point
+  //  PVector pLast = filtered.get(filtered.size()-1);
+  //  PVector pPrev = filtered.get(filtered.size()-2);
+  //  PVector endTangent = PVector.sub(pLast, pPrev);
+  //  PVector phantomEnd = PVector.add(pLast, endTangent);
+
+  //  pg.beginShape();
+  //  pg.curveVertex(phantomStart.x, phantomStart.y);
+  //  for (PVector v : filtered) {
+  //    pg.curveVertex(v.x, v.y);
+  //  }
+  //  pg.curveVertex(phantomEnd.x, phantomEnd.y);
+  //  pg.endShape();
+  //}
 
   //Randomise stroke weight
   void randomiseWeight() {
