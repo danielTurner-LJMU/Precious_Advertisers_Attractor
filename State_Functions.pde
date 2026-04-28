@@ -74,6 +74,11 @@ void setup1() {
 
   loadDataAd();
   loadDataLogin();
+  
+  //set the maximum number of active targets to a proportion of the total login events
+  maxActiveTargets = max(1, round(dataObjectsLogin.length * 0.05)); // 5%, minimum 1
+  // Scale swap frequency proportionally to dataset size
+  targetActivateChance = constrain(dataObjectsLogin.length / 1000.0, 0.02, 0.95);
 
   initMainControls();
 }

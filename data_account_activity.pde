@@ -40,7 +40,8 @@ DataObjectLogin[] dataObjectsLogin;  // Array to store each login as an object
 
 
 //-------- TARGET PROPERTIES --------//
-int maxActiveTargets = 300;          //max number of target allowed to be active
+int maxActiveTargets;          //max number of target allowed to be active
+boolean recalculateActiveTargets = false; //Used as a flag - in drawBuffer - to recalculate the number of maxActiveTargets
 float targetActivateChance = 0.9;  // Probability of a target being (de)activated
 float targetRadius = 1;             // Default radius of target shapes
 float targetOpacity = 150;           // Opacity of the visual circles

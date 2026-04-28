@@ -505,6 +505,10 @@ void controlEvent(ControlEvent theEvent) {
     startDate = int(theEvent.getController().getArrayValue(0));
     endDate = int(theEvent.getController().getArrayValue(1));
     datesVisible = true;
+
+    // Recalculate maxActiveTargets based on visible targets
+    // We need to count after hideMe has been updated - so defer to next draw
+    recalculateActiveTargets = true; // ← flag to trigger recalculation
   }
 
 

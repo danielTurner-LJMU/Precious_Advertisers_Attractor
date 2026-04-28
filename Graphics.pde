@@ -245,6 +245,20 @@ void drawBuffer() {
   calculateBorder();
   calculateLoginLine();
 
+  // When timescale changes, recount visible targets and recalculate maxActiveTargets
+  // as 5% of visible count (minimum 10), then reseed the pool to reflect new state.
+  if (recalculateActiveTargets) {
+    int visibleCount = 0;
+    for (DataObjectLogin obj : dataObjectsLogin) {
+      if (!obj.hideMe) visibleCount++;
+    }
+    maxActiveTargets = max(1, round(visibleCount * 0.05));
+    // Scale swap frequency proportionally to visible target count
+  targetActivateChance = constrain(visibleCount / 1000.0, 0.02, 0.95);
+    poolSeeded = false; // trigger reseed
+    recalculateActiveTargets = false;
+  }
+
   pg.beginDraw();
   pg.background(255);
 
