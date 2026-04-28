@@ -326,8 +326,9 @@ void outputMultiPagePDF(String label) {
         // Plain black text, no rect
         i.drawAdLabel(baseline, ascent, textHeight, color(0), color(0), false);
       } else if (xWhite) {
-        // Rect was already knocked out on colour pages - just draw black text
-        i.drawAdLabel(baseline, ascent, textHeight, color(0), color(0), false);
+        // Draw white rectangle first to knockout colour layers beneath,
+        // then draw black text on top
+        i.drawAdLabel(baseline, ascent, textHeight, color(255), color(0), true);
       } else {
         // Black rect + white text knockout
         i.drawAdLabel(baseline, ascent, textHeight, color(0), color(255), true);

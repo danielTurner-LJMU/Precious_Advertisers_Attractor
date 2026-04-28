@@ -175,6 +175,7 @@ class DataObjectAd
   int cVal;                 // Index for colour palette
   color myColor;            // Colour selected from palette
   float randomStrokeThick;   //randomised strokeWeight for when 'randomLineWeight' = true
+  boolean labelLeft = false; // whether label draws to left or right of X
 
   //Performace enhancement - Changing number of target searches to set number of frames instead of every frame
   int targetRefreshCounter = 0;
@@ -244,6 +245,9 @@ class DataObjectAd
     //initialise the random weight to 1
     randomStrokeThick = 1;
 
+    // Randomly assign label position — left or right of X
+    labelLeft = random(1) > 0.5;
+
     //clear the arraylist storing previous points
     history.clear();
 
@@ -268,7 +272,6 @@ class DataObjectAd
         history.subList(0, history.size() - historyLength).clear();
       }
     }
-
   }
 
   //Seek Closest Active Login Object
@@ -451,9 +454,19 @@ class DataObjectAd
     newR = r * xScale;
     float rightEdge = abs(newR * cos(theta)) + abs(newR * sin(theta));
     rightEdge += xThickness / 2.0;
-    float textX = rightEdge + textPadding;
 
-    float rectX = textX - innerPad;
+    float textX, rectX;
+
+    if (labelLeft) {
+      // Draw label to the left — offset by text width and padding
+      textX = -(rightEdge + textPadding + cachedTextWidth);
+      rectX = textX - innerPad;
+    } else {
+      // Draw label to the right — existing behaviour
+      textX = rightEdge + textPadding;
+      rectX = textX - innerPad;
+    }
+
     float rectY = baseline - ascent - innerPad;
     float rectW = cachedTextWidth + (innerPad * 2.0);
     float rectH = textHeight + (innerPad * 2.0);
@@ -474,7 +487,6 @@ class DataObjectAd
     pg.popMatrix();
     pg.popMatrix();
   }
-
 }
 
 //-------- SPAWN LOCATION OUTSIDE CANVAS ----------//
