@@ -74,7 +74,7 @@ void setup1() {
 
   loadDataAd();
   loadDataLogin();
-  
+
   //set the maximum number of active targets to a proportion of the total login events
   maxActiveTargets = max(1, round(dataObjectsLogin.length * 0.05)); // 5%, minimum 1
   // Scale swap frequency proportionally to dataset size
@@ -132,6 +132,8 @@ void draw1() {
    If you look in the GUI tab, I have excluded 'imScale' from this process.
    This makes for smoother exploration of the piece as the buffer is not re-drawn
    when we change the image scale.
+   strokeThick is also excluded and instead uses a debounce so the buffer only
+   redraws 300ms after the slider has stopped moving, preventing lag on large datasets.
    *** Am sure there are more I could exclude ****
    */
   if (bufferCreated) {
@@ -141,26 +143,33 @@ void draw1() {
         shapesDrawn = true;
       } else {
         if (!shapesDrawn) {
-          drawBuffer(); //draws to offscreen buffer
-          shapesDrawn = true;
-          //hide all helper graphics
-          borderVisible = false;
-          rowsVisible = false;
+          // Debounce stroke thickness changes — only redraw after slider has settled
+          if (millis() - strokeThickLastChanged > strokeDebounceMs) {
+            drawBuffer(); //draws to offscreen buffer
+            shapesDrawn = true;
+            //hide all helper graphics
+            borderVisible = false;
+            rowsVisible = false;
+          }
         }
       }
       drawPreview(); //copies offscreen buffer to the stage
-      checkHover(); //check for rollovers on login objects
+      // Only check hover if mouse is in preview area and not dragging
+      // Avoids iterating all login objects unnecessarily every frame
+      if (!dragEnabled && mouseX > guiWidth) {
+        checkHover();
+      }
       drawHoverTooltip();
     } else {
       autoGenerateInBackground();
     }
   }
+
   //draw background rectangle to cover GUI area
   fill(cBlack);
   rect(guiWidth/2, height/2, guiWidth, height);
 
   drawOverlays();
-
 }
 
 //cleanup functions

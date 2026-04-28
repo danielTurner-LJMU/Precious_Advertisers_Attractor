@@ -224,8 +224,8 @@ class DataObjectAd
   void initDraw() {
 
     PVector spawn = getRandomOffscreenPosition(spawnBorder);
-    location.x = spawn.x;
-    location.y = spawn.y;
+    location.x = random(pg.width);//spawn.x;
+    location.y = random(pg.height);//spawn.y;
 
     acceleration = new PVector(0, 0);
     velocity = new PVector(0, 0);
@@ -246,7 +246,7 @@ class DataObjectAd
 
     //clear the arraylist storing previous points
     history.clear();
-    
+
     //clear recent targets
     recentTargets.clear();
   }
@@ -268,6 +268,7 @@ class DataObjectAd
         history.subList(0, history.size() - historyLength).clear();
       }
     }
+
   }
 
   //Seek Closest Active Login Object
@@ -407,6 +408,8 @@ class DataObjectAd
       }
 
       pg.noFill();
+
+
       for (int i = 0; i < history.size(); i+=step) {
         PVector v = history.get(i);
         pg.curveVertex(v.x, v.y);
@@ -471,6 +474,7 @@ class DataObjectAd
     pg.popMatrix();
     pg.popMatrix();
   }
+
 }
 
 //-------- SPAWN LOCATION OUTSIDE CANVAS ----------//

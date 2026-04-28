@@ -80,6 +80,10 @@ boolean datesVisible = false;
 //variable to control font size of text drawn to artwork
 float fontSize = 10;
 
+//Debounce - to limit re-draws whne stroke thicknes changes - Make more responsive for user
+int strokeThickLastChanged = 0;
+int strokeDebounceMs = 300;
+
 //-------------------------------------------------------------//
 
 //creates offscreen image buffer to draw to screen

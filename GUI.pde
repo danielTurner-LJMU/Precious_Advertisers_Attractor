@@ -558,6 +558,7 @@ void controlEvent(ControlEvent theEvent) {
   }
 
   if (theEvent.isFrom("strokeThick")) {
+    strokeThickLastChanged = millis();
     if (randomLineWeight) {
       for (DataObjectAd i : dataObjectsAd) {
         i.randomiseWeight();
@@ -578,6 +579,10 @@ void controlEvent(ControlEvent theEvent) {
   //
   if (pauseMotion) {
     if (theEvent.isFrom("imScale")) {
+      // skip - handled by drawPreview scaling, no buffer redraw needed
+    } else if (theEvent.isFrom("strokeThick")) {
+      // skip immediate redraw - debounce handles this in draw1()
+      strokeThickLastChanged = millis();
     } else {
       shapesDrawn = false;
     }
