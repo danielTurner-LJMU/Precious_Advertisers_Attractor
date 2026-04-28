@@ -127,48 +127,30 @@ void draw1() {
 
   background(0);
 
-  /* We are doing some balancing of performance here. When the 'pause' button is selected
-   the offscreen buffer only updates when a GUI element is selected.
-   If you look in the GUI tab, I have excluded 'imScale' from this process.
-   This makes for smoother exploration of the piece as the buffer is not re-drawn
-   when we change the image scale.
-   strokeThick is also excluded and instead uses a debounce so the buffer only
-   redraws 300ms after the slider has stopped moving, preventing lag on large datasets.
-   *** Am sure there are more I could exclude ****
+  /* Performance balancing notes:
+   - imScale is excluded from buffer redraws — scale is handled by drawPreview()
+   - strokeThick uses a debounce — buffer only redraws after slider settles
+   - All other GUI changes while paused use the same debounce so the
+     rendering notice has time to appear before the redraw fires
+   - Export uses a frame delay so the exporting notice is visible before
+     Processing's single thread blocks during file output
    */
   if (bufferCreated) {
-    if (!autoGenerate) { //check if we are autogenerating
-      if (!pauseMotion) {
-        drawBuffer(); //draws to offscreen buffer
-        shapesDrawn = true;
-      } else {
-        if (!shapesDrawn) {
-          // Debounce stroke thickness changes — only redraw after slider has settled
-          if (millis() - strokeThickLastChanged > strokeDebounceMs) {
-            drawBuffer(); //draws to offscreen buffer
-            shapesDrawn = true;
-            //hide all helper graphics
-            borderVisible = false;
-            rowsVisible = false;
-          }
-        }
-      }
-      drawPreview(); //copies offscreen buffer to the stage
-      // Only check hover if mouse is in preview area and not dragging
-      // Avoids iterating all login objects unnecessarily every frame
-      if (!dragEnabled && mouseX > guiWidth) {
-        checkHover();
-      }
+    if (!autoGenerate) { // check if we are autogenerating
+      handleBufferRedraw();  // manages pause/debounce/redraw logic
+      drawPreview();         // copies offscreen buffer to stage
+      handleNotices();       // rendering and exporting notices — drawn after preview so they appear on top
+      handleExport();        // deferred export with frame delay
+      handleHover();         // rollover detection — only runs when mouse is in preview area
       drawHoverTooltip();
     } else {
       autoGenerateInBackground();
     }
   }
 
-  //draw background rectangle to cover GUI area
+  // Draw background rectangle to cover GUI area
   fill(cBlack);
   rect(guiWidth/2, height/2, guiWidth, height);
-
   drawOverlays();
 }
 

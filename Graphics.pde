@@ -81,8 +81,14 @@ boolean datesVisible = false;
 float fontSize = 10;
 
 //Debounce - to limit re-draws whne stroke thicknes changes - Make more responsive for user
-int strokeThickLastChanged = 0;
-int strokeDebounceMs = 300;
+int lastGuiChange = 0;
+int redrawDebounceMs = 300;
+
+// Export state — 0=none, 1=tiff, 2=pdf, 3=both
+// Using a flag and frame delay so the exporting notice is visible
+// before the export blocks Processing's single thread
+int exportMode = 0;
+int exportFrameDelay = 0;
 
 //-------------------------------------------------------------//
 
@@ -258,7 +264,7 @@ void drawBuffer() {
     }
     maxActiveTargets = max(1, round(visibleCount * 0.05));
     // Scale swap frequency proportionally to visible target count
-  targetActivateChance = constrain(visibleCount / 1000.0, 0.02, 0.95);
+    targetActivateChance = constrain(visibleCount / 1000.0, 0.02, 0.95);
     poolSeeded = false; // trigger reseed
     recalculateActiveTargets = false;
   }
@@ -619,4 +625,128 @@ void drawHoverTooltip() {
   textAlign(CENTER);
 
   rectMode(CENTER); // reset to match rest of sketch
+}
+
+
+// Manages buffer redraws — when running, redraws every frame.
+// When paused, waits for a GUI change then uses a debounce so heavy
+// renders don't fire on every slider tick.
+void handleBufferRedraw() {
+  if (!pauseMotion) {
+    drawBuffer();
+    shapesDrawn = true;
+  } else if (!shapesDrawn) {
+    if (millis() - lastGuiChange > redrawDebounceMs) {
+      drawBuffer();
+      shapesDrawn = true;
+      // Hide all helper graphics once redraw is complete
+      borderVisible = false;
+      rowsVisible = false;
+    }
+  }
+}
+
+// Shows feedback notices on top of the preview when the program
+// is busy — either waiting to redraw or waiting to export.
+// Both are drawn after drawPreview() so they appear on top of the artwork.
+void handleNotices() {
+  if (!shapesDrawn) drawRenderingNotice();
+  if (exportMode > 0) drawExportingNotice();
+}
+
+// Deferred export handler.
+// Because Processing is single-threaded the UI freezes during export.
+// We count down frames first so the exporting notice is visible
+// for at least 2 frames before the export blocks the thread.
+void handleExport() {
+  if (exportMode == 0) return; // nothing pending
+
+  if (exportFrameDelay > 0) {
+    exportFrameDelay--; // still counting down — notice is showing
+    return;
+  }
+
+  // Frame delay elapsed — safe to export
+  currentExportBaseName = generateBaseName(fileNameAppend);
+
+  if (exportMode == 1) {
+    // Tiff only
+    String outputFileName = generateFileName("tif", fileNameAppend);
+    pg.save(outputFileName);
+    saveColophon(new String[]{ outputFileName });
+  } else if (exportMode == 2) {
+    // PDF only
+    String outputFileName = generateFileName("pdf", fileNameAppend);
+    outputMultiPagePDF(fileNameAppend);
+    saveColophon(new String[]{ outputFileName });
+  } else if (exportMode == 3) {
+    // Tiff and PDF
+    String tiffFileName = generateFileName("tif", fileNameAppend);
+    String pdfFileName  = generateFileName("pdf", fileNameAppend);
+    pg.save(tiffFileName);
+    outputMultiPagePDF(fileNameAppend);
+    saveColophon(new String[]{ tiffFileName, pdfFileName });
+  }
+
+  exportMode = 0; // Reset — export complete
+}
+
+// Only checks hover when mouse is in the preview area and not dragging.
+// Avoids iterating all login objects unnecessarily every frame.
+void handleHover() {
+  if (!dragEnabled && mouseX > guiWidth) {
+    checkHover();
+  }
+}
+
+// Shows a 'RENDERING...' notice in the centre of the preview area.
+// Appears whenever a buffer redraw is pending — quick renders will
+// flash it briefly, slow ones will hold it until complete.
+void drawRenderingNotice() {
+  pushMatrix();
+  translate(previewCentreX, previewCentreY);
+
+  String msg = "RENDERING...";
+  textFont(labelFontMono);
+  textSize(18);
+  float msgWidth = textWidth(msg);
+  int padding = 10;
+
+  rectMode(CENTER);
+  textAlign(CENTER);
+  fill(0, 200);
+  noStroke();
+  rect(0, 0, msgWidth + (padding * 2), textAscent() + textDescent() + (padding * 2));
+  fill(cTheme);
+  text(msg, 0, textAscent() * 0.4);
+
+  rectMode(CENTER);
+  textAlign(CENTER);
+  popMatrix();
+}
+
+// Shows an 'EXPORTING...' notice in the centre of the preview area.
+// Appears for at least 2 frames before the export blocks the thread,
+// giving the user feedback that something is happening.
+void drawExportingNotice() {
+  pushMatrix();
+  translate(previewCentreX, previewCentreY);
+
+  String msg = "EXPORTING...";
+  textFont(labelFontMono);
+  textSize(18);
+  float msgWidth = textWidth(msg);
+  int padding = 10;
+
+  rectMode(CENTER);
+  textAlign(CENTER);
+  fill(0, 200);
+  noStroke();
+  rect(0, 0, msgWidth + (padding * 2), textAscent() + textDescent() + (padding * 2));
+  fill(cTheme);
+  text(msg, 0, textAscent() * 0.4);
+
+  rectMode(CENTER);
+  textAlign(CENTER);
+  popMatrix();
 }

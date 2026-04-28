@@ -162,26 +162,20 @@ String generateColophonPath() {
 
 // Function: outputTiff - saves current frame as TIFF
 void outputTiff() {
+  exportMode = 1;
+  exportFrameDelay = 2;
+}
 
-  currentExportBaseName = generateBaseName(fileNameAppend); // generate once
-  
-  String outputFileName = generateFileName("tif", fileNameAppend);
-  pg.save(outputFileName);
-  saveColophon(new String[]{ outputFileName });
+// ControlP5 hook - called by the Save PDF bang button
+void savePDF() {
+  exportMode = 2;
+  exportFrameDelay = 2;
 }
 
 // Function: outputTiffAndPDF - exports both TIFF and PDF versions
 void outputTiffAndPDF() {
-
-  currentExportBaseName = generateBaseName(fileNameAppend); // generate once
-
-  String tiffFileName = generateFileName("tif", fileNameAppend);
-  String pdfFileName  = generateFileName("pdf", fileNameAppend);
-
-  pg.save(tiffFileName);
-  outputMultiPagePDF(fileNameAppend);
-
-  saveColophon(new String[]{ tiffFileName, pdfFileName });
+  exportMode = 3;
+  exportFrameDelay = 2;
 }
 
 /**

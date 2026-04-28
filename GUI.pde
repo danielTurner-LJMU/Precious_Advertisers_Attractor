@@ -558,7 +558,7 @@ void controlEvent(ControlEvent theEvent) {
   }
 
   if (theEvent.isFrom("strokeThick")) {
-    strokeThickLastChanged = millis();
+    lastGuiChange = millis();
     if (randomLineWeight) {
       for (DataObjectAd i : dataObjectsAd) {
         i.randomiseWeight();
@@ -579,11 +579,12 @@ void controlEvent(ControlEvent theEvent) {
   //
   if (pauseMotion) {
     if (theEvent.isFrom("imScale")) {
-      // skip - handled by drawPreview scaling, no buffer redraw needed
+      // skip - handled by drawPreview scaling
     } else if (theEvent.isFrom("strokeThick")) {
-      // skip immediate redraw - debounce handles this in draw1()
-      strokeThickLastChanged = millis();
+      // skip immediate redraw - debounce handles this
+      lastGuiChange = millis();
     } else {
+      lastGuiChange = millis(); // ← trigger debounce for all changes
       shapesDrawn = false;
     }
   }
@@ -646,14 +647,7 @@ void generate() {
 }
 
 
-// ControlP5 hook - called by the Save PDF bang button
-void savePDF() {
 
-  currentExportBaseName = generateBaseName(fileNameAppend); // generate once
-  String outputFileName = generateFileName("pdf", fileNameAppend);
-  outputMultiPagePDF(fileNameAppend);
-  saveColophon(new String[]{ outputFileName });
-}
 
 //// ------ CONTROLLER STYLING -------- ///
 
