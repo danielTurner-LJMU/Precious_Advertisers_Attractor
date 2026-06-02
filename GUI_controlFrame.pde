@@ -7,8 +7,10 @@
  *
  * Features:
  * - Two bang buttons at the top to "Show All" or "Hide All" data objects.
+ * - Search field — type and press Enter to jump the list to the first matching advertiser name.
  * - Smooth scrolling through toggles using a custom scrollbar or mouse wheel.
  * - Smooth window dragging via an emulated title bar.
+ * - Click and drag over toggles to set multiple to the same state in one gesture.
  * - Performance-optimized toggle management using ControlP5.
  *
  * Intended for use as a companion control window to interactively manage large sets of visual elements
@@ -30,6 +32,7 @@ class ControlFrame extends PApplet {
   float windowCurrentX, windowCurrentY;  // Current window position, updated smoothly toward target
 
   int totalToggles = dataObjectsAd.length; //match number of toggles to number of advertisers
+  Integer[] sortedIndices;  // Alphabetical ordering of dataObjectsAd indices
   int toggleHeight = 25;
   int visibleHeight = 900;
   int toggleStartY = dragBarHeight + 50;
@@ -46,6 +49,14 @@ class ControlFrame extends PApplet {
   boolean draggingThumb = false;
   float dragOffsetY = 0;
   boolean thumbHovered = false;
+
+  // Search — tracks current text field input for scroll-to position
+  String searchText = "";
+
+  // Drag-to-toggle — records the state set by the first toggle clicked on mouseDown
+  // so all subsequent toggles swept over during the drag match it
+  boolean dragTogglingActive = false;
+  boolean dragToggleTargetState = false;
 
 
   ControlFrame(PApplet _parent, String name) {
@@ -98,7 +109,7 @@ class ControlFrame extends PApplet {
 
     // Hide Control Panel button
     cp5.addBang("hidePanel")
-      .setPosition(width - 90, dragBarHeight + 10)  // Adjust position to top-right
+      .setPosition(width - 90, dragBarHeight + 10)
       .setSize(40, 20)
       .setLabel("Hide Panel")
       .setTriggerEvent(Bang.RELEASE)
@@ -107,13 +118,44 @@ class ControlFrame extends PApplet {
       .setColorActive(cTheme);
     ;
 
+    // Search field — press Enter to scroll the list to the first matching advertiser name
+    cp5.addTextfield("searchField")
+      .setPosition(140, dragBarHeight + 8)
+      .setSize(150, 22)
+      .setLabel("SEARCH - type & press enter")
+      .setColor(color(255))
+      .setColorBackground(color(60))
+      .setColorForeground(cGrey)
+      .setColorActive(cTheme)
+      .setColorCursor(color(255))
+      .setColorLabel(cGrey)
+      .plugTo(this)
+      .setAutoClear(false);
+    cp5.get(Textfield.class, "searchField").getCaptionLabel()
+      .setFont(cp5FontInconsolata)
+      .setSize(11)
+      .align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE)
+      .setPaddingY(5);
+
+    // Build a sorted index array so toggles appear alphabetically by advertiser name.
+    // The array index (i) is preserved as the toggle id so controlEvent() routing
+    // to dataObjectsAd[id].drawMe continues to work correctly.
+    sortedIndices = new Integer[totalToggles];
+    for (int i = 0; i < totalToggles; i++) sortedIndices[i] = i;
+    java.util.Arrays.sort(sortedIndices, new java.util.Comparator<Integer>() {
+      public int compare(Integer a, Integer b) {
+        return dataObjectsAd[a].mySiteName.compareToIgnoreCase(dataObjectsAd[b].mySiteName);
+      }
+    });
+
     // Create required number of toggles based on data entries
-    for (int i = 0; i < totalToggles; i++) {
+    for (int pos = 0; pos < totalToggles; pos++) {
+      int i = sortedIndices[pos];
       String toggleName = "adToggle_" + i;
-      String labelText = dataObjectsAd[i].mySiteName; // Labels start at 1
+      String labelText = dataObjectsAd[i].mySiteName;
 
       Toggle t = cp5.addToggle(toggleName)
-        .setPosition(20, toggleStartY + i * toggleHeight)
+        .setPosition(20, toggleStartY + pos * toggleHeight)
         .setId(i)               // Set ID early
         .setSize(40, 20)
         .setLabel(labelText)
@@ -190,19 +232,15 @@ class ControlFrame extends PApplet {
     }
 
     // Loop through all toggles and update their positions based on scroll offset
-    for (int i = 0; i < totalToggles; i++) {
-      String toggleName = "adToggle_" + i;  // Construct toggle control name
-      Toggle t = cp5.get(Toggle.class, toggleName);
+    for (int pos = 0; pos < totalToggles; pos++) {
+      int i = sortedIndices[pos];
+      Toggle t = cp5.get(Toggle.class, "adToggle_" + i);
 
       if (t != null) {
-        // Calculate vertical position with scrolling offset applied
-        float y = toggleStartY + i * toggleHeight - scrollOffset;
-
-        // Hide toggles that would be covered by the title bar area
+        float y = toggleStartY + pos * toggleHeight - scrollOffset;
         if (y < toggleStartY) {
           t.setVisible(false);
         } else {
-          // Show and position toggles normally
           t.setVisible(true);
           t.setPosition(20, y);
         }
@@ -217,6 +255,15 @@ class ControlFrame extends PApplet {
 
   public boolean isReady() {
     return ready;
+  }
+
+  // Returns the display position (0-based) of the toggle under a given y coordinate,
+  // or -1 if outside the toggle area or over the scrollbar.
+  int toggleAtY(float y) {
+    if (y < toggleStartY || mouseX > scrollTrackX) return -1;
+    int pos = (int)((y + scrollOffset - toggleStartY) / toggleHeight);
+    if (pos >= 0 && pos < totalToggles) return pos;
+    return -1;
   }
 
   public void mousePressed() {
@@ -249,14 +296,21 @@ class ControlFrame extends PApplet {
       dragOffsetY = mouseY - scrollThumbY;
     }
 
- 
+    // Toggle has already flipped on mouseDown — read its new state as the drag target
+    int pos = toggleAtY(mouseY);
+    if (pos >= 0) {
+      Toggle t = cp5.get(Toggle.class, "adToggle_" + sortedIndices[pos]);
+      if (t != null) {
+        dragToggleTargetState = t.getBooleanValue();
+        dragTogglingActive = true;
+      }
+    }
   }
 
   public void mouseReleased() {
-
     windowDragging = false;
     draggingThumb = false;
-
+    dragTogglingActive = false;
   }
 
   public void mouseDragged() {
@@ -285,6 +339,16 @@ class ControlFrame extends PApplet {
       scrollOffset = map(thumbPos, 0, scrollRange, 0, maxOffset);
     }
 
+    // Drag-to-toggle — set any toggle swept over to match the first toggle's new state
+    if (dragTogglingActive && !draggingThumb && !windowDragging) {
+      int pos = toggleAtY(mouseY);
+      if (pos >= 0) {
+        Toggle t = cp5.get(Toggle.class, "adToggle_" + sortedIndices[pos]);
+        if (t != null && t.getBooleanValue() != dragToggleTargetState) {
+          t.setValue(dragToggleTargetState);
+        }
+      }
+    }
   }
 
   public void mouseWheel(MouseEvent event) {
@@ -299,7 +363,24 @@ class ControlFrame extends PApplet {
     scrollThumbY = map(scrollOffset, 0, maxScroll, scrollTrackY, scrollTrackY + scrollTrackHeight - scrollThumbHeight);
   }
 
- 
+  // Called by ControlP5 when Enter is pressed in the search field.
+  // Finds the first advertiser name (in sorted order) that starts with
+  // the typed text and jumps the scroll position to bring it to the top.
+  public void searchField(String val) {
+    searchText = val.trim();
+    if (searchText.isEmpty()) return;
+
+    for (int pos = 0; pos < totalToggles; pos++) {
+      int i = sortedIndices[pos];
+      if (dataObjectsAd[i].mySiteName.toLowerCase().startsWith(searchText.toLowerCase())) {
+        float maxOffset = totalToggles * toggleHeight - visibleHeight;
+        scrollOffset = constrain(pos * toggleHeight, 0, maxOffset);
+        float scrollRange = scrollTrackHeight - scrollThumbHeight;
+        scrollThumbY = map(scrollOffset, 0, maxOffset, scrollTrackY, scrollTrackY + scrollRange);
+        return;
+      }
+    }
+  }
 
   public void setAllOn() {
     for (int i = 0; i < totalToggles; i++) {
