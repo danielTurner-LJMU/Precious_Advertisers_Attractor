@@ -1,5 +1,5 @@
 /**
- * Precious: Advertisers — Attractor
+ * Precious: Advertisers — Timeline
  *
  * Part of "Precious" — a series of Processing programs that generate
  * artworks from personal Facebook data exports.
