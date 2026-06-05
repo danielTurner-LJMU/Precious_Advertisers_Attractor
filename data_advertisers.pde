@@ -181,6 +181,7 @@ class DataObjectAd
   int targetRefreshCounter = 0;
   DataObjectLogin cachedTarget = null;
   float cachedTextWidth = 0;
+  String[] wrappedLines = new String[0]; // name split into lines at ~20 chars
 
   // Cache of recently visited targets - prevents re-visiting same targets
   ArrayList<DataObjectLogin> recentTargets = new ArrayList<DataObjectLogin>();
@@ -202,6 +203,7 @@ class DataObjectAd
     } else {
       drawMe = false;
     }
+    wrappedLines = wrapName(siteName);
   }
 
   // New format - name only, booleans default to false
@@ -219,6 +221,7 @@ class DataObjectAd
     } else {
       drawMe = false;
     }
+    wrappedLines = wrapName(siteName);
   }
 
   // Initiate advertiser objects
@@ -447,6 +450,8 @@ class DataObjectAd
   // Draw just the label (rect + text) - seperated to help with PDF layer separation
   void drawAdLabel(float baseline, float ascent, float textHeight, color rectColor, color textColor, boolean drawRect) {
     if (!drawAdNames) return;
+    if (wrappedLines == null || wrappedLines.length == 0) return;
+
     pg.pushMatrix();
     pg.translate(location.x, location.y);
     pg.rotate(theta);
@@ -455,21 +460,34 @@ class DataObjectAd
     float rightEdge = abs(newR * cos(theta)) + abs(newR * sin(theta));
     rightEdge += xThickness / 2.0;
 
+    // Measure the widest wrapped line to size the rect correctly
+    pg.textFont(labelFontMono);
+    pg.textSize(fontSize);
+    float maxLineWidth = 0;
+    for (String line : wrappedLines) {
+      float w = pg.textWidth(line);
+      if (w > maxLineWidth) maxLineWidth = w;
+    }
+
+    float localAscent  = pg.textAscent();
+    float localDescent = pg.textDescent();
+    float localLineH   = localAscent + localDescent;
+    int   numLines     = wrappedLines.length;
+    float totalH       = localLineH * numLines;
+
     float textX, rectX;
 
     if (labelLeft) {
-      // Draw label to the left — offset by text width and padding
-      textX = -(rightEdge + textPadding + cachedTextWidth);
+      textX = -(rightEdge + textPadding + maxLineWidth);
       rectX = textX - innerPad;
     } else {
-      // Draw label to the right — existing behaviour
       textX = rightEdge + textPadding;
       rectX = textX - innerPad;
     }
 
-    float rectY = baseline - ascent - innerPad;
-    float rectW = cachedTextWidth + (innerPad * 2.0);
-    float rectH = textHeight + (innerPad * 2.0);
+    float rectY = baseline - localAscent - innerPad;
+    float rectW = maxLineWidth + (innerPad * 2.0);
+    float rectH = totalH + (innerPad * 2.0);
 
     pg.pushMatrix();
     pg.rotate(-theta);
@@ -482,10 +500,48 @@ class DataObjectAd
     }
 
     pg.fill(textColor);
-    pg.text(mySiteName, textX, baseline);
+    pg.textAlign(LEFT);
+    for (int li = 0; li < numLines; li++) {
+      pg.text(wrappedLines[li], textX, baseline + li * localLineH);
+    }
 
     pg.popMatrix();
     pg.popMatrix();
+  }
+
+  // Splits mySiteName into lines of at most WRAP_CHARS characters,
+  // breaking at word boundaries (spaces, hyphens, dots) where possible.
+  static final int WRAP_CHARS = 20;
+
+  String[] wrapName(String name) {
+    if (name == null || name.length() == 0) return new String[]{ "" };
+    if (name.length() <= WRAP_CHARS) return new String[]{ name };
+
+    ArrayList<String> lines = new ArrayList<String>();
+    String remaining = name.trim();
+
+    while (remaining.length() > WRAP_CHARS) {
+      // Search backwards from WRAP_CHARS for a break character (space, hyphen, dot)
+      int breakAt = -1;
+      for (int ci = WRAP_CHARS; ci > 0; ci--) {
+        char ch = remaining.charAt(ci);
+        if (ch == ' ' || ch == '-' || ch == '.') {
+          breakAt = ci + 1; // break after the delimiter so it stays on the first line
+          break;
+        }
+      }
+      if (breakAt == -1 || breakAt > remaining.length()) {
+        // No break character found — hard break at WRAP_CHARS
+        lines.add(remaining.substring(0, WRAP_CHARS));
+        remaining = remaining.substring(WRAP_CHARS).trim();
+      } else {
+        lines.add(remaining.substring(0, breakAt).trim());
+        remaining = remaining.substring(breakAt).trim();
+      }
+    }
+    if (remaining.length() > 0) lines.add(remaining);
+
+    return lines.toArray(new String[0]);
   }
 }
 

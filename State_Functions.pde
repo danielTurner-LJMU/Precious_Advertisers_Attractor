@@ -141,6 +141,7 @@ void draw1() {
       drawPreview();         // copies offscreen buffer to stage
       handleNotices();       // rendering and exporting notices — drawn after preview so they appear on top
       handleExport();        // deferred export with frame delay
+      handleUpscaleExport(); // deferred upscale tiff export (A2/A1)
       handleHover();         // rollover detection — only runs when mouse is in preview area
       drawHoverTooltip();
     } else {

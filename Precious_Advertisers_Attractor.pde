@@ -142,7 +142,7 @@ void checkHover() {
 // Builds the shared base name from the current timestamp and label.
 // Call this once at the start of an export and store in currentExportBaseName.
 String generateBaseName(String label) {
-  return "Precious_Advertisers - " +
+  return "Precious_Advertisers_Timeline - " +
     year() + "-" + nf(month(), 2) + "-" + nf(day(), 2) +
     " - " + nf(hour(), 2) + "-" + nf(minute(), 2) + "-" + nf(second(), 2) +
     " - " + currentPrintSize + " - " + label;
@@ -176,6 +176,18 @@ void savePDF() {
 void outputTiffAndPDF() {
   exportMode = 3;
   exportFrameDelay = 2;
+}
+
+// ControlP5 hook - called by the Save A2 Tiff bang button
+void outputA2Tiff() {
+  upscaleExportMode = 1;
+  upscaleFrameDelay = 2;
+}
+
+// ControlP5 hook - called by the Save A1 Tiff bang button
+void outputA1Tiff() {
+  upscaleExportMode = 2;
+  upscaleFrameDelay = 2;
 }
 
 /**

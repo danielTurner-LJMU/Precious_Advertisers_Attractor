@@ -425,26 +425,38 @@ void initMainControls() {
   cp5.addBang("outputTiff")
     .setLabel("Save Image")
     .setPosition(baseX, baseY + cSpaceY * 0.25)
-    .setSize(100, 40)
+    .setSize(75, 40)
     ;
-
   styleMain("outputTiff");
 
   cp5.addBang("savePDF")
     .setLabel("Save PDF")
-    .setPosition(baseX + (cSpaceX * 2), baseY + cSpaceY * 0.25)
-    .setSize(100, 40)
+    .setPosition(baseX + (cSpaceX * 1.4), baseY + cSpaceY * 0.25)
+    .setSize(75, 40)
     ;
-
   styleMain("savePDF");
 
   cp5.addBang("outputTiffAndPDF")
-    .setLabel("Save image and PDF")
-    .setPosition(baseX + (cSpaceX * 4), baseY + cSpaceY * 0.25)
-    .setSize(100, 40)
+    .setLabel("Save image\nand PDF")
+    .setPosition(baseX + (cSpaceX * 2.8), baseY + cSpaceY * 0.25)
+    .setSize(75, 40)
     ;
-
   styleMain("outputTiffAndPDF");
+
+  // Upscale TIFF exports — on same row as other output buttons
+  cp5.addBang("outputA2Tiff")
+    .setLabel("Save A2\nTiff")
+    .setPosition(baseX + cSpaceX * 4.2, baseY + cSpaceY * 0.25)
+    .setSize(75, 40)
+    ;
+  styleMain("outputA2Tiff");
+
+  cp5.addBang("outputA1Tiff")
+    .setLabel("Save A1\nTiff")
+    .setPosition(baseX + cSpaceX * 5.6, baseY + cSpaceY * 0.25)
+    .setSize(75, 40)
+    ;
+  styleMain("outputA1Tiff");
 }
 
 //Output size selector

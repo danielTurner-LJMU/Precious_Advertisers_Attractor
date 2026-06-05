@@ -162,6 +162,9 @@ void autoGenerateInBackground() {
     //animate generating graphics so people know something is happening.
     pushMatrix();
     translate(previewCentreX, previewCentreY);
+    textFont(labelFontMono);
+    textSize(18);
+    textAlign(CENTER, CENTER);
     fill(cTheme);
     text("GENERATING", 0, 0);
     rectMode(CENTER);
@@ -174,6 +177,9 @@ void autoGenerateInBackground() {
     //update text to show it is rendering in case this takes a while
     pushMatrix();
     translate(previewCentreX, previewCentreY);
+    textFont(labelFontMono);
+    textSize(18);
+    textAlign(CENTER, CENTER);
     fill(cTheme);
     noStroke();
     text("RENDERING", 0, 0);
@@ -749,4 +755,218 @@ void drawExportingNotice() {
   rectMode(CENTER);
   textAlign(CENTER);
   popMatrix();
+}
+
+//
+// Upscale print sizes at 300dpi — larger than the interactive print sizes
+// so kept separate and only available as direct export actions.
+// A2 = 4961 × 7016 px,  A1 = 7016 × 9933 px  (portrait, 300 dpi)
+//
+// Strategy: create a temporary oversized PGraphics, redirect pg to it,
+// scale all geometry (border, stroke, font, X size, arrivalRadius) proportionally
+// from the current buffer, draw once, save, then restore everything.
+// The interactive buffer (pgRaster) is untouched throughout.
+
+PVector[] upscalePrintSize = {
+  new PVector(4961, 7016),  // A2 @ 300dpi
+  new PVector(7016, 9933)   // A1 @ 300dpi
+};
+String[] upscalePrintSizeLabel = { "A2", "A1" };
+
+// Deferred upscale export — same frame-delay pattern as the regular export
+int upscaleExportMode  = 0;  // 1 = A2, 2 = A1
+int upscaleFrameDelay  = 0;
+
+// Called from draw1() alongside handleExport()
+void handleUpscaleExport() {
+  if (upscaleExportMode == 0) return;
+
+  if (upscaleFrameDelay > 0) {
+    upscaleFrameDelay--;
+    return;
+  }
+
+  int idx = upscaleExportMode - 1;
+  outputUpscaleTiff(idx);
+  upscaleExportMode = 0;
+}
+
+/**
+ * Renders and saves a TIFF at upscale size (A2 or A1).
+ *
+ * All geometry that depends on buffer dimensions is re-derived at the
+ * new scale. Slider-driven values (strokeThick, fontSize, xScale,
+ * xThickness, targetRadius, targetOpacity, arrivalRadius) are scaled
+ * proportionally by the ratio of new buffer height to current buffer height.
+ *
+ * The current interactive buffer (pgRaster / pg) is fully restored
+ * after the export so the preview is unaffected.
+ *
+ * @param sizeIndex  0 = A2, 1 = A1
+ */
+void outputUpscaleTiff(int sizeIndex) {
+
+  PVector targetSize = upscalePrintSize[sizeIndex].copy();
+  String  sizeLabel  = upscalePrintSizeLabel[sizeIndex];
+
+  // If current print size is square, use the shortest edge of the upscale
+  // size on both axes so the export is also square.
+  boolean isSquare = (printSize[printSizeSelect].x == printSize[printSizeSelect].y);
+  if (isSquare) {
+    float shortEdge = min(targetSize.x, targetSize.y);
+    targetSize.set(shortEdge, shortEdge);
+    sizeLabel = sizeLabel + " Square";
+  }
+
+  // --- Compute scale ratio relative to current interactive buffer ---
+  float scaleRatio = targetSize.y / (float) pgRaster.height;
+
+  // --- Snapshot all slider-driven values ---
+  float savedBorder        = border;
+  float savedStrokeThick   = strokeThick;
+  float savedFontSize      = fontSize;
+  float savedXScale        = xScale;
+  float savedXThickness    = xThickness;
+  float savedTargetRadius  = targetRadius;
+  float savedTargetOpacity = targetOpacity;
+  float savedArrivalRadius = arrivalRadius;
+  float savedTextPadding   = textPadding;
+  float savedInnerPad      = innerPad;
+
+  // --- Create oversized buffer and redirect pg ---
+  PGraphics pgUpscale = createGraphics(int(targetSize.x), int(targetSize.y));
+  PGraphics savedPg   = pg;
+  pg = pgUpscale;
+
+  // --- Scale geometry parameters ---
+  border        = savedBorder;          // border is a % so unchanged
+  strokeThick   = savedStrokeThick  * scaleRatio;
+  fontSize      = savedFontSize     * scaleRatio;
+  xScale        = savedXScale       * scaleRatio;
+  xThickness    = savedXThickness   * scaleRatio;
+  targetRadius  = savedTargetRadius * scaleRatio;
+  targetOpacity = savedTargetOpacity;   // opacity is absolute, unchanged
+  arrivalRadius = savedArrivalRadius * scaleRatio;
+  textPadding   = savedTextPadding  * scaleRatio;
+  innerPad      = savedInnerPad     * scaleRatio;
+
+  // Re-derive border pixels and login line for new buffer size
+  calculateBorder();
+  calculateLoginLine();
+
+  // Re-cache text widths at scaled font size so label rects and positions are correct
+  pg.beginDraw();
+  pg.textFont(labelFontMono);
+  pg.textSize(fontSize);
+  for (DataObjectAd i : dataObjectsAd) {
+    i.cachedTextWidth = pg.textWidth(i.mySiteName);
+  }
+  pg.endDraw();
+
+  // Scale all ad object positions and history from interactive buffer coordinates
+  // to upscale buffer coordinates — preserves the preview appearance exactly.
+  for (DataObjectAd i : dataObjectsAd) {
+    i.location.mult(scaleRatio);
+    i.velocity.mult(scaleRatio);
+    for (PVector v : i.history) {
+      v.mult(scaleRatio);
+    }
+  }
+
+  // --- Draw into the upscale buffer ---
+  pg.beginDraw();
+  pg.background(255);
+  pg.strokeCap(sqCaps ? PROJECT : ROUND);
+
+  for (DataObjectLogin i : dataObjectsLogin) {
+    i.update();
+    i.drawLogin();
+  }
+
+  if (drawRangeDates) {
+    drawDates();
+  }
+
+  step = max(10, ceil(strokeThick / 8));
+
+  pg.blendMode(MULTIPLY);
+  for (DataObjectAd i : dataObjectsAd) {
+    if (i.drawMe) i.drawAdLines();
+  }
+  pg.blendMode(BLEND);
+
+  pg.textFont(labelFontMono);
+  pg.textSize(fontSize);
+  float ascent     = pg.textAscent();
+  float descent    = pg.textDescent();
+  float textHeight = ascent + descent;
+  float baseline   = (ascent + descent) * 0.5 * 0.8;
+
+  pg.textAlign(LEFT);
+  for (DataObjectAd i : dataObjectsAd) {
+    if (i.drawMe) {
+      i.drawAdX();
+      if (drawAdBlocks) {
+        i.drawAdLabel(baseline, ascent, textHeight, xColor, xWhite ? color(0) : color(255), true);
+      } else {
+        i.drawAdLabel(baseline, ascent, textHeight, color(0), color(0), false);
+      }
+    }
+  }
+
+  pg.endDraw();
+
+  // --- Save ---
+  // Always generate a fresh folder for upscale exports, named with size label and pixel dimensions.
+  String dims = int(targetSize.x) + "x" + int(targetSize.y);
+  String upscaleBaseName = "Precious_Advertisers_Timeline - " +
+    year() + "-" + nf(month(), 2) + "-" + nf(day(), 2) +
+    " - " + nf(hour(), 2) + "-" + nf(minute(), 2) + "-" + nf(second(), 2) +
+    " - " + sizeLabel + " " + dims + " - " + fileNameAppend;
+  String outputFileName = "x - output/" + upscaleBaseName + "/" + upscaleBaseName + ".tif";
+  pg.save(outputFileName);
+  String savedBaseName = currentExportBaseName;
+  currentExportBaseName = upscaleBaseName;
+  saveColophon(new String[]{ outputFileName });
+  currentExportBaseName = savedBaseName;
+  println("Upscale export saved: " + outputFileName);
+
+  // --- Restore everything ---
+  pg            = savedPg;
+  border        = savedBorder;
+  strokeThick   = savedStrokeThick;
+  fontSize      = savedFontSize;
+  xScale        = savedXScale;
+  xThickness    = savedXThickness;
+  targetRadius  = savedTargetRadius;
+  targetOpacity = savedTargetOpacity;
+  arrivalRadius = savedArrivalRadius;
+  textPadding   = savedTextPadding;
+  innerPad      = savedInnerPad;
+
+  // Restore geometry for the interactive buffer
+  calculateBorder();
+  calculateLoginLine();
+
+  // Inverse-scale ad positions back to interactive buffer coordinates
+  float inverseRatio = 1.0 / scaleRatio;
+  for (DataObjectAd i : dataObjectsAd) {
+    i.location.mult(inverseRatio);
+    i.velocity.mult(inverseRatio);
+    for (PVector v : i.history) {
+      v.mult(inverseRatio);
+    }
+  }
+
+  // Re-cache text widths at original font size
+  pg.beginDraw();
+  pg.textFont(labelFontMono);
+  pg.textSize(fontSize);
+  for (DataObjectAd i : dataObjectsAd) {
+    i.cachedTextWidth = pg.textWidth(i.mySiteName);
+  }
+  pg.endDraw();
+
+  // Dispose the upscale buffer to free memory
+  pgUpscale.dispose();
 }
