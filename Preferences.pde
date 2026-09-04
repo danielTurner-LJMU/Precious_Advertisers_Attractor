@@ -33,18 +33,40 @@ void initPreferences() {
     pPreferences = loadStrings(dataPath(prefFilePath));
 
     if (pPreferences.length > 0) { //check there is a line of text in the file
-      //set parentFolderPath to first line of text
-      parentFolderPath = pPreferences[0];
+      String rememberedPath = pPreferences[0];
 
-      // Split full path into components
-      parentFolderName = split(parentFolderPath, '/');
+      // The remembered folder may no longer be there — an external drive that
+      // is not plugged in, a folder moved or renamed, or a path saved under a
+      // different user account on a previous machine, which is the case that
+      // found this. Only the FILE was being checked, never the folder it
+      // names, so a stale path still offered CONFIRM and sent the program on
+      // to read JSON out of somewhere that does not exist.
+      File rememberedFolder = new File(rememberedPath);
 
-      // Extract the last folder name for display
-      folderName = parentFolderName[parentFolderName.length - 1];
+      if (rememberedFolder.exists() && rememberedFolder.isDirectory()) {
+        //set parentFolderPath to first line of text
+        parentFolderPath = rememberedPath;
 
-      // If on state 0 (e.g., startup screen), show confirm controller
-      if (state == 0) {
-        showController("confirm", true);
+        // Split full path into components
+        parentFolderName = split(parentFolderPath, '/');
+
+        // Extract the last folder name for display
+        folderName = parentFolderName[parentFolderName.length - 1];
+
+        // If on state 0 (e.g., startup screen), show confirm controller
+        if (state == 0) {
+          showController("confirm", true);
+        }
+      } else {
+        // Behave exactly as if no preference had been saved: leave
+        // parentFolderPath unset, leave CONFIRM hidden, and let the participant
+        // choose a folder. Selecting one overwrites the stale entry, so this
+        // recovers itself without anyone editing the file by hand. Said out
+        // loud in the console rather than failing silently, so the reason is
+        // visible if the program is opened and appears to have forgotten.
+        println("Saved data folder is no longer available:");
+        println("  " + rememberedPath);
+        println("Please select the data folder again.");
       }
     }
   }
